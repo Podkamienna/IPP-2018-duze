@@ -5,19 +5,16 @@
 #ifndef DROGI_DICTIONARY_H
 #define DROGI_DICTIONARY_H
 
-#include "definitions.h"
-
 #include <stdbool.h>
 
+typedef struct Dictionary Dictionary;
 
-Dictionary *initializeDictionary(int hash);
+Dictionary *initializeDictionary();
 
-void *searchDictionary(Dictionary *dictionary, char *name);
+void *searchDictionary(Dictionary *dictionary, const char *name);
 
-bool *insertDictionary(Dictionary *dictionary, char *name, void *getNewNode(void));
+bool insertDictionary(Dictionary *dictionary, const char *name, void *content);
 
-bool deleteDictionary(Dictionary *dictionary, char *name);
-
-void freeDictionary(Dictionary *dictionary, void freeContent());
+void freeDictionary(Dictionary *dictionary, void *freeContent(void *));
 
 #endif //DROGI_DICTIONARY_H

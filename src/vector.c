@@ -22,6 +22,10 @@ static bool resizeVector(Vector *vector) {
 }
 
 bool pushVector(Vector *vector, void *value) {
+    if (vector == NULL) {
+        return false;
+    }
+
     if (vector->size + 1 > vector->maxSize) {
         if (!resizeVector(vector)) {
             return false;

@@ -3,22 +3,52 @@
 //
 
 #include "dictionary.h"
-#include "definitions.h"
 
 #include <stdbool.h>
 #include <string.h>
 #include <stdlib.h>
+#include <stdint.h>
 
+typedef struct Dictionary Dictionary;
+typedef struct Tree Tree;
+typedef struct EntryList EntryList;
 
-int getHash(char *text) {
-    int n = strlen(text);
-    int tmp = 1, tmpHash = 0;
-    for (int i = 0; i < n; i++) {
-        tmpHash += tmp * text[i];
-        tmp *= GENERATOR;
+struct Dictionary {
+    int id;
+    Tree *tree;
+};
+
+struct Tree {
+    EntryList *entries; //entries with certain hash
+    uint64_t hash;
+    Tree *next, *prev;
+};
+
+struct EntryList {
+    EntryList *next;
+    char *name;
+    void *content;
+};
+
+static const uint64_t PRIME = 179425373; //big prime number
+static const uint64_t GENERATOR = 259; //number that generates multiplicative group Z_MOD(PRIME)
+
+/**
+ * getHash is not NULL
+ * @param text
+ * @return
+ */
+static uint64_t getHash(const char *text) {
+    size_t n = strlen(text);
+    uint64_t coefficient = 1, tmpHash = 0;
+
+    for (size_t i = 0; i < n; i++) {
+        tmpHash += coefficient * text[i];
+        coefficient *= GENERATOR;
         tmpHash %= PRIME;
-        tmp %= PRIME;
+        coefficient %= PRIME;
     }
+
     return tmpHash;
 }
 
@@ -32,22 +62,40 @@ Dictionary *initializeDictionary() {
 
     return newDictionary;
 }
+
 /**
- * The dictionary is not NULL, returns the list node that was searched for or NULL if there was nothing found
  * @param dictionary
  * @param name
  * @param hash
- * @return
+ * @return NULL if name is NULL or dictionary is NULL or the entry that is being searched
+ * for doesn't exist
  */
-void *searchDictionary(Dictionary *dictionary, char *name) {
-    Tree *tmp = dictionary->tree;
-    int hash = getHash(name);
 
-    while (tmp != NULL || (hash != tmp->hash || strcmp(name, tmp->name) != 0)) {
-        tmp = tmp->next;
+void *searchDictionary(Dictionary *dictionary, const char *name) {
+    if (dictionary == NULL || name == NULL)
+        return NULL;
+    Tree *treePosition = dictionary->tree;
+    uint64_t hash = getHash(name);
+
+    while (treePosition != NULL && hash != treePosition->hash) {
+        treePosition = treePosition->next;
     }
 
-    return tmp;
+    if (treePosition == NULL) {
+        return NULL;
+    }
+
+    EntryList *listPosition = treePosition->entries;
+
+    while (listPosition != NULL && strcmp(listPosition->name, name) != 0) {
+        listPosition = listPosition->next;
+    }
+
+    if (listPosition == NULL) {
+        return NULL;
+    }
+
+    return listPosition->content;
 }
 /**
  * the dictionary is not NULL
@@ -57,21 +105,14 @@ void *searchDictionary(Dictionary *dictionary, char *name) {
  * @param hash
  * @return
  */
-bool *insertDictionary(Dictionary *dictionary, char *name, void *getNewContent(void)) {
-    Tree *node = malloc(sizeof(Tree));
-    int hash = getHash(name);
-
-    if (node == NULL) {
+bool insertDictionary(Dictionary *dictionary, const char *name, void *content) {
+    if (dictionary == NULL || name == NULL || content == NULL) {
         return false;
     }
 
-    void *newContent = getNewContent();
+    uint64_t hash = getHash(name);
 
-    if (newContent == NULL) {
-        return false;
-    }
-
-    node->name = malloc(strlen(name)*sizeof(char));
+    node->name = malloc(strlen(name) * sizeof(char));
 
     for (int i = 0; i < strlen(name); i++) {
         node->name[i] = name[i];
@@ -87,49 +128,7 @@ bool *insertDictionary(Dictionary *dictionary, char *name, void *getNewContent(v
     return true;
 }
 
-/**
- * dictionary is not NULL
- * @param dictionary
- * @param name
- * @return
- */
-bool deleteDictionary(Dictionary *dictionary, char *name) {
-    Tree *tmp = searchDictionary(dictionary, name);
-
-    if (tmp == NULL) {
-        return false;
-    }
-
-    if (tmp->prev == NULL && tmp->next == NULL) {
-        free(tmp);
-        dictionary->tree = NULL;
-
-        return true;
-    }
-
-    if (tmp->prev == NULL) {
-        tmp->next->prev = NULL;
-        dictionary->tree = tmp->next;
-        free(tmp);
-
-        return true;
-    }
-
-    if (tmp->next == NULL) {
-        tmp->prev->next = NULL;
-        free(tmp);
-
-        return true;
-    }
-
-    tmp->prev->next = tmp->next;
-    tmp->next->prev = tmp->prev;
-    free(tmp);
-    return true;
-
-}
-
-void freeDictionary(Dictionary *dictionary, void freeContent()) {
+void freeDictionary(Dictionary *dictionary, void *freeContent(void *)) {
     Tree *tmp1 = dictionary->tree, *tmp2;
 
     while (tmp1 != NULL) {
