@@ -33,7 +33,9 @@ set(SOURCE_FILES
         src/list.c
         src/list.h
         src/citiesAndRoads.c
-        src/citiesAndRoads.h)
+        src/citiesAndRoads.h
+        src/set.c
+        src/set.h)
 
 # Wskazujemy plik wykonywalny.
 add_executable(map ${SOURCE_FILES})
