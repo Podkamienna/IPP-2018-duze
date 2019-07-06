@@ -14,6 +14,8 @@ Set *initializeSet();
 
 void *searchSet(bool isOk(void *));
 
+bool *insertSet(void *content);
+
 void freeSet();
 
 #endif /* DROGI_SET_H */

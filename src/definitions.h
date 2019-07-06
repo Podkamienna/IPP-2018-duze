@@ -6,6 +6,7 @@
 #define DROGI_DEFINITIONS_H
 
 #include "dictionary.h"
+#include "set.h"
 
 typedef struct City City;
 typedef struct Road Road;
