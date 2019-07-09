@@ -33,7 +33,9 @@ set(SOURCE_FILES
         src/citiesAndRoads.c
         src/citiesAndRoads.h
         src/set.c
-        src/set.h)
+        src/set.h
+        src/hashTable.c
+        src/hashTable.h)
 
 # Wskazujemy plik wykonywalny.
 add_executable(map ${SOURCE_FILES})

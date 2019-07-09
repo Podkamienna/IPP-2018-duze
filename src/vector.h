@@ -21,7 +21,7 @@ Vector *initializeVector(size_t initialSize);
 
 bool pushVector(Vector *vector, void *value);
 
-void freeVector(Vector *vector, void freeValue(void *));
+void deleteVector(Vector *vector, void deleteValue(void *));
 
 
 #endif /* DROGI_VECTOR_H */

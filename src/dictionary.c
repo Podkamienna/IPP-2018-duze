@@ -10,43 +10,24 @@
 #include <stdlib.h>
 #include <stdint.h>
 
+static const size_t INITIAL_HASH_TABLE_SIZE = 100;
+static const size_t LOAD_FACTOR_MULTIPLIER = 3;
+static const size_t LOAD_FACTOR_DIVIDER = 4;
+
+
 typedef struct Dictionary Dictionary;
 typedef struct HashTable HashTable;
-typedef struct EntryList EntryList;
-
-static const uint64_t PRIME = 179425373; //big prime number
-static const uint64_t GENERATOR = 259; //number that generates the multiplicative group Z_MOD(PRIME)
-static const uint64_t INITIAL_HASH_TABLE_SIZE = 100;
-/**
- * getHash is not NULL
- * @param text
- * @return
- */
-static size_t getHash(const char *text) {
-    size_t n = strlen(text);
-    uint64_t coefficient = 1, tmpHash = 0;
-
-    for (size_t i = 0; i < n; i++) {
-        tmpHash += coefficient * text[i];
-        coefficient *= GENERATOR;
-        tmpHash %= PRIME;
-        coefficient %= PRIME;
-    }
-
-    return tmpHash;
-}
-
+typedef struct Entry Entry;
 
 struct Dictionary {
-    uint64_t id;
+    size_t id;
     HashTable *hashTable;
 };
 
-struct HashTable {
-    Vector *table; //entries with certain hash
-    uint64_t size;
-    uint64_t numberOfUsed;
-};
+
+static bool isFull(HashTable *hashTable) {
+    return true;
+}
 
 Dictionary *initializeDictionary() {
     Dictionary *newDictionary = malloc(sizeof(Dictionary));
@@ -68,7 +49,7 @@ Dictionary *initializeDictionary() {
     newDictionary->hashTable->table = initializeVector(INITIAL_HASH_TABLE_SIZE);
     newDictionary->hashTable->size = INITIAL_HASH_TABLE_SIZE;
 
-    if(newDictionary->hashTable->table == NULL) {
+    if (newDictionary->hashTable->table == NULL) {
         free(newDictionary->hashTable);
         free(newDictionary);
 
@@ -84,7 +65,7 @@ bool resizeDictionary(Dictionary *dictionary) {
     }
 
     dictionary->hashTable->size = dictionary->hashTable->table->maxSize;
-    
+
 }
 
 /**
@@ -96,21 +77,7 @@ bool resizeDictionary(Dictionary *dictionary) {
  */
 
 void *searchDictionary(Dictionary *dictionary, const char *name, bool isRight(void *, string)) {
-    if (dictionary == NULL || name == NULL) {
-        return NULL;
-    }
 
-    size_t i = getHash(name) % dictionary->hashTable->size;
-
-    while (dictionary->hashTable->table->data[i] != NULL && !isRight(dictionary->hashTable->table->data[i], name)) {
-        i = (i + 1) % (dictionary->hashTable->size + 1);
-    }
-
-    if (dictionary->hashTable->table->data[i] == NULL) {
-        return NULL;
-    }
-
-    return dictionary->hashTable->table->data[i];
 }
 /**
  * the dictionary is not NULL

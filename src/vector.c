@@ -33,9 +33,10 @@ Vector *initializeVector(size_t initialSize) {
         return NULL;
     }
 
-    newVector->data = malloc(initialSize*sizeof(void *));
+    newVector->data = malloc(initialSize * sizeof(void *));
 
     if (newVector->data == NULL) {
+        free(newVector);
         return NULL;
     }
 
@@ -92,14 +93,14 @@ bool insertAfterVector(Vector *vector, void *value, size_t location) { //jaki ty
     }
 }
 
-void freeVector(Vector *vector, void freeValue(void *)) {
+void deleteVector(Vector *vector, void deleteValue(void *)) {
     if (vector == NULL) {
         return;
     }
 
-    if (vector->data != NULL && freeValue != NULL) {
+    if (vector->data != NULL && deleteValue != NULL) {
         for (size_t i = 0; i < vector->size; i++) {
-            freeValue(vector->data[i]);
+            deleteValue(vector->data[i]);
         }
     }
 
