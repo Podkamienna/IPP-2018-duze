@@ -3,7 +3,7 @@
 //
 
 #include "dictionary.h"
-#include "vector.h"
+#include "hashTable.h"
 
 #include <stdbool.h>
 #include <string.h>
@@ -22,11 +22,13 @@ typedef struct Entry Entry;
 struct Dictionary {
     size_t id;
     HashTable *hashTable;
+    size_t size;
+    size_t numberOfElements;
 };
 
 
-static bool isFull(HashTable *hashTable) {
-    return true;
+static bool isFull(Dictionary *dictionary) {
+    return LOAD_FACTOR_DIVIDER*dictionary->numberOfElements >= LOAD_FACTOR_MULTIPLIER*dictionary->size;
 }
 
 Dictionary *initializeDictionary() {
@@ -37,35 +39,17 @@ Dictionary *initializeDictionary() {
     }
 
     newDictionary->id = 0;
-    newDictionary->hashTable = malloc(sizeof(HashTable));
+    newDictionary->hashTable = initializeHashTable(INITIAL_HASH_TABLE_SIZE);
 
     if (newDictionary->hashTable == NULL) {
         free(newDictionary);
-
         return NULL;
     }
 
-    newDictionary->hashTable->numberOfUsed = 0;
-    newDictionary->hashTable->table = initializeVector(INITIAL_HASH_TABLE_SIZE);
-    newDictionary->hashTable->size = INITIAL_HASH_TABLE_SIZE;
-
-    if (newDictionary->hashTable->table == NULL) {
-        free(newDictionary->hashTable);
-        free(newDictionary);
-
-        return NULL;
-    }
+    newDictionary->numberOfElements = 0;
+    newDictionary->size = INITIAL_HASH_TABLE_SIZE;
 
     return newDictionary;
-}
-//zakladam, ze dictionary nie jest NULLem i dictionary->hashTable też
-bool resizeDictionary(Dictionary *dictionary) {
-    if (!resizeVector(dictionary->hashTable->table)) {
-        return false;
-    }
-
-    dictionary->hashTable->size = dictionary->hashTable->table->maxSize;
-
 }
 
 /**
@@ -76,8 +60,8 @@ bool resizeDictionary(Dictionary *dictionary) {
  * for doesn't exist
  */
 
-void *searchDictionary(Dictionary *dictionary, const char *name, bool isRight(void *, string)) {
-
+void *searchDictionary(Dictionary *dictionary, const char *name) {
+    return searchHashTable(dictionary->hashTable, name);
 }
 /**
  * the dictionary is not NULL
@@ -87,24 +71,35 @@ void *searchDictionary(Dictionary *dictionary, const char *name, bool isRight(vo
  * @param hash
  * @return
  */
-bool insertDictionary(Dictionary *dictionary, const char *name, void *content) {
-    if (dictionary == NULL || name == NULL || content == NULL || dictionary->hashTable == NULL) {
+bool insertDictionary(Dictionary *dictionary, const char *name, void *value, void deleteValue(void *)) {
+    if (dictionary == NULL || name == NULL || value == NULL || dictionary->hashTable == NULL) {
         return false;
     }
 
-    if (2 * dictionary->hashTable->numberOfUsed > dictionary->hashTable->size) { //Czy taka licza jest ok???
-        resizeDictionary(dictionary);
+    if (isFull(dictionary)) {
+        HashTable *newHashTable = resizeHashTable(dictionary->hashTable, 2*dictionary->size);
+
+        if (newHashTable == NULL) {
+            return false;
+        }
+
+        if (!insertHashTable(newHashTable, name, value)) {
+            deleteHashTable(newHashTable, deleteValue);
+            return false;
+        }
+
+        dictionary->hashTable = newHashTable;
+        return true;
     }
 
+    if (!insertHashTable(dictionary->hashTable, name, value)) {
+        return false;
+    }
 
+    return true;
 }
 
-void freeDictionary(Dictionary *dictionary, void *freeContent(void *)) {
-    while (tmp1 != NULL) {
-        freeContent(tmp1->content);
-        tmp2 = tmp1;
-        free(tmp1->name);
-        tmp1 = tmp1->next;
-        free(tmp2);
-    }
+void deleteDictionary(Dictionary *dictionary, void deleteValue(void *)) {
+    deleteHashTable(dictionary->hashTable, deleteValue);
+    free(dictionary);
 }

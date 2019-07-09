@@ -11,10 +11,10 @@ typedef struct Dictionary Dictionary;
 
 Dictionary *initializeDictionary();
 
-void *searchDictionary(Dictionary *dictionary, const char *name, bool isRight(void *, string));
+void *searchDictionary(Dictionary *dictionary, const char *name);
 
-bool insertDictionary(Dictionary *dictionary, const char *name, void *content);
+bool insertDictionary(Dictionary *dictionary, const char *name, void *value, void deleteValue(void *));
 
-void freeDictionary(Dictionary *dictionary, void *freeContent(void *));
+void deleteDictionary(Dictionary *dictionary, void deleteValue(void *));
 
 #endif //DROGI_DICTIONARY_H
