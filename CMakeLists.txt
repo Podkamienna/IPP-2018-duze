@@ -30,8 +30,6 @@ set(SOURCE_FILES
         src/definitions.h
         src/vector.c
         src/vector.h
-        src/list.c
-        src/list.h
         src/citiesAndRoads.c
         src/citiesAndRoads.h
         src/set.c

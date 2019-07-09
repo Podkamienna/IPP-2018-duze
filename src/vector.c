@@ -6,8 +6,12 @@
 #include <stdlib.h>
 #include <stdbool.h>
 
-static bool resizeVector(Vector *vector) {
+bool resizeVector(Vector *vector) {
     void **newData;
+    if (vector == NULL) {
+        return false;
+    }
+
     size_t newSize = 2 * vector->maxSize + 4;
 
     newData = realloc(vector->data, newSize * sizeof(void *));

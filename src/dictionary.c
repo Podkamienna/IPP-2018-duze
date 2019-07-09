@@ -77,6 +77,15 @@ Dictionary *initializeDictionary() {
 
     return newDictionary;
 }
+//zakladam, ze dictionary nie jest NULLem i dictionary->hashTable też
+bool resizeDictionary(Dictionary *dictionary) {
+    if (!resizeVector(dictionary->hashTable->table)) {
+        return false;
+    }
+
+    dictionary->hashTable->size = dictionary->hashTable->table->maxSize;
+    
+}
 
 /**
  * @param dictionary
@@ -91,7 +100,7 @@ void *searchDictionary(Dictionary *dictionary, const char *name, bool isRight(vo
         return NULL;
     }
 
-    size_t i = getHash(name);
+    size_t i = getHash(name) % dictionary->hashTable->size;
 
     while (dictionary->hashTable->table->data[i] != NULL && !isRight(dictionary->hashTable->table->data[i], name)) {
         i = (i + 1) % (dictionary->hashTable->size + 1);
@@ -112,18 +121,18 @@ void *searchDictionary(Dictionary *dictionary, const char *name, bool isRight(vo
  * @return
  */
 bool insertDictionary(Dictionary *dictionary, const char *name, void *content) {
-    if (dictionary == NULL || name == NULL || content == NULL) {
+    if (dictionary == NULL || name == NULL || content == NULL || dictionary->hashTable == NULL) {
         return false;
     }
 
-    uint64_t hash = getHash(name);
+    if (2 * dictionary->hashTable->numberOfUsed > dictionary->hashTable->size) { //Czy taka licza jest ok???
+        resizeDictionary(dictionary);
+    }
 
 
 }
 
 void freeDictionary(Dictionary *dictionary, void *freeContent(void *)) {
-    Tree *tmp1 = dictionary->tree, *tmp2;
-
     while (tmp1 != NULL) {
         freeContent(tmp1->content);
         tmp2 = tmp1;

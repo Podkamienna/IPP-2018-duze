@@ -15,6 +15,8 @@ struct Vector {
     void **data;
 };
 
+bool resizeVector(Vector *vector);
+
 Vector *initializeVector(size_t initialSize);
 
 bool pushVector(Vector *vector, void *value);
