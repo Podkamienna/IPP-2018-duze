@@ -3,6 +3,7 @@
 //
 
 #include "dictionary.h"
+#include "vector.h"
 
 #include <stdbool.h>
 #include <string.h>
@@ -10,35 +11,18 @@
 #include <stdint.h>
 
 typedef struct Dictionary Dictionary;
-typedef struct Tree Tree;
+typedef struct HashTable HashTable;
 typedef struct EntryList EntryList;
 
-struct Dictionary {
-    int id;
-    Tree *tree;
-};
-
-struct Tree {
-    EntryList *entries; //entries with certain hash
-    uint64_t hash;
-    Tree *next, *prev;
-};
-
-struct EntryList {
-    EntryList *next;
-    char *name;
-    void *content;
-};
-
 static const uint64_t PRIME = 179425373; //big prime number
-static const uint64_t GENERATOR = 259; //number that generates multiplicative group Z_MOD(PRIME)
-
+static const uint64_t GENERATOR = 259; //number that generates the multiplicative group Z_MOD(PRIME)
+static const uint64_t INITIAL_HASH_TABLE_SIZE = 100;
 /**
  * getHash is not NULL
  * @param text
  * @return
  */
-static uint64_t getHash(const char *text) {
+static size_t getHash(const char *text) {
     size_t n = strlen(text);
     uint64_t coefficient = 1, tmpHash = 0;
 
@@ -52,13 +36,44 @@ static uint64_t getHash(const char *text) {
     return tmpHash;
 }
 
+
+struct Dictionary {
+    uint64_t id;
+    HashTable *hashTable;
+};
+
+struct HashTable {
+    Vector *table; //entries with certain hash
+    uint64_t size;
+    uint64_t numberOfUsed;
+};
+
 Dictionary *initializeDictionary() {
     Dictionary *newDictionary = malloc(sizeof(Dictionary));
 
-    if (newDictionary == NULL)
+    if (newDictionary == NULL) {
         return NULL;
+    }
 
-    newDictionary->tree = NULL;
+    newDictionary->id = 0;
+    newDictionary->hashTable = malloc(sizeof(HashTable));
+
+    if (newDictionary->hashTable == NULL) {
+        free(newDictionary);
+
+        return NULL;
+    }
+
+    newDictionary->hashTable->numberOfUsed = 0;
+    newDictionary->hashTable->table = initializeVector(INITIAL_HASH_TABLE_SIZE);
+    newDictionary->hashTable->size = INITIAL_HASH_TABLE_SIZE;
+
+    if(newDictionary->hashTable->table == NULL) {
+        free(newDictionary->hashTable);
+        free(newDictionary);
+
+        return NULL;
+    }
 
     return newDictionary;
 }
@@ -71,31 +86,22 @@ Dictionary *initializeDictionary() {
  * for doesn't exist
  */
 
-void *searchDictionary(Dictionary *dictionary, const char *name) {
-    if (dictionary == NULL || name == NULL)
-        return NULL;
-    Tree *treePosition = dictionary->tree;
-    uint64_t hash = getHash(name);
-
-    while (treePosition != NULL && hash != treePosition->hash) {
-        treePosition = treePosition->next;
-    }
-
-    if (treePosition == NULL) {
+void *searchDictionary(Dictionary *dictionary, const char *name, bool isRight(void *, string)) {
+    if (dictionary == NULL || name == NULL) {
         return NULL;
     }
 
-    EntryList *listPosition = treePosition->entries;
+    size_t i = getHash(name);
 
-    while (listPosition != NULL && strcmp(listPosition->name, name) != 0) {
-        listPosition = listPosition->next;
+    while (dictionary->hashTable->table->data[i] != NULL && !isRight(dictionary->hashTable->table->data[i], name)) {
+        i = (i + 1) % (dictionary->hashTable->size + 1);
     }
 
-    if (listPosition == NULL) {
+    if (dictionary->hashTable->table->data[i] == NULL) {
         return NULL;
     }
 
-    return listPosition->content;
+    return dictionary->hashTable->table->data[i];
 }
 /**
  * the dictionary is not NULL
@@ -112,20 +118,7 @@ bool insertDictionary(Dictionary *dictionary, const char *name, void *content) {
 
     uint64_t hash = getHash(name);
 
-    node->name = malloc(strlen(name) * sizeof(char));
 
-    for (int i = 0; i < strlen(name); i++) {
-        node->name[i] = name[i];
-    }
-
-    node->hash = getHash(name);
-    node->prev = NULL;
-    node->next = dictionary->tree;
-    node->content = newContent;
-    dictionary->tree->prev = node;
-    dictionary->tree = node;
-
-    return true;
 }
 
 void freeDictionary(Dictionary *dictionary, void *freeContent(void *)) {

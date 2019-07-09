@@ -15,9 +15,9 @@ struct Vector {
     void **data;
 };
 
-bool pushVector(Vector *vector, void *value);
+Vector *initializeVector(size_t initialSize);
 
-Vector *initializeVector();
+bool pushVector(Vector *vector, void *value);
 
 void freeVector(Vector *vector, void freeValue(void *));
 

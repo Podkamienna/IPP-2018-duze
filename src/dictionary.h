@@ -11,7 +11,7 @@ typedef struct Dictionary Dictionary;
 
 Dictionary *initializeDictionary();
 
-void *searchDictionary(Dictionary *dictionary, const char *name);
+void *searchDictionary(Dictionary *dictionary, const char *name, bool isRight(void *, string));
 
 bool insertDictionary(Dictionary *dictionary, const char *name, void *content);
 
