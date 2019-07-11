@@ -21,9 +21,9 @@ typedef struct Entry Entry;
 
 struct Dictionary {
     size_t id;
-    HashTable *hashTable;
     size_t size;
     size_t numberOfElements;
+    HashTable *hashTable;
 };
 
 
@@ -39,15 +39,14 @@ Dictionary *initializeDictionary() {
     }
 
     newDictionary->id = 0;
-    newDictionary->hashTable = initializeHashTable(INITIAL_HASH_TABLE_SIZE);
+    newDictionary->numberOfElements = 0;
+    newDictionary->size = INITIAL_HASH_TABLE_SIZE;
+    newDictionary->hashTable = initializeHashTable(newDictionary->size);
 
     if (newDictionary->hashTable == NULL) {
         free(newDictionary);
         return NULL;
     }
-
-    newDictionary->numberOfElements = 0;
-    newDictionary->size = INITIAL_HASH_TABLE_SIZE;
 
     return newDictionary;
 }
@@ -61,6 +60,10 @@ Dictionary *initializeDictionary() {
  */
 
 void *searchDictionary(Dictionary *dictionary, const char *name) {
+    if (dictionary == NULL) {
+        return NULL;
+    }
+
     return searchHashTable(dictionary->hashTable, name);
 }
 /**
@@ -82,7 +85,7 @@ bool insertDictionary(Dictionary *dictionary, const char *name, void *value, voi
         if (newHashTable == NULL) {
             return false;
         }
-
+// TODO
         if (!insertHashTable(newHashTable, name, value)) {
             deleteHashTable(newHashTable, deleteValue);
             return false;
@@ -100,6 +103,10 @@ bool insertDictionary(Dictionary *dictionary, const char *name, void *value, voi
 }
 
 void deleteDictionary(Dictionary *dictionary, void deleteValue(void *)) {
+    if (dictionary == NULL) {
+        return;
+    }
+
     deleteHashTable(dictionary->hashTable, deleteValue);
     free(dictionary);
 }
