@@ -21,11 +21,11 @@ Set *initializeSet() {
 }
 
 void *searchSet(Set *set, bool isOk(void *)) {
-    searchVector(set->vector, isOk);
+    return searchVector(set->vector, isOk);
 }
 
-bool *insertSet(Set *set, void *value) {
-    pushVector(set->vector, value);
+bool insertSet(Set *set, void *value) {
+    return pushVector(set->vector, value);
 }
 
 void deleteSet(Set *set, void deleteValue(void *)) {

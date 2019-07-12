@@ -12,7 +12,7 @@ Set *initializeSet();
 
 void *searchSet(Set *set, bool isOk(void *));
 
-bool *insertSet(Set *set, void *value);
+bool insertSet(Set *set, void *value);
 
 void deleteSet(Set *set, void deleteValue(void *));
 

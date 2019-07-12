@@ -20,7 +20,7 @@ struct Map {
 struct City {
     int id;
     char *name;
-    Set roads;
+    Set *roads;
 };
 
 struct Road {

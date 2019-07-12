@@ -9,7 +9,7 @@
 
 typedef struct Heap Heap;
 
-Heap *initializeHeap(int compare (void *, void *));
+Heap *initializeHeap(int compare(void *, void *));
 
 bool pushHeap(Heap *heap, void *value);
 

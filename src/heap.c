@@ -3,7 +3,7 @@
 //
 #include <stdio.h>
 
-#include "Heap.h"
+#include "heap.h"
 #include "vector.h"
 
 typedef struct Heap Heap;

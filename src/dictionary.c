@@ -8,9 +8,8 @@
 #include <stdbool.h>
 #include <string.h>
 #include <stdlib.h>
-#include <stdint.h>
 
-static const size_t INITIAL_HASH_TABLE_SIZE = 100;
+static const size_t INITIAL_HASH_TABLE_SIZE = 128;
 static const size_t LOAD_FACTOR_MULTIPLIER = 3;
 static const size_t LOAD_FACTOR_DIVIDER = 4;
 
@@ -20,7 +19,7 @@ typedef struct HashTable HashTable;
 typedef struct Entry Entry;
 
 struct Dictionary {
-    size_t id;
+    size_t id; // TODO może nextId
     HashTable *hashTable;
     size_t size;
     size_t numberOfElements;
@@ -28,7 +27,7 @@ struct Dictionary {
 
 
 static bool isFull(Dictionary *dictionary) {
-    return LOAD_FACTOR_DIVIDER*dictionary->numberOfElements >= LOAD_FACTOR_MULTIPLIER*dictionary->size;
+    return LOAD_FACTOR_DIVIDER * dictionary->numberOfElements >= LOAD_FACTOR_MULTIPLIER * dictionary->size;
 }
 
 Dictionary *initializeDictionary() {
@@ -39,15 +38,14 @@ Dictionary *initializeDictionary() {
     }
 
     newDictionary->id = 0;
-    newDictionary->hashTable = initializeHashTable(INITIAL_HASH_TABLE_SIZE);
+    newDictionary->numberOfElements = 0;
+    newDictionary->size = INITIAL_HASH_TABLE_SIZE;
+    newDictionary->hashTable = initializeHashTable(newDictionary->size);
 
     if (newDictionary->hashTable == NULL) {
         free(newDictionary);
         return NULL;
     }
-
-    newDictionary->numberOfElements = 0;
-    newDictionary->size = INITIAL_HASH_TABLE_SIZE;
 
     return newDictionary;
 }
@@ -71,25 +69,19 @@ void *searchDictionary(Dictionary *dictionary, const char *name) {
  * @param hash
  * @return
  */
-bool insertDictionary(Dictionary *dictionary, const char *name, void *value, void deleteValue(void *)) {
+bool insertDictionary(Dictionary *dictionary, const char *name, void *value) {
     if (dictionary == NULL || name == NULL || value == NULL || dictionary->hashTable == NULL) {
         return false;
     }
 
     if (isFull(dictionary)) {
-        HashTable *newHashTable = resizeHashTable(dictionary->hashTable, 2*dictionary->size);
+        HashTable *newHashTable = resizeHashTable(dictionary->hashTable, 2 * dictionary->size);
 
         if (newHashTable == NULL) {
             return false;
         }
 
-        if (!insertHashTable(newHashTable, name, value)) {
-            deleteHashTable(newHashTable, deleteValue);
-            return false;
-        }
-
         dictionary->hashTable = newHashTable;
-        return true;
     }
 
     if (!insertHashTable(dictionary->hashTable, name, value)) {
@@ -100,6 +92,10 @@ bool insertDictionary(Dictionary *dictionary, const char *name, void *value, voi
 }
 
 void deleteDictionary(Dictionary *dictionary, void deleteValue(void *)) {
+    if (dictionary == NULL) {
+        return;
+    }
+
     deleteHashTable(dictionary->hashTable, deleteValue);
     free(dictionary);
 }

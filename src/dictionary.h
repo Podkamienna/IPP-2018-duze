@@ -13,7 +13,7 @@ Dictionary *initializeDictionary();
 
 void *searchDictionary(Dictionary *dictionary, const char *name);
 
-bool insertDictionary(Dictionary *dictionary, const char *name, void *value, void deleteValue(void *));
+bool insertDictionary(Dictionary *dictionary, const char *name, void *value);
 
 void deleteDictionary(Dictionary *dictionary, void deleteValue(void *));
 

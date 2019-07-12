@@ -5,7 +5,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "Heap.h"
+#include "heap.h"
 
 int comp(int *a, int *b) {
     return *a - *b;
