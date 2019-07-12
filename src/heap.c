@@ -1,7 +1,6 @@
 //
 // Created by alicja on 10.07.19.
 //
-#include <stdio.h>
 
 #include "heap.h"
 #include "vector.h"
@@ -10,18 +9,19 @@ typedef struct Heap Heap;
 
 struct Heap {
     Vector *vector;
-    int (*compare) (void *, void *);
+
+    int (*compare)(void *, void *);
 };
 
-static size_t parent(size_t i) {
+static size_t getParent(size_t i) {
     return (i - 1) / 2;
 }
 
-static size_t leftChild(size_t i) {
+static size_t getLeftChild(size_t i) {
     return 2 * i + 1;
 }
 
-static size_t rightChild(size_t i) {
+static size_t getRightChild(size_t i) {
     return 2 * i + 2;
 }
 
@@ -37,22 +37,24 @@ static size_t minNotNull(Heap *heap, size_t i, size_t j) {
     return j;
 }
 
-static void swap(void **arr, int i, int j) {
+static void swap(void **arr, size_t i, size_t j) {
     void *tmp = arr[i];
     arr[i] = arr[j];
     arr[j] = tmp;
 }
 
+
+#include <stdio.h> // TODO usunąć
+
 void seeHeap(Heap *heap) {
-    void *pom = NULL;
-    for(int i = 1; i < heap->vector->size; i++) {
-        pom = (heap->vector->data)[i];
-        printf("%d", i);
+    // void *pom = NULL;
+    for (size_t i = 0; i < heap->vector->size; i++) {
+        //pom = (heap->vector->data)[i];
+        printf("%lu\n", i);
     }
-    int k;
 }
 
-Heap *initializeHeap(int compare (void *, void *)) {
+Heap *initializeHeap(int compare(void *, void *)) {
     Heap *newHeap = malloc(sizeof(Heap));
 
     if (newHeap == NULL) {
@@ -66,7 +68,7 @@ Heap *initializeHeap(int compare (void *, void *)) {
         return NULL;
     }
 
-    newHeap->compare =  compare;
+    newHeap->compare = compare;
 
     return newHeap;
 
@@ -78,10 +80,16 @@ bool pushHeap(Heap *heap, void *value) {
     }
 
     size_t position = heap->vector->size - 1;
+    void **data = heap->vector->data;
 
-    while (position != 0 && heap->compare(heap->vector->data[parent(position)], heap->vector->data[position]) > 0) { //TODO???, warunek do ciała wrzucićć, zmiennna opomcnicza parent
-        swap(heap->vector->data, position, parent(position));
-        position = parent(position);
+    while (position != 0) { //TODO???, warunek do ciała wrzucićć, zmiennna opomcnicza parent
+        size_t parent = getParent(position);
+        if (heap->compare(data[parent], data[position]) > 0) {
+            swap(data, position, parent);
+            position = parent;
+        } else {
+            break;
+        }
     }
 
     return true;
@@ -92,21 +100,21 @@ void *popHeap(Heap *heap) {
         return NULL;
     }
 
-    void *top = heap->vector->data[0];
+    void **data = heap->vector->data;
     size_t position = 0;
+    void *top = data[0];
 
-    swap(heap->vector->data, 0, heap->vector->size);
+
+    swap(data, 0, heap->vector->size - 1);
     popFromVector(heap->vector, NULL);
 
-    while (leftChild(position) < heap->vector->size ) {
-        size_t minChild = minNotNull(heap, leftChild(position), rightChild(position));
+    while (getLeftChild(position) < heap->vector->size) {
+        size_t minChild = minNotNull(heap, getLeftChild(position), getRightChild(position));
 
-        if (heap->compare(heap->vector->data[minChild], heap->vector->data[position]) < 0) { //???
-            swap(heap->vector->data, position, minChild);
+        if (heap->compare(data[position], data[minChild]) > 0) { //???
+            swap(data, position, minChild);
             position = minChild;
-        }
-
-        else {
+        } else {
             break;
         }
     }
@@ -115,5 +123,10 @@ void *popHeap(Heap *heap) {
 }
 
 void deleteHeap(Heap *heap, void deleteValue(void *)) {
+    if (heap == NULL) {
+        return;
+    }
 
+    deleteVector(heap->vector, deleteValue);
+    free(heap);
 }

@@ -18,6 +18,7 @@ Set *initializeSet() {
     }
 
     newSet->vector = initializeVector();
+    return newSet;
 }
 
 void *searchSet(Set *set, bool isOk(void *)) {
