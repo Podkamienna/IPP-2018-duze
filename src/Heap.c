@@ -1,6 +1,7 @@
 //
 // Created by alicja on 10.07.19.
 //
+#include <stdio.h>
 
 #include "Heap.h"
 #include "vector.h"
@@ -12,30 +13,43 @@ struct Heap {
     int (*compare) (void *, void *);
 };
 
-static int parent(int i) {
+static size_t parent(size_t i) {
     return (i - 1) / 2;
 }
 
-static int leftChild(int i) {
+static size_t leftChild(size_t i) {
     return 2 * i + 1;
 }
 
-static int rightChild(int i) {
+static size_t rightChild(size_t i) {
     return 2 * i + 2;
 }
 
-static int minNotNull(Heap *heap, int i, int j) {
-    if (heap->vector->data[i] == NULL && heap->vector->data[j] == NULL) {
-        return -1;
+static size_t minNotNull(Heap *heap, size_t i, size_t j) {
+    if (j >= heap->vector->size) {
+        return i;
     }
 
+    if (heap->compare(heap->vector->data[i], heap->vector->data[j]) <= 0) {
+        return i;
+    }
 
+    return j;
 }
 
-static void swap(void *a, void *b) { //czy ta funckcja działa?
-    void *c = a;
-    a = b;
-    b = c;
+static void swap(void **arr, int i, int j) {
+    void *tmp = arr[i];
+    arr[i] = arr[j];
+    arr[j] = tmp;
+}
+
+void seeHeap(Heap *heap) {
+    void *pom = NULL;
+    for(int i = 1; i < heap->vector->size; i++) {
+        pom = (heap->vector->data)[i];
+        printf("%d", i);
+    }
+    int k;
 }
 
 Heap *initializeHeap(int compare (void *, void *)) {
@@ -52,7 +66,7 @@ Heap *initializeHeap(int compare (void *, void *)) {
         return NULL;
     }
 
-    newHeap->compare = compare;
+    newHeap->compare =  compare;
 
     return newHeap;
 
@@ -63,28 +77,32 @@ bool pushHeap(Heap *heap, void *value) {
         return false;
     }
 
-    size_t position = heap->vector->size;
+    size_t position = heap->vector->size - 1;
 
-    while (position != 0 && heap->compare(heap->vector->data[parent(position)], heap->vector->data[position]) > 0) { //???
-        swap(heap->vector->data[position], heap->vector->data[parent(position)]);
+    while (position != 0 && heap->compare(heap->vector->data[parent(position)], heap->vector->data[position]) > 0) { //TODO???, warunek do ciała wrzucićć, zmiennna opomcnicza parent
+        swap(heap->vector->data, position, parent(position));
         position = parent(position);
     }
+
+    return true;
 }
 
 void *popHeap(Heap *heap) {
-    if (heap == NULL)
+    if (heap == NULL) {
         return NULL;
+    }
 
-    swap(heap->vector->data[0], heap->vector->data[heap->vector->size]);
-    deleteFromVector(heap->vector, NULL);
+    void *top = heap->vector->data[0];
+    size_t position = 0;
 
-    size_t position = 0;//////////////////////////////////////////////////
+    swap(heap->vector->data, 0, heap->vector->size);
+    popFromVector(heap->vector, NULL);
 
-    while (leftChild(position) <= heap->vector->size && rightChild(position) <= heap->vector->size) {
-        int minChild = minNotNull(heap, leftChild(position), rightChild(position));
+    while (leftChild(position) < heap->vector->size ) {
+        size_t minChild = minNotNull(heap, leftChild(position), rightChild(position));
 
         if (heap->compare(heap->vector->data[minChild], heap->vector->data[position]) < 0) { //???
-            swap(heap->vector->data[position], heap->vector->data[minChild]);
+            swap(heap->vector->data, position, minChild);
             position = minChild;
         }
 
@@ -93,7 +111,9 @@ void *popHeap(Heap *heap) {
         }
     }
 
-    return heap->vector->data[heap->vector->size + 1];
+    return top;
 }
 
-void deleteHeap(Heap *heap, void deleteValue(void *));
+void deleteHeap(Heap *heap, void deleteValue(void *)) {
+
+}

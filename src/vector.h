@@ -17,9 +17,15 @@ struct Vector {
 
 bool resizeVector(Vector *vector);
 
-Vector *initializeVector(size_t initialSize);
+Vector *initializeVector();
+
+void *searchVector(Vector *vector, bool isOk(void *));
 
 bool pushVector(Vector *vector, void *value);
+
+void *getEntry(Vector *vector, size_t position);
+
+void popFromVector(Vector *vector, void deleteValue(void *));
 
 void deleteVector(Vector *vector, void deleteValue(void *));
 

@@ -25,7 +25,7 @@ bool resizeVector(Vector *vector) {
     return false;
 }
 
-Vector *initializeVector(size_t initialSize) {
+Vector *initializeVector() {
     Vector *newVector = NULL;
     newVector = malloc(sizeof(Vector));
 
@@ -33,17 +33,27 @@ Vector *initializeVector(size_t initialSize) {
         return NULL;
     }
 
-    newVector->data = malloc(initialSize * sizeof(void *));
+    newVector->data = NULL;
 
-    if (newVector->data == NULL) {
-        free(newVector);
-        return NULL;
-    }
 
     newVector->size = 0;
-    newVector->maxSize = initialSize;
+    newVector->maxSize = 0;
 
     return newVector;
+}
+
+void *searchVector(Vector *vector, bool isOk(void *)) {
+    for (size_t i = 0; i < vector->size; i++) {
+        if (isOk(vector->data[i])) {
+            return vector->data[i];
+        }
+    }
+
+    return NULL;
+}
+
+void *getEntry(Vector *vector, size_t position) {
+    return vector->data[position];
 }
 
 bool pushVector(Vector *vector, void *value) {
@@ -60,36 +70,15 @@ bool pushVector(Vector *vector, void *value) {
     return true;
 }
 
-/**
- * inserts a value in a first place after a given location
- * that is NULL
- * @param vector
- * @param value
- * @param location
- * @return
- */
-bool insertAfterVector(Vector *vector, void *value, size_t location) { //jaki typ tutaj??????????
-    if (vector == NULL) { //czy jak dojdę na koniec wektora to powiększać, czy nie???????
-        return false;
+void popFromVector(Vector *vector, void deleteValue(void *)) {
+    if (vector == NULL) {
+        return;
     }
 
-    size_t i = location;
+    vector->size--;
 
-    if (vector->data[i] == NULL) {
-        vector->data[i] = malloc(sizeof(void *));
-        vector->data[i] = value;
-
-        return true;
-    }
-
-    i++;
-
-    while (vector->data[i] != NULL && i != location) {
-        i = (i + 1) % (location + 1);
-    }
-
-    if (i == location) { //ale to nigdy sie nie stanie
-        return false;
+    if (deleteValue != NULL) {
+        deleteValue(vector->data[vector->size]);
     }
 }
 

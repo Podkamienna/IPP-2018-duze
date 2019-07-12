@@ -9,11 +9,13 @@
 
 typedef struct Heap Heap;
 
-Heap *initializeHeap();
+Heap *initializeHeap(int compare (void *, void *));
 
-bool pushHeap(Heap *heap, void *value); //jaki typ?
+bool pushHeap(Heap *heap, void *value);
 
 void *popHeap(Heap *heap);
+
+void seeHeap(Heap *heap);
 
 void deleteHeap(Heap *heap, void deleteValue(void *));
 

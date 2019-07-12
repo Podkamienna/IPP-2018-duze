@@ -2,12 +2,12 @@
  */
 
 #include "set.h"
+#include "vector.h"
 
 #include <stdlib.h>
 
 struct Set {
-    Set *next;
-    void *content;
+    Vector *vector;
 };
 
 Set *initializeSet() {
@@ -17,12 +17,18 @@ Set *initializeSet() {
         return NULL;
     }
 
-    newSet->next = NULL;
-    newSet->content =
+    newSet->vector = initializeVector();
 }
 
-void *searchSet(bool isOk(void *));
+void *searchSet(Set *set, bool isOk(void *)) {
+    searchVector(set->vector, isOk);
+}
 
-bool *insertSet(void *content);
+bool *insertSet(Set *set, void *value) {
+    pushVector(set->vector, value);
+}
 
-void freeSet();
+void deleteSet(Set *set, void deleteValue(void *)) {
+    deleteVector(set->vector, deleteValue);
+    free(set);
+}
