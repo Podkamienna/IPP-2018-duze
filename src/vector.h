@@ -19,11 +19,9 @@ bool resizeVector(Vector *vector);
 
 Vector *initializeVector();
 
-void *searchVector(Vector *vector, bool isOk(void *));
+void *searchVector(Vector *vector, bool isOk(void *, void *), void *value);
 
 bool pushVector(Vector *vector, void *value);
-
-void *getEntry(Vector *vector, size_t position);
 
 void popFromVector(Vector *vector, void deleteValue(void *));
 

@@ -42,18 +42,14 @@ Vector *initializeVector() {
     return newVector;
 }
 
-void *searchVector(Vector *vector, bool isOk(void *)) {
+void *searchVector(Vector *vector, bool isOk(void *, void *), void *value) {
     for (size_t i = 0; i < vector->size; i++) {
-        if (isOk(vector->data[i])) {
+        if (isOk(vector->data[i], value)) {
             return vector->data[i];
         }
     }
 
     return NULL;
-}
-
-void *getEntry(Vector *vector, size_t position) {
-    return vector->data[position];
 }
 
 bool pushVector(Vector *vector, void *value) {

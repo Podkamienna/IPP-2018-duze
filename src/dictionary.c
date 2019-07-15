@@ -19,10 +19,10 @@ typedef struct HashTable HashTable;
 typedef struct Entry Entry;
 
 struct Dictionary {
-    size_t id; // TODO może nextId
-    HashTable *hashTable;
+    size_t id;
     size_t size;
     size_t numberOfElements;
+    HashTable *hashTable;
 };
 
 
@@ -59,6 +59,10 @@ Dictionary *initializeDictionary() {
  */
 
 void *searchDictionary(Dictionary *dictionary, const char *name) {
+    if (dictionary == NULL) {
+        return NULL;
+    }
+
     return searchHashTable(dictionary->hashTable, name);
 }
 /**
@@ -78,6 +82,11 @@ bool insertDictionary(Dictionary *dictionary, const char *name, void *value) {
         HashTable *newHashTable = resizeHashTable(dictionary->hashTable, 2 * dictionary->size);
 
         if (newHashTable == NULL) {
+            return false;
+        }
+// TODO
+        if (!insertHashTable(newHashTable, name, value)) {
+            deleteHashTable(newHashTable, deleteValue);
             return false;
         }
 

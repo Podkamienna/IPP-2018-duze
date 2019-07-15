@@ -10,7 +10,7 @@ typedef struct Set Set;
 
 Set *initializeSet();
 
-void *searchSet(Set *set, bool isOk(void *));
+void *searchSet(Set *set, bool isOk(void *, void *), void *value);
 
 bool insertSet(Set *set, void *value);
 

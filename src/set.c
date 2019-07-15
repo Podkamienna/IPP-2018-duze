@@ -21,8 +21,8 @@ Set *initializeSet() {
     return newSet;
 }
 
-void *searchSet(Set *set, bool isOk(void *)) {
-    return searchVector(set->vector, isOk);
+void *searchSet(Set *set, bool isOk(void *, void *), void *value) {
+    return searchVector(set->vector, isOk, value);
 }
 
 bool insertSet(Set *set, void *value) {
