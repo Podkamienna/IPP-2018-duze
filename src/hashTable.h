@@ -16,6 +16,8 @@ void *searchHashTable(HashTable *hashTable, const char *name);
 
 bool insertHashTable(HashTable *hashTable, const char *name, void *value);
 
+void iterate(HashTable *hashTable, void fun(void *));
+
 HashTable *resizeHashTable(HashTable *hashTable, size_t newSize);
 
 void deleteHashTable(HashTable *hashTable, void deleteValue(void *));

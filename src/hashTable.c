@@ -97,6 +97,12 @@ static bool insertEntryHashTable(HashTable *hashTable, Entry *entry) {
     return false;
 }
 
+void iterate(HashTable *hashTable, void fun(void *)) {
+    for (int i = 0; i < hashTable->size; i++) {
+        fun(hashTable->table[i]->value);
+    }
+}
+
 HashTable *initializeHashTable(size_t initialSize) {
     HashTable *newHashTable = malloc(sizeof(HashTable));
 

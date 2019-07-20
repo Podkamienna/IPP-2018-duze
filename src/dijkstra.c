@@ -8,50 +8,38 @@
 #include <stdlib.h>
 
 typedef struct Graph Graph;
+typedef struct City City;
+typedef struct Road Road;
 
 struct Graph {
-    void *node;
-    void *road; //droga wchodzaca do node
+    City *node;
+    Road *edge; //droga wchodzaca do node
     Graph *prev; //do odzyskiwania najkrotszej sciezki
     int priority; //priority = najmn ob znana odl wierzch node od wierzcholka startowego
     int minYear; //minimalny rok ostatniego remontu na optymalnej sciezce od wierzch start do obecnego
 };
 
-void clearVisited(city *mapa) {
-    if(mapa == NULL)
-        return;
 
-    mapa->visited = 0;
 
-    clearVisited(mapa->left);
-    clearVisited(mapa->right);
+Graph *getNewGraphNode(void *node, void *edge, int priority, int minYear, Graph *pr) {
+    Graph *newGraph = NULL;
+    newGraph = malloc(sizeof(Graph));
+
+    if (newGraph == NULL) {
+        return NULL;
+    }
+
+    newGraph->node = node;
+    newGraph->priority = priority;
+    newGraph->minYear = minYear;
+    newGraph->prev = pr;
+    newGraph->edge = edge;
+
+    return newGraph;
 }
 
-graphNode *getNewGraphNode(city *mapa, int priority, int minYear, graphNode *pr, priorityQueue **prQu, roadNode *road) {
-    graphNode *temp = NULL;
-    temp = (graphNode *) malloc(sizeof(graphNode));
 
-    temp->node = mapa;
-    temp->priority = priority;
-    temp->minYear = minYear;
-    temp->prev = pr;
-    temp->road = road;
-    (*prQu)->maxAllocIndex++;
-
-    return temp;
-}
-
-graphNode *getGraphNode(city *mapa, int priority, int minYear, graphNode *pr, graphNode *temp, roadNode *road) {
-    temp->node = mapa;
-    temp->priority = priority;
-    temp->minYear = minYear;
-    temp->prev = pr;
-    temp->road = road;
-
-    return temp;
-}
-
-int compare(graphNode *a, graphNode *b) { //function to compare to graphNodes, to get a good order in dijkstra
+int compare(Graph *a, Graph *b) { //function to compare to graphNodes, to get a good order in dijkstra
     if(a->priority > b->priority)
         return -1;
 
@@ -67,64 +55,6 @@ int compare(graphNode *a, graphNode *b) { //function to compare to graphNodes, t
     return 1;
 }
 
-priorityQueue *pop(priorityQueue *prQu) {
-    int i = 1;
-
-    if (prQu->lastUsedIndex == 0)
-        return NULL;
-
-    graphNode *temp = NULL;
-
-    (prQu->heap)[1] = (prQu->heap)[prQu->lastUsedIndex];
-    (prQu->lastUsedIndex)--;
-    while (true) {
-        if (leftChild(i) > prQu->lastUsedIndex)
-            break;
-
-
-        if (rightChild(i) > prQu->lastUsedIndex) { //compare zwr 1 jesli pierwsze mniejsze od drugiego
-            if (compare((prQu->heap)[i], (prQu->heap)[leftChild(i)]) >= 0) {
-                break;
-            }
-
-            temp = (prQu->heap)[i];
-            (prQu->heap)[i] = (prQu->heap)[leftChild(i)];
-            (prQu->heap)[leftChild(i)] = temp;
-
-            i = leftChild(i);
-        }
-        else if (compare((prQu->heap)[leftChild(i)], (prQu->heap)[rightChild(i)]) >= 0) {
-            if (compare((prQu->heap)[i], (prQu->heap)[leftChild(i)]) >= 0)
-                break;
-
-            temp = (prQu->heap)[i];
-            (prQu->heap)[i] = (prQu->heap)[leftChild(i)];
-            (prQu->heap)[leftChild(i)] = temp;
-
-            i = leftChild(i);
-        }
-        else {
-            if (compare((prQu->heap)[i], (prQu->heap)[rightChild(i)]) >= 0)
-                break;
-
-            temp = (prQu->heap)[i];
-            (prQu->heap)[i] = (prQu->heap)[rightChild(i)];
-            (prQu->heap)[rightChild(i)] = temp;
-
-            i = rightChild(i);
-        }
-    }
-    return prQu;
-}
-
-void clear(city *root) { //ustawianie calej mapy na nieodwiedzone
-    if (root == NULL)
-        return;
-    root->visited = 0;
-    clear(root->left);
-    clear(root->right);
-}
-
 int getNonzeroMin(int a, int b) {
     if (a == 0)
         return b;
@@ -138,8 +68,8 @@ int getNonzeroMin(int a, int b) {
     return b;
 }
 
-void getNeighbours(graphNode *temp, priorityQueue **prQu) {
-    roadNode *iter1 = NULL, *iter2 = NULL; //iter1 do chodzenia poziomo, iter2 do chodzenia pionowo
+void getNeighbours(Graph *temp, Heap *heap) {
+    Road *iter1 = NULL, *iter2 = NULL; //iter1 do chodzenia poziomo, iter2 do chodzenia pionowo
     iter1 = (temp->node)->road;
     graphNode *temp1 = NULL;
 
