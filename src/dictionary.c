@@ -84,11 +84,6 @@ bool insertDictionary(Dictionary *dictionary, const char *name, void *value) {
         if (newHashTable == NULL) {
             return false;
         }
-// TODO
-        if (!insertHashTable(newHashTable, name, value)) {
-            deleteHashTable(newHashTable, deleteValue);
-            return false;
-        }
 
         dictionary->hashTable = newHashTable;
     }

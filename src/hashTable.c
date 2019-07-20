@@ -98,7 +98,7 @@ static bool insertEntryHashTable(HashTable *hashTable, Entry *entry) {
 }
 
 void iterate(HashTable *hashTable, void fun(void *)) {
-    for (int i = 0; i < hashTable->size; i++) {
+    for (size_t i = 0; i < hashTable->size; i++) {
         fun(hashTable->table[i]->value);
     }
 }
@@ -177,10 +177,12 @@ HashTable *resizeHashTable(HashTable *hashTable, size_t newSize) {
         if (hashTable->table[i] != NULL) {
             if (!insertEntryHashTable(newHashTable, hashTable->table[i])) {
                 deleteHashTableLeaveEntries(newHashTable);
+
                 return NULL;
             }
         }
     }
+    deleteHashTableLeaveEntries(hashTable);
 
     return newHashTable;
 }

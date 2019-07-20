@@ -2,8 +2,8 @@
  *
  */
 
-#ifndef DROGI_HASHTABLE_H
-#define DROGI_HASHTABLE_H
+#ifndef DROGI_HASH_TABLE_H
+#define DROGI_HASH_TABLE_H
 
 #include <stdbool.h>
 #include <stdlib.h>
@@ -22,4 +22,4 @@ HashTable *resizeHashTable(HashTable *hashTable, size_t newSize);
 
 void deleteHashTable(HashTable *hashTable, void deleteValue(void *));
 
-#endif /* DROGI_HASHTABLE_H */
+#endif /* DROGI_HASH_TABLE_H */
