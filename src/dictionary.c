@@ -95,6 +95,10 @@ bool insertDictionary(Dictionary *dictionary, const char *name, void *value) {
     return true;
 }
 
+void deleteFromDictionary(Dictionary *dictionary, const char *name, void deleteValue(void *)) {
+    deleteFromHashTable(dictionary->hashTable, name, deleteValue);
+}
+
 void deleteDictionary(Dictionary *dictionary, void deleteValue(void *)) {
     if (dictionary == NULL) {
         return;

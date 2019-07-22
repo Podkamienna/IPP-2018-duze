@@ -6,6 +6,7 @@
 #include <stdlib.h>
 #include <stdbool.h>
 
+
 bool resizeVector(Vector *vector) {
     void **newData;
     if (vector == NULL) {
@@ -16,13 +17,13 @@ bool resizeVector(Vector *vector) {
 
     newData = realloc(vector->data, newSize * sizeof(void *));
 
-    if (newData != NULL) {
-        vector->data = newData;
-        vector->maxSize = newSize;
-        return true;
+    if (newData == NULL) {
+        return false;
     }
 
-    return false;
+    vector->data = newData;
+    vector->maxSize = newSize;
+    return true;
 }
 
 Vector *initializeVector() {
@@ -43,6 +44,10 @@ Vector *initializeVector() {
 }
 
 void *searchVector(Vector *vector, bool isOk(void *, void *), void *value) {
+    if (vector == NULL) {
+        return NULL;
+    }
+
     for (size_t i = 0; i < vector->size; i++) {
         if (isOk(vector->data[i], value)) {
             return vector->data[i];
@@ -54,6 +59,10 @@ void *searchVector(Vector *vector, bool isOk(void *, void *), void *value) {
 
 bool pushVector(Vector *vector, void *value) {
     if (vector == NULL) {
+        return false;
+    }
+
+    if (value == NULL) {
         return false;
     }
 

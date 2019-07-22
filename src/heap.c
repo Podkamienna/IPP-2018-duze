@@ -9,7 +9,6 @@ typedef struct Heap Heap;
 
 struct Heap {
     Vector *vector;
-
     int (*compare)(void *, void *);
 };
 
@@ -25,6 +24,7 @@ static size_t getRightChild(size_t i) {
     return 2 * i + 2;
 }
 
+//returns smaller of the parents, that is not NULL
 static size_t minNotNull(Heap *heap, size_t i, size_t j) {
     if (j >= heap->vector->size) {
         return i;
@@ -37,6 +37,7 @@ static size_t minNotNull(Heap *heap, size_t i, size_t j) {
     return j;
 }
 
+//swaps two nodes in the heap
 static void swap(void **arr, size_t i, size_t j) {
     void *tmp = arr[i];
     arr[i] = arr[j];
@@ -111,7 +112,7 @@ void *popHeap(Heap *heap) {
     while (getLeftChild(position) < heap->vector->size) {
         size_t minChild = minNotNull(heap, getLeftChild(position), getRightChild(position));
 
-        if (heap->compare(data[position], data[minChild]) > 0) { //???
+        if (heap->compare(data[position], data[minChild]) > 0) {
             swap(data, position, minChild);
             position = minChild;
         } else {

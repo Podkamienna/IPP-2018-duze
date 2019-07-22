@@ -73,8 +73,10 @@ void deleteMap(Map *map) {
  */
 bool addRoad(Map *map, const char *city1, const char *city2,
              unsigned length, int builtYear) {
-    //TODO co jezeli map jest NULLem?
-    //TODO czy moge zalozyc, ze slownik nie bedzie NULLem, a rzeczy beda ustawione na NULL w tablicy?
+    if (map == NULL) {
+        return false;
+    }
+
     if (city1 == NULL || city2 == NULL) {
         return false;
     }
@@ -87,7 +89,7 @@ bool addRoad(Map *map, const char *city1, const char *city2,
         return false;
     }
 
-    return addNewRoad(map, city1, city2, length, builtYear);
+    return addNewRoad(map, city1, city2, builtYear, length);
 }
 
 /** @brief Modyfikuje rok ostatniego remontu odcinka drogi.
@@ -103,7 +105,9 @@ bool addRoad(Map *map, const char *city1, const char *city2,
  * podanymi miastami, podany rok jest wcześniejszy niż zapisany dla tego odcinka
  * drogi rok budowy lub ostatniego remontu.
  */
-bool repairRoad(Map *map, const char *city1, const char *city2, int repairYear);
+bool repairRoad(Map *map, const char *city1, const char *city2, int repairYear) {
+    return fixRoad(map, city1, city2, repairYear);
+}
 
 /** @brief Łączy dwa różne miasta drogą krajową.
  * Tworzy drogę krajową pomiędzy dwoma miastami i nadaje jej podany numer.

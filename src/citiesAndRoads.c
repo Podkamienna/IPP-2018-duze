@@ -32,6 +32,34 @@ Road *getNewRoad(int year, int length, City *city1, City *city2) {
     return newRoad;
 }
 
+bool predicate(Road *road1, Road *road2) {
+    if(road1->city1 == road2->city1 && road1->city2 == road2->city2) {
+        return true;
+    }
+
+    if(road1->city1 == road2->city2 && road1->city2 == road2->city1) {
+        return true;
+    }
+
+    return false;
+}
+
+//returns true if the road doesn't exist and false otherwise and if sth goes wrong
+//called from addRoad
+static bool notExistsRoad(Map *map, City *city1, City *city2) {
+    if (city1 == NULL || city2 == NULL) {
+        return false;
+    }
+//TODO Czy da się bez tego alokowania? W sensie można np porownywac tylko z 2. miastem
+    Road *tmpRoad = getNewRoad(0, 0, city1, city2);
+
+    if (tmpRoad == NULL) {
+        return false;
+    }
+
+    return !searchSet(city1->roads, predicate, tmpRoad);
+}
+
 City *getNewCity(const char *name) {
     City *newCity = malloc(sizeof(City));
 
@@ -53,7 +81,7 @@ City *getNewCity(const char *name) {
 }
 
 static bool addCity(Map *map, City *city) {
-    if (tmpCity == NULL) {
+    if (city == NULL || map == NULL) {
         return false;
     }
 
@@ -61,6 +89,14 @@ static bool addCity(Map *map, City *city) {
 }
 
 bool addNewRoad(Map *map, const char *city1, const char *city2, int year, int length) {
+    if (map == NULL) {
+        return false;
+    }
+
+    if (city1 == NULL || city2 == NULL) {
+        return false;
+    }
+
     City *tmpCity1, *tmpCity2;
     tmpCity1 = searchCity(map, city1);
     tmpCity2 = searchCity(map, city2);
@@ -83,8 +119,9 @@ bool addNewRoad(Map *map, const char *city1, const char *city2, int year, int le
         newCity2 = getNewCity(city2);
         if (newCity2 == NULL || !addCity(map, newCity2)) {
             if (tmpCity1 == NULL) {
-                deleteCity(map, newCity1);
+                deleteFromDictionary(map->cities, city1, deleteCity);
             }
+
             return false;
         }
     }
@@ -92,13 +129,44 @@ bool addNewRoad(Map *map, const char *city1, const char *city2, int year, int le
     else {
         newCity2 = tmpCity2;
     }
-
+    //jezeli tak jest, to miasta istnialy wczesniej, wiec nie trzeba nic usuwac
     if (!notExistsRoad(map, newCity1, newCity2)) {
-        deleteCity(newCity1);
-        deleteCity(newCity2);
-        //to jest zle...
+        return false;
     }
 
+    Road *newRoad = getNewRoad(year, length, newCity1, newCity2);
+
+    if (!insertSet(newCity2->roads, newRoad)) {
+        if (tmpCity1 == NULL) {
+            deleteFromDictionary(map->cities, city1, deleteCity);
+        }
+
+        if (tmpCity2 == NULL) {
+            deleteFromDictionary(map->cities, city2, deleteCity);
+        }
+
+        deleteRoad(newRoad);
+
+        return false;
+    }
+
+    if (!insertSet(newCity1->roads, newRoad)) {
+        deleteLastAdded(newCity2->roads, deleteRoad);
+
+        if (tmpCity1 == NULL) {
+            deleteFromDictionary(map->cities, city1, deleteCity);
+        }
+
+        if (tmpCity2 == NULL) {
+            deleteFromDictionary(map->cities, city2, deleteCity);
+        }
+
+        deleteRoad(newRoad);
+
+        return false;
+    }
+
+    return true;
 }
 
 void zeroVisited(City *city) {
@@ -109,36 +177,9 @@ void zeroVisited(City *city) {
     city->visited = 0;
 }
 
+
 City *searchCity(Map *map, const char *city) {
     return searchDictionary(map->cities, city);
-}
-
-bool predicate(Road *road1, Road *road2) {
-    if(road1->city1 == road2->city1 && road1->city2 == road2->city2) {
-        return true;
-    }
-
-    if(road1->city1 == road2->city2 && road1->city2 == road2->city1) {
-        return true;
-    }
-
-    return false;
-}
-
-//returns true if the road doesn't exist and false otherwise and if sth goes wrong
-//called from addRoad
-bool notExistsRoad(Map *map, City *city1, City *city2) {
-    if (city1 == NULL || city2 == NULL) {
-        return false;
-    }
-//TODO Czy da się bez tego alokowania? W sensie można np porownywac tylko z 2. miastem
-    Road *tmpRoad = getNewRoad(0, 0, city1, city2);
-
-    if (tmpRoad == NULL) {
-        return false;
-    }
-
-    return !searchSet(city1->roads, predicate, tmpRoad);
 }
 
 //called from repairRoad
@@ -152,12 +193,26 @@ Road *searchRoad(Map *map, City *city1, City *city2) {
     if (tmpRoad == NULL) {
         return NULL;
     }
-    //TODO czy rozważać sytuację,gdy jest droga w jednym mieście, a w drugim nie?
+
     return searchSet(city1->roads, predicate, tmpRoad);
 }
 
 void deleteRoad(Road *road) {
     free(road);
+}
+
+bool fixRoad(Map *map, const char *city1, const char *city2, int repairYear) {
+    if (city1 == NULL || city2 == NULL) {
+        return false;
+    }
+
+    City *tmpCity1 = searchCity(map, city1), *tmpCity2 = searchCity(map, city2);
+
+    if (tmpCity1 == NULL || tmpCity2 == NULL) {
+        return false;
+    }
+
+
 }
 
 void deleteCity(City *city) {

@@ -9,8 +9,8 @@
 #include <stdint.h>
 #include <string.h>
 
-static const uint64_t PRIME = 179425373; //big prime number
-static const uint64_t GENERATOR = 259; //number that generates the multiplicative group Z_MOD(PRIME)
+static const uint64_t PRIME = 179425373; //duża liczba pierwsza
+static const uint64_t GENERATOR = 259; //generator grupy multyplikatywnej Z_{PRIME}
 
 typedef struct HashTable HashTable;
 typedef struct Entry Entry;
@@ -25,7 +25,7 @@ struct Entry {
     const char *name;
     void *value;
 };
-
+//funkcja licząca hash danego napisu
 static uint64_t getHash(const char *text) {
     size_t n = strlen(text);
     uint64_t coefficient = 1, tmpHash = 0;
@@ -40,6 +40,7 @@ static uint64_t getHash(const char *text) {
     return tmpHash;
 }
 
+//usuwa hash tablicę, niezwalniając pamięci zaalokowanej na jej elementy
 static void deleteHashTableLeaveEntries(HashTable *hashTable) {
     if (hashTable == NULL) {
         return;
@@ -49,6 +50,7 @@ static void deleteHashTableLeaveEntries(HashTable *hashTable) {
     free(hashTable);
 }
 
+//zwraca nowe entry, lub NULL, gdy się nie udało zaalokować pamięci
 static Entry *initializeEntry(const char *name, void *value) {
     Entry *newEntry = malloc(sizeof(Entry));
 
@@ -63,24 +65,23 @@ static Entry *initializeEntry(const char *name, void *value) {
     return newEntry;
 }
 
-static void deleteEntry(Entry *entry, void deleteValue(void *)) {
-    if (entry == NULL) {
-        return;
-    }
-
-    if (deleteValue != NULL) {
-        deleteValue(entry->value);
-    }
-
-    free(entry);
-}
-
+//jeżeli dane wejście jest wyznaczone przez zadany napisa i hash
+//zwraca true, wpp zwraca false
 static bool isEqual(uint64_t hash, const char *name, Entry *entry) {
     return entry->hash == hash && strcmp(entry->name, name) == 0;
 }
 
+//zwraca pozycje elementu w danej hash tablicy
+static size_t getPosition(HashTable *hashTable, size_t hash) {
+    return hash % hashTable->size;
+}
+
+//wstawia wejście na pierwsze po wyliczonej pozycji
+//puste miejsce w hash tablicy
+//jeżeli to wejście jest już obecne lub nie ma wolnych pól w tablicy
+//zwraca false, inaczej zwraca true
 static bool insertEntryHashTable(HashTable *hashTable, Entry *entry) {
-    size_t position = entry->hash % hashTable->size;
+    size_t position = getPosition(hashTable, entry->hash);
 
     for (size_t i = 0; i < hashTable->size; i++, position = (position + 1) % hashTable->size) {
         if (hashTable->table[i] == NULL) {
@@ -97,6 +98,38 @@ static bool insertEntryHashTable(HashTable *hashTable, Entry *entry) {
     return false;
 }
 
+//znajduje wejście w hash tablicy wyznaczone przez zadany napis
+static Entry *searchEntryHashTable(HashTable *hashTable, const char *name) {
+    size_t hash = getHash(name);
+    size_t position = getPosition(hashTable, hash);
+    size_t i = 0;
+
+    while (hashTable->table[(position + i) % (hashTable->size + 1)] != NULL || i < hashTable->size) {
+        if (hashTable->table[(position + i) % (hashTable->size + 1)]->hash != hash) {
+            return NULL;
+        }
+
+        if (isEqual(hash, name, hashTable->table[(position + i) % (hashTable->size + 1)])) {
+            return hashTable->table[(position + i) % (hashTable->size + 1)];
+        }
+    }
+
+    return NULL;
+}
+
+//usuwa wejście hash tablicy
+static void deleteEntry(Entry *entry, void deleteValue(void *)) {
+    if (entry == NULL) {
+        return;
+    }
+
+    if (deleteValue != NULL) {
+        deleteValue(entry->value);
+    }
+
+    free(entry);
+}
+
 void iterate(HashTable *hashTable, void fun(void *)) {
     for (size_t i = 0; i < hashTable->size; i++) {
         fun(hashTable->table[i]->value);
@@ -107,6 +140,10 @@ HashTable *initializeHashTable(size_t initialSize) {
     HashTable *newHashTable = malloc(sizeof(HashTable));
 
     if (newHashTable == NULL) {
+        return NULL;
+    }
+
+    if (initialSize <= 0) {
         return NULL;
     }
 
@@ -185,6 +222,12 @@ HashTable *resizeHashTable(HashTable *hashTable, size_t newSize) {
     deleteHashTableLeaveEntries(hashTable);
 
     return newHashTable;
+}
+
+void deleteFromHashTable(HashTable *hashTable, const char *name, void deleteValue(void *)) {
+    Entry *entry = searchEntryHashTable(hashTable, name);
+
+    deleteEntry(entry, deleteValue);
 }
 
 void deleteHashTable(HashTable *hashTable, void deleteValue(void *)) {

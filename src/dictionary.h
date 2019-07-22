@@ -15,6 +15,8 @@ void *searchDictionary(Dictionary *dictionary, const char *name);
 
 bool insertDictionary(Dictionary *dictionary, const char *name, void *value);
 
+void deleteFromDictionary(Dictionary *dictionary, const char *name, void deleteValue(void *));
+
 void deleteDictionary(Dictionary *dictionary, void deleteValue(void *));
 
 #endif //DROGI_DICTIONARY_H
