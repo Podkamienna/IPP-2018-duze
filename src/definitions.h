@@ -23,6 +23,7 @@ struct City {
     char *name;
     Set *roads;
     int visited; //TODO funkcja do czyszczenia tego w citiesAndRoads
+    // TODO to chyba nie pasuje (visited).
 };
 
 struct Road {

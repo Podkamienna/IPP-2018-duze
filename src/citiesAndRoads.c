@@ -10,11 +10,12 @@
 #include <string.h>
 
 bool isCityName(const char *city) {
-        if (city == NULL) {
-            return false;
-        }
+    if (city == NULL) {
+        return false;
+    }
 
-        size_t len = strlen(city);
+    size_t len = strlen(city);
+    // TODO
 }
 
 Road *getNewRoad(int year, int length, City *city1, City *city2) {
@@ -32,12 +33,12 @@ Road *getNewRoad(int year, int length, City *city1, City *city2) {
     return newRoad;
 }
 
-bool predicate(Road *road1, Road *road2) {
-    if(road1->city1 == road2->city1 && road1->city2 == road2->city2) {
+bool predicate(Road *road1, Road *road2) { // TODO zbyt ogólna nazwa?
+    if (road1->city1 == road2->city1 && road1->city2 == road2->city2) {
         return true;
     }
 
-    if(road1->city1 == road2->city2 && road1->city2 == road2->city1) {
+    if (road1->city1 == road2->city2 && road1->city2 == road2->city1) {
         return true;
     }
 
@@ -63,7 +64,7 @@ static bool notExistsRoad(Map *map, City *city1, City *city2) {
 City *getNewCity(const char *name) {
     City *newCity = malloc(sizeof(City));
 
-    if(newCity == NULL) {
+    if (newCity == NULL) {
         return NULL;
     }
 
@@ -97,7 +98,7 @@ bool addNewRoad(Map *map, const char *city1, const char *city2, int year, int le
         return false;
     }
 
-    City *tmpCity1, *tmpCity2;
+    City *tmpCity1, *tmpCity2; // TODO zbyteczne
     tmpCity1 = searchCity(map, city1);
     tmpCity2 = searchCity(map, city2);
 
@@ -109,9 +110,7 @@ bool addNewRoad(Map *map, const char *city1, const char *city2, int year, int le
         if (newCity1 == NULL || !addCity(map, newCity1)) {
             return false;
         }
-    }
-
-    else {
+    } else {
         newCity1 = tmpCity1;
     }
 
@@ -119,18 +118,17 @@ bool addNewRoad(Map *map, const char *city1, const char *city2, int year, int le
         newCity2 = getNewCity(city2);
         if (newCity2 == NULL || !addCity(map, newCity2)) {
             if (tmpCity1 == NULL) {
-                deleteFromDictionary(map->cities, city1, deleteCity);
+                deleteFromDictionary(map->cities, city1, deleteCity); // TODO zbyteczne ?
             }
 
             return false;
         }
-    }
-
-    else {
+    } else {
         newCity2 = tmpCity2;
     }
     //jezeli tak jest, to miasta istnialy wczesniej, wiec nie trzeba nic usuwac
-    if (!notExistsRoad(map, newCity1, newCity2)) {
+    // TODO poprawić komentarze
+    if (!notExistsRoad(map, newCity1, newCity2)) { // TODO wymyślić lepszą nazwę
         return false;
     }
 
@@ -138,7 +136,7 @@ bool addNewRoad(Map *map, const char *city1, const char *city2, int year, int le
 
     if (!insertSet(newCity2->roads, newRoad)) {
         if (tmpCity1 == NULL) {
-            deleteFromDictionary(map->cities, city1, deleteCity);
+            deleteFromDictionary(map->cities, city1, deleteCity); // TODO niepotrzebne?
         }
 
         if (tmpCity2 == NULL) {
@@ -178,10 +176,11 @@ void zeroVisited(City *city) {
 }
 
 
-City *searchCity(Map *map, const char *city) {
+City *searchCity(Map *map, const char *city) { //  TODO nie ma sprawdzenia NULL a wszędzie indziej jest
     return searchDictionary(map->cities, city);
 }
 
+// TODO co co za komentarz?
 //called from repairRoad
 Road *searchRoad(Map *map, City *city1, City *city2) {
     if (city1 == NULL || city2 == NULL) {
@@ -212,7 +211,7 @@ bool fixRoad(Map *map, const char *city1, const char *city2, int repairYear) {
         return false;
     }
 
-
+    // TODO
 }
 
 void deleteCity(City *city) {
@@ -220,5 +219,6 @@ void deleteCity(City *city) {
 
     free(city->name);
     free(city);
-    city = NULL; // czy to wystarczy, żeby było ok przy usuwaniu jezeli cos sie zepsuje przy usuwaniu drogi?
+    // TODO jak są usuwane odcinki drogowe?
+    city = NULL; // czy to wystarczy, żeby było ok przy usuwaniu jezeli cos sie zepsuje przy usuwaniu drogi? nie
 }

@@ -8,6 +8,7 @@
 
 
 bool resizeVector(Vector *vector) {
+    // TODO może static? nigdzie nie jest uzywane na zewnatrz modulu? czy kiedys bedzie?
     void **newData;
     if (vector == NULL) {
         return false;
@@ -44,6 +45,7 @@ Vector *initializeVector() {
 }
 
 void *searchVector(Vector *vector, bool isOk(void *, void *), void *value) {
+    // TODO niegodnosc nazw z deklaracja, czy zmienic sygnature komparatora na zwracanie int?
     if (vector == NULL) {
         return NULL;
     }

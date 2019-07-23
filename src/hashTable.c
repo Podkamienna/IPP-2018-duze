@@ -25,8 +25,10 @@ struct Entry {
     const char *name;
     void *value;
 };
+
 //funkcja licząca hash danego napisu
 static uint64_t getHash(const char *text) {
+    // TODO strlen niepotrzebny for(i = 0; text[i] != '\0'; i++)
     size_t n = strlen(text);
     uint64_t coefficient = 1, tmpHash = 0;
 
@@ -83,7 +85,8 @@ static size_t getPosition(HashTable *hashTable, size_t hash) {
 static bool insertEntryHashTable(HashTable *hashTable, Entry *entry) {
     size_t position = getPosition(hashTable, entry->hash);
 
-    for (size_t i = 0; i < hashTable->size; i++, position = (position + 1) % hashTable->size) {
+    for (size_t i = 0; i < hashTable->size; i++, position = (position + 1) % hashTable->size) { // TODO getPosition
+        // TODO może lepiej zamiast getPosition zrobić getNextPosition
         if (hashTable->table[i] == NULL) {
             hashTable->table[i] = entry;
 
@@ -105,7 +108,8 @@ static Entry *searchEntryHashTable(HashTable *hashTable, const char *name) {
     size_t i = 0;
 
     while (hashTable->table[(position + i) % (hashTable->size + 1)] != NULL || i < hashTable->size) {
-        if (hashTable->table[(position + i) % (hashTable->size + 1)]->hash != hash) {
+        if (hashTable->table[(position + i) % (hashTable->size + 1)]->hash !=
+            hash) { // TODO skrócić (zrobić getNextPosition)
             return NULL;
         }
 
@@ -131,6 +135,7 @@ static void deleteEntry(Entry *entry, void deleteValue(void *)) {
 }
 
 void iterate(HashTable *hashTable, void fun(void *)) {
+    // TODO usunąć
     for (size_t i = 0; i < hashTable->size; i++) {
         fun(hashTable->table[i]->value);
     }

@@ -22,6 +22,7 @@ Set *initializeSet() {
 }
 
 void *searchSet(Set *set, bool cmp(void *, void *), void *value) {
+    // TODO moze cmp jako jako atrybut przy inicjalizacji ustawić?
     if (set == NULL) {
         return NULL;
     }

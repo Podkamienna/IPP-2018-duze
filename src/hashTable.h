@@ -65,7 +65,7 @@ void deleteFromHashTable(HashTable *hashTable, const char *name, void deleteValu
  * @brief 
  * @param hashTable
  * @param deleteValue
- */
+ */ // TODO
 void deleteHashTable(HashTable *hashTable, void deleteValue(void *));
 
 #endif /* DROGI_HASH_TABLE_H */

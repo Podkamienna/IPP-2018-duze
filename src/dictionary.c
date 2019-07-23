@@ -19,7 +19,7 @@ typedef struct HashTable HashTable;
 typedef struct Entry Entry;
 
 struct Dictionary {
-    size_t id;
+    size_t id; // TODO zupełnie zapomniane. Usunąć, użyć?
     size_t size;
     size_t numberOfElements;
     HashTable *hashTable;
