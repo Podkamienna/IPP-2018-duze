@@ -50,14 +50,6 @@ Dictionary *initializeDictionary() {
     return newDictionary;
 }
 
-/**
- * @param dictionary
- * @param name
- * @param hash
- * @return NULL if name is NULL or dictionary is NULL or the entry that is being searched
- * for doesn't exist
- */
-
 void *searchDictionary(Dictionary *dictionary, const char *name) {
     if (dictionary == NULL) {
         return NULL;
@@ -65,14 +57,7 @@ void *searchDictionary(Dictionary *dictionary, const char *name) {
 
     return searchHashTable(dictionary->hashTable, name);
 }
-/**
- * the dictionary is not NULL
- * @param dictionary
- * @param name
- * @param getNewContent
- * @param hash
- * @return
- */
+
 bool insertDictionary(Dictionary *dictionary, const char *name, void *value) {
     if (dictionary == NULL || name == NULL || value == NULL || dictionary->hashTable == NULL) {
         return false;
