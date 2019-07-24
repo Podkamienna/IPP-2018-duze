@@ -8,9 +8,10 @@
 
 struct Set {
     Vector *vector;
+    int (*compare)(void *, void *);
 };
 
-Set *initializeSet() {
+Set *initializeSet(int compare(void *, void *)) {
     Set *newSet = malloc(sizeof(Set));
 
     if (newSet == NULL) {
@@ -18,16 +19,17 @@ Set *initializeSet() {
     }
 
     newSet->vector = initializeVector();
+    newSet->compare = compare;
+
     return newSet;
 }
 
-void *searchSet(Set *set, bool cmp(void *, void *), void *value) {
-    // TODO moze cmp jako jako atrybut przy inicjalizacji ustawić?
+void *searchSet(Set *set, void *value) {
     if (set == NULL) {
         return NULL;
     }
 
-    return searchVector(set->vector, cmp, value);
+    return searchVector(set->vector, set->compare, value);
 }
 
 bool insertSet(Set *set, void *value) {

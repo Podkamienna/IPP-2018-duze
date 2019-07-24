@@ -31,13 +31,14 @@ HashTable *initializeHashTable(size_t initialSize);
 void *searchHashTable(HashTable *hashTable, const char *name);
 
 /**
- * @brief Dodaje element do hash tablicy
+ * @brief Dodaje element do hash tablicy, jeżeli go nie ma w tej tablicy
  * @param hashTable — hash tablica do której element jest dodawany
  * @param name — nazwa przyporządkowana do wartości, którama być dodana
  * @param value — wartość która ma być dodana to hash tablicy
  * @return Wartość @p true jeżeli udało się dodać element.
  * Wartość @p false, jeżeli coś się nie powiodło: nie udało się zaalokować
- * pamięci lub któryś z parametrów miał niepoprawną wartość
+ * pamięci, któryś z parametrów miał niepoprawną wartość lub element
+ * już był w hash tablicy
  */
 bool insertHashTable(HashTable *hashTable, const char *name, void *value);
 
@@ -62,7 +63,7 @@ HashTable *resizeHashTable(HashTable *hashTable, size_t newSize);
 void deleteFromHashTable(HashTable *hashTable, const char *name, void deleteValue(void *));
 
 /**
- * @brief 
+ * @brief
  * @param hashTable
  * @param deleteValue
  */ // TODO

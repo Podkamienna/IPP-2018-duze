@@ -12,7 +12,7 @@ typedef struct Set Set;
  * @brief Funkcja alokująca pamięć pod i zwracająca nowy Set.
  * @return Nowy Set lub NULL, gdy nie udało się zaalokować pamięci.
  */
-Set *initializeSet();
+Set *initializeSet(int compare(void *, void *));
 
 /**
  * @brief Funkcja wyszukująca w Set zadanej wartości.
@@ -22,7 +22,7 @@ Set *initializeSet();
  * @return Zwraca znalezioną wartość lub NULL, gdy się nie udało jej znaleźć,
  * lub set jest NULLem
  */
-void *searchSet(Set *set, bool cmp(void *, void *), void *value);
+void *searchSet(Set *set, void *value);
 
 /**
  * @brief Dodaje zadaną wartość do setu.

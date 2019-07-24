@@ -42,7 +42,7 @@ Vector *initializeVector();
  * obecna w wektorze, lub któryś z parametrów
  * ma niepoprawną wartość
  */
-void *searchVector(Vector *vector, bool cmp(void *, void *), void *value);
+void *searchVector(Vector *vector, int cmp(void *, void *), void *value);
 
 /**
  * @brief Dodaje zadaną wartość na koniec wektora.

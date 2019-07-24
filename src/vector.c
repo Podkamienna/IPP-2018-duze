@@ -44,14 +44,13 @@ Vector *initializeVector() {
     return newVector;
 }
 
-void *searchVector(Vector *vector, bool isOk(void *, void *), void *value) {
-    // TODO niegodnosc nazw z deklaracja, czy zmienic sygnature komparatora na zwracanie int?
+void *searchVector(Vector *vector, int cmp(void *, void *), void *value) {
     if (vector == NULL) {
         return NULL;
     }
 
     for (size_t i = 0; i < vector->size; i++) {
-        if (isOk(vector->data[i], value)) {
+        if (cmp(vector->data[i], value)) {
             return vector->data[i];
         }
     }

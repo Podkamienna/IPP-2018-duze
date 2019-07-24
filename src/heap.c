@@ -83,9 +83,9 @@ bool pushHeap(Heap *heap, void *value) {
     size_t position = heap->vector->size - 1;
     void **data = heap->vector->data;
 
-    while (position != 0) { //TODO???, warunek do ciała wrzucićć, zmiennna opomcnicza parent
+    while (true) { //TODO???, warunek do ciała wrzucićć, zmiennna opomcnicza parent
         size_t parent = getParent(position);
-        if (heap->compare(data[parent], data[position]) > 0) {
+        if (heap->compare(data[parent], data[position]) > 0 && position != 0) {
             swap(data, position, parent);
             position = parent;
         } else {

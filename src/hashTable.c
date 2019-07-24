@@ -28,11 +28,9 @@ struct Entry {
 
 //funkcja licząca hash danego napisu
 static uint64_t getHash(const char *text) {
-    // TODO strlen niepotrzebny for(i = 0; text[i] != '\0'; i++)
-    size_t n = strlen(text);
     uint64_t coefficient = 1, tmpHash = 0;
 
-    for (size_t i = 0; i < n; i++) {
+    for (size_t i = 0; text[i] != '\0'; i++) {
         tmpHash += coefficient * text[i];
         coefficient *= GENERATOR;
         tmpHash %= PRIME;
