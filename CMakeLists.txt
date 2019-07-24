@@ -38,7 +38,10 @@ set(SOURCE_FILES
         src/hashTable.h
         src/heap.c
         src/heap.h
-        src/dijkstra.c src/dijkstra.h src/route.c src/route.h)
+        src/dijkstra.c
+        src/dijkstra.h
+        src/route.c
+        src/route.h)
 
 # Wskazujemy plik wykonywalny.
 add_executable(map ${SOURCE_FILES})
