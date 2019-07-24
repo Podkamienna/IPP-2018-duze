@@ -37,8 +37,8 @@ void *searchHashTable(HashTable *hashTable, const char *name);
  * @param value — wartość która ma być dodana to hash tablicy
  * @return Wartość @p true jeżeli udało się dodać element.
  * Wartość @p false, jeżeli coś się nie powiodło: nie udało się zaalokować
- * pamięci, któryś z parametrów miał niepoprawną wartość lub element
- * już był w hash tablicy
+ * pamięci, któryś z parametrów miał niepoprawną wartość lub nazwa ma już
+ * przypisaną wartość w hash tablicy.
  */
 bool insertHashTable(HashTable *hashTable, const char *name, void *value);
 
@@ -55,7 +55,7 @@ void iterate(HashTable *hashTable, void fun(void *)); //TODO usunac
 HashTable *resizeHashTable(HashTable *hashTable, size_t newSize);
 
 /**
- * Usuwa wartość przypisaną do danego napisu z hash tablicy.
+ * @brief Usuwa wartość przypisaną do danego napisu z hash tablicy.
  * @param hashTable — tablica z której jest usuwane
  * @param name — napis do którego jest przypisana usuwana wartość
  * @param deleteValue — funkcja usuwająca wartość
@@ -63,10 +63,10 @@ HashTable *resizeHashTable(HashTable *hashTable, size_t newSize);
 void deleteFromHashTable(HashTable *hashTable, const char *name, void deleteValue(void *));
 
 /**
- * @brief
- * @param hashTable
- * @param deleteValue
- */ // TODO
+ * @brief Usuwa hash tablicę.
+ * @param hashTable — tablica, która ma być usunięta
+ * @param deleteValue — funkcja usuwająca wartość
+ */
 void deleteHashTable(HashTable *hashTable, void deleteValue(void *));
 
 #endif /* DROGI_HASH_TABLE_H */
