@@ -7,6 +7,9 @@
 
 #include "definitions.h"
 
+static const int MINIMAL_ROUTE_ID = 1;
+static const int MAXIMAL_ROUTE_ID = 999;
+
 Route *initializeRoute();
 
 void deleteRoute(Route route);

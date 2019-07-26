@@ -7,6 +7,7 @@
 #include <stdbool.h>
 
 typedef struct Set Set;
+typedef struct SetIterator SetIterator;
 
 /**
  * @brief Funkcja alokująca pamięć pod i zwracająca nowy Set.
@@ -47,5 +48,13 @@ void deleteLastAdded(Set *set, void deleteValue(void *));
  * @param deleteValue — funkcja usuwająca elementy zbioru
  */
 void deleteSet(Set *set, void deleteValue(void *));
+
+SetIterator *getNewSetIterator(Set *set);
+
+bool *incrementSetIterator(SetIterator *setIterator);
+
+void *getNextSetIterator(SetIterator *setIterator);
+
+void deleteSetIterator(SetIterator *setIterator);
 
 #endif /* DROGI_SET_H */

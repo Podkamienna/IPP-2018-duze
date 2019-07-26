@@ -2,8 +2,8 @@
 // Created by alicja on 04.07.19.
 //
 
-#ifndef DROGI_CITIESANDROADS_H
-#define DROGI_CITIESANDROADS_H
+#ifndef DROGI_CITIES_AND_ROADS_H
+#define DROGI_CITIES_AND_ROADS_H
 
 #include "definitions.h"
 
@@ -33,8 +33,14 @@ City *getNewCity(const char *name);
  * NULL, jeżeli coś się nie powiodło - miasto nie istnieje
  * w mapie lub parametry wejściowe są nieprawidłowe.
  */
+
+//TODO
+int compareCities(City *city1, City *city2);
+
 City *searchCity(Map *map, const char *city);
 
+//TODO
+void visit(City *city);
 /**
  * @brief Zmienia zadane miasto na oznaczone jako nie odwiedzone
  * @param city — miasto do ododwiedzenia
@@ -50,6 +56,8 @@ void unvisit(City *city);
  */
 bool isVisited(City *city);
 
+//TODO komentarz
+City *getNeighbour(Road *road, City *city);
 /**
  * @brief Usuwa zadane miasto.
  * @param city — miasto do usunięcia
@@ -108,4 +116,4 @@ bool updateYearRoad(Map *map, const char *city1, const char *city2, int year);
  */
 void deleteRoad(Road *road);
 
-#endif //DROGI_CITIESANDROADS_H
+#endif //DROGI_CITIES_AND_ROADS_H

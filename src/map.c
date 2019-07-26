@@ -53,7 +53,7 @@ void deleteMap(Map *map) {
         free(map->routes[i]);
     }
 
-    deleteDictionary(map->cities, deleteCity());
+    deleteDictionary(map->cities, deleteCity);
 
     free(map);
 }
@@ -74,10 +74,6 @@ void deleteMap(Map *map) {
 bool addRoad(Map *map, const char *city1, const char *city2,
              unsigned length, int builtYear) {
     if (map == NULL) {
-        return false;
-    }
-
-    if (city1 == NULL || city2 == NULL) {
         return false;
     }
 
@@ -106,7 +102,19 @@ bool addRoad(Map *map, const char *city1, const char *city2,
  * drogi rok budowy lub ostatniego remontu.
  */
 bool repairRoad(Map *map, const char *city1, const char *city2, int repairYear) {
-    return fixRoad(map, city1, city2, repairYear);
+    if (map == NULL) {
+        return false;
+    }
+
+    if (!isCityName(city1) || !isCityName(city2)) {
+        return false;
+    }
+
+    if (repairYear == 0) {
+        return false;
+    }
+
+    return updateYearRoad(map, city1, city2, repairYear);
 }
 
 /** @brief Łączy dwa różne miasta drogą krajową.
@@ -127,7 +135,21 @@ bool repairRoad(Map *map, const char *city1, const char *city2, int repairYear) 
  * się zaalokować pamięci.
  */
 bool newRoute(Map *map, unsigned routeId,
-              const char *city1, const char *city2);
+              const char *city1, const char *city2) {
+    if (map == NULL) {
+        return false;
+    }
+
+    if (!isCityName(city1) || !isCityName(city2)) {
+        return false;
+    }
+
+    if (routeId < MINIMAL_ROUTE_ID || routeId > MAXIMAL_ROUTE_ID) {
+        return false;
+    }
+
+    return addNewRoute(map, routeId, city1, city2);
+}
 
 /** @brief Wydłuża drogę krajową do podanego miasta.
  * Dodaje do drogi krajowej nowe odcinki dróg do podanego miasta w taki sposób,

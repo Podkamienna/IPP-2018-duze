@@ -35,6 +35,9 @@ bool pushHeap(Heap *heap, void *value);
  */
 void *popHeap(Heap *heap);
 
+//TODO
+bool isEmptyHeap(Heap *heap);
+
 void seeHeap(Heap *heap);
 
 /**
