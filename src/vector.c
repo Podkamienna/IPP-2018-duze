@@ -6,6 +6,8 @@
 #include <stdlib.h>
 #include <stdbool.h>
 
+typedef struct Vector Vector;
+typedef struct VectorIterator VectorIterator;
 
 bool resizeVector(Vector *vector) {
     // TODO może static? nigdzie nie jest uzywane na zewnatrz modulu? czy kiedys bedzie?
@@ -88,6 +90,14 @@ void popFromVector(Vector *vector, void deleteValue(void *)) {
     }
 }
 
+bool isEmptyVector(Vector *vector) {
+    if (vector == NULL) {
+        return true;
+    }
+
+    return vector->size == 0;
+}
+
 void deleteVector(Vector *vector, void deleteValue(void *)) {
     if (vector == NULL) {
         return;
@@ -101,4 +111,51 @@ void deleteVector(Vector *vector, void deleteValue(void *)) {
 
     free(vector->data);
     free(vector);
+}
+
+//TODO czy nie wywalić tego do oddzielnego pliku?
+VectorIterator *getNewVectorIterator(Vector *vector) {
+    if (vector == NULL) {
+        return NULL;
+    }
+
+    VectorIterator *newVectorIterator = malloc(sizeof(VectorIterator));
+    if (newVectorIterator == NULL) {
+        return NULL;
+    }
+
+    newVectorIterator->vector = vector;
+    newVectorIterator->position = -1;
+
+    return newVectorIterator;
+}
+
+bool incrementVectorIterator(VectorIterator *vectorIterator) {
+    if (vectorIterator == NULL) {
+        return false;
+    }
+
+    if (vectorIterator->position + 1 >= vectorIterator->vector->size) {
+        return false;
+    }
+
+    vectorIterator->position++;
+
+    return true;
+}
+
+void *getNextVectorIterator(VectorIterator *vectorIterator) {
+    if (vectorIterator == NULL || vectorIterator->vector == NULL) {
+        return NULL;
+    }
+
+    if (!incrementVectorIterator(vectorIterator)) {
+        return NULL;
+    }
+
+    return vectorIterator->vector->data[vectorIterator->position];
+}
+
+void deleteVectorIterator(VectorIterator *vectorIterator) {
+    free(vectorIterator);
 }

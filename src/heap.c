@@ -55,6 +55,14 @@ void seeHeap(Heap *heap) {
     }
 }
 
+bool isEmptyHeap(Heap *heap) {
+    if (heap == NULL) {
+        return true;
+    }
+
+    return isEmptyVector(heap->vector);
+}
+
 Heap *initializeHeap(int compare(void *, void *)) {
     Heap *newHeap = malloc(sizeof(Heap));
 

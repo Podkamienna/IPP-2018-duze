@@ -33,7 +33,12 @@ struct Road {
 };
 
 struct Route {
-
+    City *city;
+    Road *edge; //droga wchodzaca do city
+    Route *prev; //do odzyskiwania najkrotszej sciezki
+    int priority; //priority = najmn ob znana odl wierzch city od wierzcholka startowego
+    int minYear; //minimalny rok ostatniego remontu na najkrótszej sciezce od wierzch start do obecnego
 };
+
 
 #endif //DROGI_DEFINITIONS_H

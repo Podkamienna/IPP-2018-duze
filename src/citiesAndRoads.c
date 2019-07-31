@@ -4,6 +4,7 @@
 
 #include "citiesAndRoads.h"
 #include "definitions.h"
+#include "dictionary.h"
 #include "set.h"
 
 #include <stdlib.h>
@@ -28,6 +29,7 @@ static Road getRoad(int year, int length, City *city1, City *city2) {
     return newRoad;
 }
 
+//zakladam, ze nie sa NULLami
 static int compareRoads(Road *road1, Road *road2) {//TODO static????
     if (road1->city1 == road2->city1 && road1->city2 == road2->city2) {
         return 0;
@@ -82,6 +84,15 @@ City *getNewCity(const char *name) {
     return newCity;
 }
 
+//zakladam, ze nie sa NULLami
+int compareCities(City *city1, City *city2) {
+    if (strcmp(city1->name, city2->name)) {
+        return 0;
+    }
+
+    return 1;
+}
+
 City *searchCity(Map *map, const char *city) {
     if (map == NULL) {
         return NULL;
@@ -92,6 +103,14 @@ City *searchCity(Map *map, const char *city) {
     }
 
     return searchDictionary(map->cities, city);
+}
+
+void visit(City *city) {
+    if (city == NULL) {
+        return;
+    }
+
+    city->visited = 1;
 }
 
 void unvisit(City *city) {
@@ -108,6 +127,26 @@ bool isVisited(City *city) {
     }
 
     return city->visited != 0;
+}
+
+City *getNeighbour(Road *road, City *city) {
+    if (road == NULL || city == NULL) {
+        return NULL;
+    }
+
+    if (compareCities(road->city1, city) != 0  && compareCities(road->city2, city) != 0) {
+        return NULL;
+    }
+
+    if (compareCities(road->city1, city) != 0) {
+        return road->city1;
+    }
+
+    if (compareCities(road->city2, city) != 0) {
+        return road->city2;
+    }
+
+    return NULL;
 }
 
 void deleteCity(City *city) {
@@ -241,6 +280,10 @@ bool updateYearRoad(Map *map, const char *city1, const char *city2, int year) {
     Road *tmpRoad = searchRoad(map, tmpCity1, tmpCity2);
 
     if (tmpRoad == NULL) {
+        return false;
+    }
+
+    if (tmpRoad->year > year) {
         return false;
     }
 

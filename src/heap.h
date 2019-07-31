@@ -35,10 +35,15 @@ bool pushHeap(Heap *heap, void *value);
  */
 void *popHeap(Heap *heap);
 
+//TODO
+bool isEmptyHeap(Heap *heap);
+
 void seeHeap(Heap *heap);
 
 /**
- * @brief Usuwa kopiec.
+ * @brief Usuwa kopiec. Jeżeli deleteValue jest NULLem to
+ * usuwa samą strukturę, bez usuwania rzeczy w niej
+ * zawartych.
  * @param heap — kopiec do usunięcia
  * @param deleteValue — funkcja usuwająca element kopca
  */

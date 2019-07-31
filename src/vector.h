@@ -8,11 +8,17 @@
 #include <stdbool.h>
 
 typedef struct Vector Vector;
+typedef struct VectorIterator VectorIterator;
 
 struct Vector {
     size_t size;
     size_t maxSize;
     void **data;
+};
+
+struct VectorIterator {
+    size_t position;
+    Vector *vector;
 };
 
 /**
@@ -61,6 +67,9 @@ bool pushVector(Vector *vector, void *value);
  */
 void popFromVector(Vector *vector, void deleteValue(void *));
 
+//TODO
+bool isEmptyVector(Vector *vector);
+
 /**
  * @brief Usuwa wektor.
  * @param vector — wektor do usunięcia
@@ -68,5 +77,12 @@ void popFromVector(Vector *vector, void deleteValue(void *));
  */
 void deleteVector(Vector *vector, void deleteValue(void *));
 
+VectorIterator *getNewVectorIterator(Vector *vector);
+
+bool incrementVectorIterator(VectorIterator *vectorIterator);
+
+void *getNextVectorIterator(VectorIterator *vectorIterator);
+
+void deleteVectorIterator(VectorIterator *vectorIterator);
 
 #endif /* DROGI_VECTOR_H */
