@@ -8,8 +8,6 @@
 #include "map.h"
 #include "definitions.h"
 
-typedef struct Graph Graph;
-
 Route *dijkstra(City *start, City *end);
 
 #endif //DROGI_DIJKSTRA_H
