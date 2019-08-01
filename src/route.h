@@ -18,6 +18,5 @@ bool insertToRoute(Map *map, unsigned routeId, const char *city1, const char *ci
 
 bool addToRoute(Map *map, unsigned routeId, const char *city);
 
-void deleteRoute(Route route);
 
 #endif //DROGI_ROUTE_H

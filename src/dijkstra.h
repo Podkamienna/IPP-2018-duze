@@ -8,6 +8,8 @@
 #include "map.h"
 #include "definitions.h"
 
+void deleteRoute(Route *route);
+
 Route *dijkstra(City *start, City *end);
 
 #endif //DROGI_DIJKSTRA_H
