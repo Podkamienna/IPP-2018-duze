@@ -10,13 +10,15 @@
 static const int MINIMAL_ROUTE_ID = 1;
 static const int MAXIMAL_ROUTE_ID = 999;
 
-Route *initializeRoute();
+Route *getNewRoute();
 
 bool addNewRoute(Map *map, unsigned routeId, const char *city1, const char *city2);
 
 bool insertToRoute(Map *map, unsigned routeId, const char *city1, const char *city2);
 
 bool addToRoute(Map *map, unsigned routeId, const char *city);
+
+void deleteRoute(Route *route);
 
 
 #endif //DROGI_ROUTE_H

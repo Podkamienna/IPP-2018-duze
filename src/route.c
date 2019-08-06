@@ -10,6 +10,12 @@
 #include <stdlib.h>
 #include <string.h>
 
+Route *getNewRoute() {
+    Route *newRoute = malloc(sizeof(Route));
+
+    return newRoute;
+}
+
 bool addNewRoute(Map *map, unsigned routeId, const char *city1, const char *city2) {
     if (map == NULL) {
         return false;
@@ -30,88 +36,25 @@ bool addNewRoute(Map *map, unsigned routeId, const char *city1, const char *city
     return true;
 }
 
-//route  - wskaźnik na początek drogi krajowej
-//city - miasto zawierający które NODE chcemy
-Route *findFirstCity(Route *route, const char *city1, const char *city2) { //TODO static
-    Route *position = route;
-    while (position != NULL) {
-        if (strcmp(city1, position->city->name) == 0) { //czy tak jest ok?
-            return position;
-        }
-
-        if (strcmp(city2, position->city->name) == 0) {
-            return position;
-        }
-    }
-
-    return NULL;
-}
-
-bool overwriteRoute(Map *map, unsigned routeId, const char *city1, const char *city2, Route *route) {
+//extendRoute
+//wszystkie miasta, które już są w drodze krajowej, nie mogą być w rozszerzeniu
+//puszczam dijkstrę z obu końców i wybieram lepszy, ale nie NULL
+bool addToRoute(Map *map, unsigned routeId, const char *city) {
     if (map == NULL) {
         return false;
     }
 
-    if (city1 == NULL || city2 == NULL) {
+    if (city == NULL) {
         return false;
     }
 
-    Route *firstCity = findFirstCity(map->routes[routeId], city1, city2), *secondCity;
-    Route *position = firstCity;
-
-    //sprawdzenie, czy to 2. miasto wgl jest w drodze krajowej
-    while (position->prev != NULL) {
-        position = position->prev;
-
-        if (strcmp(position->city->name, city1) == 0) {
-            break;
-        }
-
-        if (strcmp(position->city->name, city2) == 0) {
-            break;
-        }
-    }
-
-    if (position->prev == NULL) {
-        return false;
-    }
-
-    //usunięcie rzeczy
-    position = firstCity;
-
-    while (true) {
-        position = position->prev;
-
-        if (strcmp(position->city->name, city1) == 0) {
-            break;
-        }
-
-        if (strcmp(position->city->name, city2) == 0) {
-            break;
-        }
-
-        deleteRoute(position);
-    }
-
-    secondCity = position;
-
-    //włożenie nowych rzeczy
-    position = route;
-
-    firstCity->prev = route;
-
-    while (position->prev != NULL) {
-        position = position->prev;
-    }
-
-    position->prev = secondCity;
-
-    return true;
+    List *restrictedCities = initializeList(compareCities);
 }
 
-bool insertToRoute(Map *map, unsigned routeId, const char *city1, const char *city2){
+//Nie usuwa miast!!!
+void deleteRoute(Route *route) {
+    deleteList(route->path, deleteCity);
 
+    free(route);
 }
-
-bool addToRoute(Map *map, unsigned routeId, const char *city);
 

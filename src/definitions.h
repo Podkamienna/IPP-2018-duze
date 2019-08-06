@@ -11,7 +11,9 @@
 typedef struct City City;
 typedef struct Road Road;
 typedef struct Route Route;
+typedef struct List List;
 typedef struct Map Map;
+typedef struct dijkstraReturnValue dijkstraReturnValue;
 
 struct Map {
     Route *routes[1000];
@@ -33,12 +35,10 @@ struct Road {
 };
 
 struct Route {
-    City *city;
-    Road *edge; //droga wchodzaca do city
-    Route *prev; //do odzyskiwania najkrotszej sciezki
-    int priority; //priority = najmn ob znana odl wierzch city od wierzcholka startowego
-    int minYear; //minimalny rok ostatniego remontu na najkrótszej sciezce od wierzch start do obecnego
+    List *path;
+    City *source, *destination;
+    unsigned length;
+    int minimalYear;
 };
-
 
 #endif //DROGI_DEFINITIONS_H

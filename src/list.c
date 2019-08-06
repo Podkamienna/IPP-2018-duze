@@ -17,9 +17,14 @@ struct ListNode {
 
 struct List {
     ListNode *listNode;
+    int (*compare)(void *, void *)
 };
 
-List *initializeList() {
+List *initializeList(int compare(void *, void *)) {
+    if (compare == NULL) {
+        return NULL;
+    }
+
     List *newList = malloc(sizeof(List));
 
     if (newList == NULL) {
@@ -27,12 +32,17 @@ List *initializeList() {
     }
 
     newList->listNode = NULL;
+    newList->compare = compare;
 
     return newList;
 }
 
 bool addToList(List *list, void *value) {
     if (list == NULL) {
+        return false;
+    }
+
+    if (value == NULL) {
         return false;
     }
 
@@ -50,7 +60,7 @@ bool addToList(List *list, void *value) {
     return true;
 }
 
-bool exists(List *list, void *value, int compare(void *, void *)) {
+bool exists(List *list, void *value) {
     if (list == NULL) {
         return false;
     }
@@ -62,7 +72,7 @@ bool exists(List *list, void *value, int compare(void *, void *)) {
     ListNode *position = list->listNode;
 
     while (position != NULL) {
-        if (compare(value, position->data) == 0) {
+        if (list->compare(value, position->data) == 0) {
             return true;
         }
     }
@@ -70,7 +80,72 @@ bool exists(List *list, void *value, int compare(void *, void *)) {
     return false;
 }
 
-void deleteList(List *list) {
+bool insertToList(List *list, List *toInsert, void *beginning, void *end) {
+    if (list == NULL || toInsert == NULL) {
+        return false;
+    }
+
+    if (list->listNode == NULL && beginning == NULL && end == NULL) {
+        list->listNode = toInsert->listNode;
+
+        return true;
+    }
+
+    if (beginning == NULL && end == NULL) {
+        return false;
+    }
+
+    if (list->listNode == NULL) {
+        return false;
+    }
+
+    if (toInsert->listNode == NULL) {
+        return true;
+    }
+
+    ListNode *position = list->listNode;
+    ListNode *endToInsert = toInsert->listNode;
+
+    while (endToInsert->next != NULL) {
+        endToInsert = endToInsert->next;
+    }
+
+    if (beginning == NULL) {
+        endToInsert->next = list->listNode;
+        list->listNode = toInsert->listNode;
+
+        return true;
+    }
+
+    if (end == NULL) {
+        while (position->next != NULL) {
+            position = position->next;
+        }
+
+        position->next = toInsert->listNode;
+
+        return true;
+    }
+
+    while (true) {
+        if (position == NULL || position->next == NULL) {
+            return false;
+        }
+
+        if (list->compare(position->data, beginning) == 0 && list->compare(position->next->data, end) == 0) {
+            ListNode *positionToInsert = toInsert->listNode;
+
+            position->next = toInsert->listNode;
+            endToInsert->next = end;
+
+            return true;
+        }
+
+        position = position->next;
+    }
+}
+
+void deleteList(List *list, void deleteValue(void *)) {
     if (list == NULL) {
         return;
     }
@@ -79,8 +154,11 @@ void deleteList(List *list) {
 
     while(position->next != NULL) {
         tmp = position;
-        free(tmp);
+        if (deleteValue != NULL) {
+            deleteValue(tmp->data);
+        }
 
+        free(tmp);
         position = position->next;
     }
 
