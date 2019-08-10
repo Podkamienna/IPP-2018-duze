@@ -34,6 +34,7 @@ City *getNewCity(const char *name);
  * w mapie lub parametry wejściowe są nieprawidłowe.
  */
 
+bool removeSomeRoad(Map *map, City *city1, City *city2);
 //TODO
 int compareCities(City *city1, City *city2);
 

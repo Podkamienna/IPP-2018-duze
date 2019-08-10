@@ -63,7 +63,7 @@ bool exists(List *list, void *value);
  * listy, z których początek jest pierwszy. Jeżeli początek i koniec
  * mają wartość NULL, a zadana lista jest niepusta, to zwraca false.
  */
-bool insertToList(List *list, List *toInsert, void *beginning, void *end);
+bool insertToList(List *list, List *toInsert);
 
 /**
  * @brief Usuwa zadaną listę. Jeżeli deleteValue to NULL,

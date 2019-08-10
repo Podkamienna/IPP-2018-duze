@@ -67,6 +67,17 @@ bool pushVector(Vector *vector, void *value);
  */
 void popFromVector(Vector *vector, void deleteValue(void *));
 
+/**
+ * @brief Usuwa zadany element z wektora.
+ * @param vector — wektor z którego będzie usuwane
+ * @param deleteValue — funkcja usuwająca element wektora
+ * @param value — element do usunięcia
+ * @return Wartość @p true jeżeli udało się usunąć.
+ * Wartość @p false, jeżeli element do usunięcia nie jest zawarty
+ * z wektora..
+ */
+bool deleteFromVector(Vector *vector, void deleteValue(void *), int compare(void *, void *), void *value);
+
 //TODO
 bool isEmptyVector(Vector *vector);
 

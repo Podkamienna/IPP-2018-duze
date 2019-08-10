@@ -36,11 +36,16 @@ void *searchSet(Set *set, void *value);
 bool insertSet(Set *set, void *value);
 
 /**
- * @brief Usuwa element, który był dodany jako ostatni.
+ * @brief Usuwa zadany element ze zbioru.
  * @param set — zbiór z którego będzie usuwane
  * @param deleteValue — funkcja usuwająca element zbioru
+ * @param value — element do usunięcia
+ * @return Wartość @p true jeżeli udało się usunąć.
+ * Wartość @p false, jeżeli element do usunięcia nie jest zawarty
+ * w zbiorze.
  */
-void deleteLastAdded(Set *set, void deleteValue(void *));
+ //może jednak void? TODO
+bool deleteFromSet(Set *set, void deleteValue(void *), void *value);
 
 /**
  * @brief Usuwa zbiór.
@@ -51,7 +56,7 @@ void deleteSet(Set *set, void deleteValue(void *));
 
 SetIterator *getNewSetIterator(Set *set);
 
-bool *incrementSetIterator(SetIterator *setIterator);
+bool incrementSetIterator(SetIterator *setIterator);
 
 void *getNextSetIterator(SetIterator *setIterator);
 

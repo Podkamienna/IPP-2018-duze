@@ -11,24 +11,26 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-typedef struct routeSection routeSection;
+typedef struct RouteSection RouteSection;
 
-struct routeSection {
+struct RouteSection {
     City *city;
-    routeSection *prev;
+    Road *road; //droga, którą weszliśmy do city
+    RouteSection *prev;
     int priority; //priority = najmn ob znana odl wierzch city od wierzcholka startowego
     int minYear; //minimalny rok ostatniego remontu na najkrótszej sciezce od wierzch start do obecnego
 };
 
-routeSection *getNewRouteSection(City *node, int priority, int minYear, routeSection *pr) {
-    routeSection *newPath = NULL;
-    newPath = malloc(sizeof(routeSection));
+RouteSection *getNewRouteSection(City *city, Road *road, int priority, int minYear, RouteSection *pr) {
+    RouteSection *newPath = NULL;
+    newPath = malloc(sizeof(RouteSection));
 
     if (newPath == NULL) {
         return NULL;
     }
 
-    newPath->city = node;
+    newPath->city = city;
+    newPath->road = road;
     newPath->priority = priority;
     newPath->minYear = minYear;
     newPath->prev = pr;
@@ -36,11 +38,11 @@ routeSection *getNewRouteSection(City *node, int priority, int minYear, routeSec
     return newPath;
 }
 
-void deleteRouteSection(routeSection *path) {
+void deleteRouteSection(RouteSection *path) {
     free(path);
 }
 
-void deleteRouteDijkstra(routeSection *route) {
+void deleteRouteDijkstra(RouteSection *route) {
     if (route->prev == NULL) {
         return;
     }
@@ -49,7 +51,7 @@ void deleteRouteDijkstra(routeSection *route) {
     free(route);
 }
 
-int compareRouteSection(routeSection *a, routeSection *b) {
+int compareRouteSection(RouteSection *a, RouteSection *b) {
     if(a->priority > b->priority)
         return -1;
 
@@ -79,7 +81,7 @@ int nonzeroMin(int a, int b) {
 }
 
 //tworzy listę, będącą drogą krajową
-Route *createRoute(routeSection *tempRoute, City *source, City *destination) {
+Route *createRoute(RouteSection *tempRoute, City *source, City *destination) {
     Route *newRoute = getNewRoute();
 
     if (newRoute == NULL) {
@@ -91,10 +93,10 @@ Route *createRoute(routeSection *tempRoute, City *source, City *destination) {
     newRoute->source = source;
     newRoute->destination = destination;
 
-    routeSection *position = tempRoute;
+    RouteSection *position = tempRoute;
 
     while (position->prev != NULL) {
-        if (!addToList(newRoute->path, position->city)) {
+        if (!addToList(newRoute->path, getNewPathNode(position->city, position->road))) {
             deleteRoute(newRoute);
 
             return NULL;
@@ -104,14 +106,14 @@ Route *createRoute(routeSection *tempRoute, City *source, City *destination) {
     return newRoute;
 }
 
-bool pushNeighbours(routeSection *graph, Heap *heap, Vector *routes, List *restrictedCities) {
+bool pushNeighbours(RouteSection *graph, Heap *heap, Vector *routes, List *restrictedCities) {
     SetIterator *setIterator = getNewSetIterator(graph->city->roads);
 
     if (setIterator == NULL) {
         return false;
     }
 
-    routeSection *temp1 = NULL;
+    RouteSection *temp1 = NULL;
     Road *road;
     City *neighbour;
 
@@ -148,6 +150,7 @@ bool pushNeighbours(routeSection *graph, Heap *heap, Vector *routes, List *restr
             }
         }
         }
+        return true;
     }
 
 //TODO pozmieniać jakoś te wszystkie nazwy i wgl, nowa struktura na drogi krajowe (tu zrobić jakąś inną)
@@ -165,7 +168,7 @@ Route *dijkstra(City *source, City *destination, List *restrictedCities) {
         return NULL;
     }
 
-    routeSection *temp = getNewRouteSection(source,  0, 0, NULL); //wierzcholek poczatkowy
+    RouteSection *temp = getNewRouteSection(source,  0, 0, NULL); //wierzcholek poczatkowy
 
     if (temp == NULL) {
         deleteHeap(priorityQueue, deleteRouteDijkstra);
@@ -191,13 +194,13 @@ Route *dijkstra(City *source, City *destination, List *restrictedCities) {
     }
 
     if (!pushVector(routes, temp)) {
-        deleteHeap(priorityQueue, NULL);
+        deleteHeap(priorityQueue, NULL); //TODO jak memleaki, to pewnie tu
         deleteVector(routes, deleteRouteDijkstra);
 
         return NULL;
     }
 
-    routeSection *worseEnd = NULL, *tempEnd = NULL; //zmienna przechowujaca graf koncowy przed ostatnia zmiana na lepsze (zeby sprawdzic, czy jednoznaczne)
+    RouteSection *worseEnd = NULL, *tempEnd = NULL; //zmienna przechowujaca graf koncowy przed ostatnia zmiana na lepsze (zeby sprawdzic, czy jednoznaczne)
     while (!isEmptyHeap(priorityQueue) && worseEnd == NULL) {
         temp = popHeap(priorityQueue);
 
@@ -218,12 +221,6 @@ Route *dijkstra(City *source, City *destination, List *restrictedCities) {
 
         visit(temp->city); //ustawiamy obecny wierzcholek na odwiedzony
     }
-    if (tempEnd == NULL || (worseEnd != NULL && compareRouteSection(worseEnd, tempEnd) == 0)) {//sprawdzenie czy jednoznaczne
-        deleteHeap(priorityQueue, NULL);
-        deleteVector(routes, deleteRouteDijkstra);
-
-        return NULL;
-    }
 
     Route *newRoute = createRoute(tempEnd, source, destination);
 
@@ -232,6 +229,10 @@ Route *dijkstra(City *source, City *destination, List *restrictedCities) {
         deleteVector(routes, deleteRouteDijkstra);
 
         return NULL;
+    }
+
+    if (tempEnd == NULL || (worseEnd != NULL && compareRouteSection(worseEnd, tempEnd) == 0)) {//sprawdzenie czy jednoznaczne
+        newRoute->minimalYear = 0;
     }
 
     deleteHeap(priorityQueue, NULL);

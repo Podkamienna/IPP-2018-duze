@@ -7,10 +7,14 @@
 
 #include "definitions.h"
 
-static const int MINIMAL_ROUTE_ID = 1;
-static const int MAXIMAL_ROUTE_ID = 999;
+static const unsigned MINIMAL_ROUTE_ID = 1;
+static const unsigned MAXIMAL_ROUTE_ID = 999;
+
+typedef struct PathNode PathNode;
 
 Route *getNewRoute();
+
+PathNode *getNewPathNode(City *city, Road *road);
 
 bool addNewRoute(Map *map, unsigned routeId, const char *city1, const char *city2);
 

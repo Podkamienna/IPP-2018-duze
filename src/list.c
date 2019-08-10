@@ -75,23 +75,19 @@ bool exists(List *list, void *value) {
         if (list->compare(value, position->data) == 0) {
             return true;
         }
+        position = position->next;
     }
 
     return false;
 }
 
-bool insertToList(List *list, List *toInsert, void *beginning, void *end) {
+//TODO robić tak, żeby było spoko - puszczać to na każdej z 1000 dróg krajowych (usunac beginning i end)
+bool insertToList(List *list, List *toInsert) {
     if (list == NULL || toInsert == NULL) {
         return false;
     }
 
-    if (list->listNode == NULL && beginning == NULL && end == NULL) {
-        list->listNode = toInsert->listNode;
-
-        return true;
-    }
-
-    if (beginning == NULL && end == NULL) {
+    if (toInsert->listNode == NULL) {
         return false;
     }
 
@@ -99,50 +95,54 @@ bool insertToList(List *list, List *toInsert, void *beginning, void *end) {
         return false;
     }
 
-    if (toInsert->listNode == NULL) {
-        return true;
-    }
+    ListNode *beginInsert = toInsert->listNode;
+    ListNode *endInsert = toInsert->listNode;
 
     ListNode *position = list->listNode;
-    ListNode *endToInsert = toInsert->listNode;
+    ListNode *endList = NULL;
 
-    while (endToInsert->next != NULL) {
-        endToInsert = endToInsert->next;
+    while (endInsert->next != NULL) {
+        endInsert = endInsert->next;
     }
 
-    if (beginning == NULL) {
-        endToInsert->next = list->listNode;
-        list->listNode = toInsert->listNode;
+    if (list->compare(position, endInsert) == 0) {
+        free(position);
+        endInsert->next = position->next;
+        list->listNode = beginInsert;
 
         return true;
     }
 
-    if (end == NULL) {
-        while (position->next != NULL) {
-            position = position->next;
-        }
+    while (position != NULL) {
+        endList = position;
+        if (list->compare(beginInsert->data, position->data) == 0) {
+            if (position->next == NULL) {
+                position->next = beginInsert->next;
+                free(beginInsert);
 
-        position->next = toInsert->listNode;
+                return true;
+            }
 
-        return true;
-    }
+            if (list->compare(endInsert->data, position->next->data) == 0) {
+                endInsert->next = position->next->next;
+                free(position->next);
 
-    while (true) {
-        if (position == NULL || position->next == NULL) {
-            return false;
-        }
+                position->next = beginInsert->next;
+                free(beginInsert);
 
-        if (list->compare(position->data, beginning) == 0 && list->compare(position->next->data, end) == 0) {
-            ListNode *positionToInsert = toInsert->listNode;
-
-            position->next = toInsert->listNode;
-            endToInsert->next = end;
-
-            return true;
+                return true;
+            }
         }
 
         position = position->next;
     }
+
+    if (list->compare(endList->data, beginInsert->data) == 0) {
+        endList->next = beginInsert->next;
+        free(beginInsert);
+    }
+
+    return false;
 }
 
 void deleteList(List *list, void deleteValue(void *)) {

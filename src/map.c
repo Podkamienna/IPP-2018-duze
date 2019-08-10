@@ -2,6 +2,7 @@
 #include "dictionary.h"
 #include "route.h"
 #include "citiesAndRoads.h"
+#include "list.h"
 
 #include <stdbool.h>
 #include <stdlib.h>
@@ -81,7 +82,7 @@ bool addRoad(Map *map, const char *city1, const char *city2,
         return false;
     }
 
-    if (length <= 0 || builtYear == 0) {
+    if (length == 0 || builtYear == 0) {
         return false;
     }
 
@@ -168,7 +169,9 @@ bool newRoute(Map *map, unsigned routeId,
  * wyznaczyć nowego fragmentu drogi krajowej lub nie udało się zaalokować
  * pamięci.
  */
-bool extendRoute(Map *map, unsigned routeId, const char *city);
+bool extendRoute(Map *map, unsigned routeId, const char *city) {
+    return addToRoute(map, routeId, city);
+}
 
 /** @brief Usuwa odcinek drogi między dwoma różnymi miastami.
  * Usuwa odcinek drogi między dwoma miastami. Jeśli usunięcie tego odcinka drogi
@@ -187,7 +190,35 @@ bool extendRoute(Map *map, unsigned routeId, const char *city);
  * uzupełnić przerwanego ciągu drogi krajowej lub nie udało się zaalokować
  * pamięci.
  */
-bool removeRoad(Map *map, const char *city1, const char *city2);
+bool removeRoad(Map *map, const char *city1, const char *city2) {
+    City *tmpCity1 = searchCity(map, city1);
+    City *tmpCity2 = searchCity(map, city2);
+
+    if (tmpCity1 == NULL || tmpCity2 == NULL) {
+        return false;
+    }
+
+    Road *toRemove = searchRoad(map, tmpCity1, tmpCity2);
+
+    if (toRemove == NULL) {
+        return false;
+    }
+
+    int removedYear = toRemove->year;
+    unsigned removedLength = toRemove->length;
+
+    removeSomeRoad(map, tmpCity1, tmpCity2);
+
+    for (int i = MINIMAL_ROUTE_ID; i <= MAXIMAL_ROUTE_ID; i++) {
+        List *restrictedCities = initializeList(compareCities);
+        //TODO zmienić komparatry wszędzie
+
+        if
+    }
+
+
+    //TODO dokończyć!!! Przejrzeć wszystkie drogi krajowe i powkładać tam rzeczy
+}
 
 /** @brief Udostępnia informacje o drodze krajowej.
  * Zwraca wskaźnik na napis, który zawiera informacje o drodze krajowej. Alokuje
