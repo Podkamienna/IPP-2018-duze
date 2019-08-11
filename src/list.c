@@ -71,7 +71,6 @@ bool exists(List *list, void *value) {
     return false;
 }
 
-//TODO robić tak, żeby było spoko - puszczać to na każdej z 1000 dróg krajowych (usunac beginning i end)
 bool insertToList(List *list, List *toInsert) {
     if (list == NULL || toInsert == NULL) {
         return false;

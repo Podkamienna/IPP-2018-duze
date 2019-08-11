@@ -11,14 +11,13 @@ typedef struct VectorIterator VectorIterator;
 
 bool resizeVector(Vector *vector) {
     // TODO może static? nigdzie nie jest uzywane na zewnatrz modulu? czy kiedys bedzie?
-    void **newData;
     if (vector == NULL) {
         return false;
     }
 
     size_t newSize = 2 * vector->maxSize + 4;
 
-    newData = realloc(vector->data, newSize * sizeof(void *));
+    void **newData = realloc(vector->data, newSize * sizeof(void *));
 
     if (newData == NULL) {
         return false;
@@ -26,12 +25,12 @@ bool resizeVector(Vector *vector) {
 
     vector->data = newData;
     vector->maxSize = newSize;
+
     return true;
 }
 
 Vector *initializeVector() {
-    Vector *newVector = NULL;
-    newVector = malloc(sizeof(Vector));
+    Vector *newVector = malloc(sizeof(Vector));
 
     if (newVector == NULL) {
         return NULL;
@@ -75,6 +74,7 @@ bool pushVector(Vector *vector, void *value) {
         }
     }
     vector->data[vector->size++] = value;
+
     return true;
 }
 

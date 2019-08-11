@@ -15,6 +15,10 @@ typedef struct List List;
 typedef struct Map Map;
 typedef struct dijkstraReturnValue dijkstraReturnValue;
 
+const char *SEMICOLON = ";";
+const char *MINUS = "-";
+const char ZERO = '0';
+
 struct Map {
     Route *routes[1000];
     Dictionary *cities;

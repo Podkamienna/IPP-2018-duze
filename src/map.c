@@ -4,6 +4,7 @@
 #include "citiesAndRoads.h"
 #include "list.h"
 #include "dijkstra.h"
+#include "string.h"
 
 #include <stdbool.h>
 #include <stdlib.h>
@@ -348,20 +349,82 @@ bool removeRoad(Map *map, const char *city1, const char *city2) {
  * @return Wskaźnik na napis lub NULL, gdy nie udało się zaalokować pamięci.
  */
 char const *getRouteDescription(Map *map, unsigned routeId) {
+    if (map == NULL) {
+        return NULL;
+    }
+
     if (map->routes[routeId] == NULL) {
         return NULL;
     }
 
-    const char *string;
-    size_t maximalStringSize = 10;
-    size_t stringSize = 0;
+    if (routeId < MINIMAL_ROUTE_ID || routeId > MAXIMAL_ROUTE_ID) {
+        return NULL;
+    }
 
-    string = malloc(maximalStringSize*sizeof(char));
+    String *string = initializeString();
 
-    if (stringSize > )
+    PathNode *position = map->routes[routeId]->path->listNode->next;
 
+    if (!concatenateString(string, ))
+    if (!concatenateString(string, position->city->name)) {
+        deleteString(string, true);
 
+        return false;
+    }
 
+    while (position != NULL) {
+        if (!concatenateString(string, SEMICOLON)) {
+            deleteString(string, true);
+
+            return NULL;
+        }
+
+        const char *year = numberToString(position->road->year);
+
+        if (year == NULL) {
+            deleteString(string, true);
+
+            return false;
+        }
+
+        const char *length = numberToString(position->road->length);
+
+        if (length == NULL) {
+            deleteString(string, true);
+
+            return false;
+        }
+
+        if (!concatenateString(string, length)) {
+            deleteString(string, true);
+
+            return NULL;
+        }
+
+        if (!concatenateString(string, SEMICOLON)) {
+            deleteString(string, true);
+
+            return NULL;
+        }
+
+        if (!concatenateString(string, year)) {
+            deleteString(string, true);
+
+            return false;
+        }
+
+        if (!concatenateString(string, SEMICOLON)) {
+            deleteString(string, true);
+
+            return NULL;
+        }
+
+        if (!concatenateString(string, position->city->name)) {
+            deleteString(string, true);
+
+            return NULL;
+        }
+    }
 }
 
 
