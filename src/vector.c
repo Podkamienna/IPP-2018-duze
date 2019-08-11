@@ -85,9 +85,11 @@ void popFromVector(Vector *vector, void deleteValue(void *)) {
 
     vector->size--;
 
-    if (deleteValue != NULL) {
+    if (deleteValue != NULL && vector->data[vector->size] != NULL) {
         deleteValue(vector->data[vector->size]);
     }
+
+    vector->data[vector->size] = NULL;
 }
 
 static void swap(void **arr, size_t i, size_t j) {

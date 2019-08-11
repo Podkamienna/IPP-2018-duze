@@ -97,6 +97,9 @@ bool addNewRoad(Map *map, const char *city1, const char *city2, int year, int le
  * @return Znaleziona droga lub NULL, gdy nie ma drogi lub któryś
  * z argumentów ma niepoprawną wartość
  */
+
+int compareRoads(Road *road1, Road *road2);
+
 Road *searchRoad(Map *map, City *city1, City *city2);
 
 /**

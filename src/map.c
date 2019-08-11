@@ -3,16 +3,26 @@
 #include "route.h"
 #include "citiesAndRoads.h"
 #include "list.h"
+#include "dijkstra.h"
 
 #include <stdbool.h>
 #include <stdlib.h>
 #include <string.h>
+#include <math.h>
 
 /**
  * Struktura przechowująca mapę dróg krajowych.
  */
 typedef struct Map Map;
 
+//TODO to gdzieś indziej. Gdzie?
+int min(int a, int b) {
+    if (a > b) {
+        return b;
+    }
+
+    return a;
+}
 /** @brief Tworzy nową strukturę.
  * Tworzy nową, pustą strukturę niezawierającą żadnych miast, odcinków dróg ani
  * dróg krajowych.
@@ -51,7 +61,7 @@ void deleteMap(Map *map) {
     }
 
     for (int i = 0; i < 1000; i++) {
-        free(map->routes[i]);
+        deleteRoute(map->routes[i]);
     }
 
     deleteDictionary(map->cities, deleteCity);
@@ -141,6 +151,10 @@ bool newRoute(Map *map, unsigned routeId,
         return false;
     }
 
+    if (city1 == NULL || city2 == NULL) {
+        return false;
+    }
+
     if (!isCityName(city1) || !isCityName(city2)) {
         return false;
     }
@@ -149,7 +163,17 @@ bool newRoute(Map *map, unsigned routeId,
         return false;
     }
 
-    return addNewRoute(map, routeId, city1, city2);
+    Route *newRoute = dijkstra(searchDictionary(map->cities, city1), searchDictionary(map->cities, city2), NULL);
+
+    if (!isCorrectRoute(newRoute)) { //sprawdzam, czy udalo sie wyznaczyc droge i czy jednznacznie
+        deleteRoute(newRoute);
+
+        return false;
+    }
+
+    map->routes[routeId] = newRoute;
+
+    return true;
 }
 
 /** @brief Wydłuża drogę krajową do podanego miasta.
@@ -170,7 +194,60 @@ bool newRoute(Map *map, unsigned routeId,
  * pamięci.
  */
 bool extendRoute(Map *map, unsigned routeId, const char *city) {
-    return addToRoute(map, routeId, city);
+    if (map == NULL) {
+        return false;
+    }
+
+    if (city == NULL) {
+        return false;
+    }
+
+    if (map->routes[routeId] == NULL) {
+        return false;
+    }
+//TODO porobić zmienne na miasta/restricted itd
+    Route *tempRoute1 = dijkstra(searchDictionary(map->cities, city), map->routes[routeId]->source, map->routes[routeId]->path);
+
+    if (tempRoute1 == NULL) {
+        return false;
+    }
+
+    Route *tempRoute2 = dijkstra(map->routes[routeId]->destination, searchDictionary(map->cities, city), map->routes[routeId]->path);
+
+    if (tempRoute2 == NULL) {
+        deleteRoute(tempRoute1);
+
+        return false;
+    }
+
+    int compareResult = compareRoute(tempRoute1, tempRoute2);
+
+    if (compareResult == 0) {
+        deleteRoute(tempRoute1);
+        deleteRoute(tempRoute2);
+
+        return false;
+    }
+
+    if (compareResult == 1) {
+        deleteRoute(tempRoute2);
+
+        insertToList(map->routes[routeId]->path, tempRoute1); //działa, bo w każdej drodze krajowej każde miasto występuje
+        map->routes[routeId]->source = tempRoute1->source; //conajwyżej raz
+        map->routes[routeId]->minimalYear = min(map->routes[routeId]->minimalYear, tempRoute1->minimalYear);
+        map->routes[routeId]->length += tempRoute1->length;
+    }
+
+    if (compareResult == -1) {
+        deleteRoute(tempRoute2);
+
+        insertToList(map->routes[routeId]->path, tempRoute2); //jak wyżej
+        map->routes[routeId]->destination = tempRoute1->destination;
+        map->routes[routeId]->minimalYear = min(map->routes[routeId]->minimalYear, tempRoute1->minimalYear);
+        map->routes[routeId]->length += tempRoute1->length;
+    }
+
+    return true;
 }
 
 /** @brief Usuwa odcinek drogi między dwoma różnymi miastami.
@@ -204,19 +281,54 @@ bool removeRoad(Map *map, const char *city1, const char *city2) {
         return false;
     }
 
-    int removedYear = toRemove->year;
-    unsigned removedLength = toRemove->length;
+    PathNode *pathNode = getNewPathNode(NULL, toRemove);
+
+    if (pathNode == NULL) {
+        return false;
+    }
+
+    List **RoutesToInsert = calloc(sizeof(List), 1000);
+
+    if (RoutesToInsert == NULL) {
+        deletePathNode(pathNode);
+
+        return false;
+    }
+
+    for (unsigned int i = MINIMAL_ROUTE_ID; i <= MAXIMAL_ROUTE_ID; i++) {
+        List *restrictedPaths = map->routes[i]->path;
+        if (exists(restrictedPaths, pathNode)) {
+            Route *newRoute = dijkstra(tmpCity1, tmpCity2, restrictedPaths);
+
+            if (!isCorrectRoute(newRoute)) {
+                if (newRoute != NULL) {
+                    deleteRoute(newRoute);
+                }
+
+                for (unsigned j = i; j >= 0; j--) {
+                    deleteList(RoutesToInsert[j], deletePathNode);
+                }
+
+                deletePathNode(pathNode);
+                free(RoutesToInsert);
+
+                return false;
+            }
+
+            RoutesToInsert[i] = newRoute->path;
+        }
+    }
+
+    for (unsigned i = MINIMAL_ROUTE_ID; i <= MAXIMAL_ROUTE_ID; i++) {
+        insertToList(map->routes[i]->path, RoutesToInsert[i]);
+    }
 
     removeSomeRoad(map, tmpCity1, tmpCity2);
 
-    for (int i = MINIMAL_ROUTE_ID; i <= MAXIMAL_ROUTE_ID; i++) {
-        List *restrictedCities = initializeList(compareCities);
-        //TODO zmienić komparatry wszędzie
+    deletePathNode(pathNode);
+    free(RoutesToInsert);
 
-        if
-    }
-
-
+    return true;
     //TODO dokończyć!!! Przejrzeć wszystkie drogi krajowe i powkładać tam rzeczy
 }
 
@@ -235,6 +347,21 @@ bool removeRoad(Map *map, const char *city1, const char *city2) {
  * @param[in] routeId    – numer drogi krajowej.
  * @return Wskaźnik na napis lub NULL, gdy nie udało się zaalokować pamięci.
  */
-char const *getRouteDescription(Map *map, unsigned routeId);
+char const *getRouteDescription(Map *map, unsigned routeId) {
+    if (map->routes[routeId] == NULL) {
+        return NULL;
+    }
+
+    const char *string;
+    size_t maximalStringSize = 10;
+    size_t stringSize = 0;
+
+    string = malloc(maximalStringSize*sizeof(char));
+
+    if (stringSize > )
+
+
+
+}
 
 

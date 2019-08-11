@@ -30,7 +30,7 @@ static Road getRoad(int year, int length, City *city1, City *city2) {
 }
 
 //zakladam, ze nie sa NULLami
-static int compareRoads(Road *road1, Road *road2) {//TODO static????
+int compareRoads(Road *road1, Road *road2) {//TODO static????
     if (road1->city1 == road2->city1 && road1->city2 == road2->city2) {
         return 0;
     }
@@ -240,8 +240,8 @@ bool removeSomeRoad(Map *map, City *city1, City *city2) {
         return false;
     }
 
-    deleteFromSet(city1->roads, deleteRoad, tmpRoad);
-    deleteFromSet(city2->roads, deleteRoad, tmpRoad);
+    deleteFromSet(city1->roads, NULL, tmpRoad);
+    deleteFromSet(city2->roads, NULL, tmpRoad);
 }
 
 Road *searchRoad(Map *map, City *city1, City *city2) {

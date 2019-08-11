@@ -44,7 +44,7 @@ set(SOURCE_FILES
         src/route.h
         src/list.c
         src/list.h
-        )
+        src/string.c src/string.h)
 
 # Wskazujemy plik wykonywalny.
 add_executable(map ${SOURCE_FILES})

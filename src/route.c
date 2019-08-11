@@ -12,10 +12,9 @@
 
 typedef struct PathNode PathNode;
 
-struct PathNode {
-    City *city;
-    Road *road;
-};
+int comparePathNodes(PathNode *a, PathNode *b) {
+    return compareRoads(a->road, b->road);
+}
 
 Route *getNewRoute() {
     Route *newRoute = malloc(sizeof(Route));
@@ -109,6 +108,10 @@ PathNode *getNewPathNode(City *city, Road *road) {
     return pathNode;
 }
 
+void deletePathNode(PathNode *pathNode) {
+    free(pathNode);
+}
+
 //extendRoute
 //wszystkie miasta, które już są w drodze krajowej, nie mogą być w rozszerzeniu
 //puszczam dijkstrę z obu końców i wybieram lepszy, ale nie NULL
@@ -179,7 +182,7 @@ void deleteRoute(Route *route) {
         return;
     }
 
-    deleteList(route->path, deleteCity);
+    deleteList(route->path, deletePathNode);
 
     free(route);
 }

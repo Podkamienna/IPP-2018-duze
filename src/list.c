@@ -10,16 +10,6 @@
 typedef struct ListNode ListNode;
 typedef struct List List;
 
-struct ListNode {
-    void *data;
-    ListNode *next;
-};
-
-struct List {
-    ListNode *listNode;
-    int (*compare)(void *, void *)
-};
-
 List *initializeList(int compare(void *, void *)) {
     if (compare == NULL) {
         return NULL;

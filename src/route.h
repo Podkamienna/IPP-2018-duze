@@ -12,15 +12,22 @@ static const unsigned MAXIMAL_ROUTE_ID = 999;
 
 typedef struct PathNode PathNode;
 
-Route *getNewRoute();
+struct PathNode {
+    City *city;
+    Road *road;
+};
+
+int comparePathNodes(PathNode *a, PathNode *b);
 
 PathNode *getNewPathNode(City *city, Road *road);
 
-bool addNewRoute(Map *map, unsigned routeId, const char *city1, const char *city2);
+void deletePathNode(PathNode *pathNode)
 
-bool insertToRoute(Map *map, unsigned routeId, const char *city1, const char *city2);
+Route *getNewRoute();
 
-bool addToRoute(Map *map, unsigned routeId, const char *city);
+bool isCorrectRoute(Route *route);
+
+int *compareRoute(Route *route1, Route *route2);
 
 void deleteRoute(Route *route);
 

@@ -7,7 +7,18 @@
 
 #include <stdbool.h>
 
+typedef struct ListNode ListNode;
 typedef struct List List;
+
+struct ListNode {
+    void *data;
+    ListNode *next;
+};
+
+struct List {
+    ListNode *listNode;
+    int (*compare)(void *, void *)
+};
 
 /**
  * @brief Alokuje pamięc pod i zwraca wskaźnik na
