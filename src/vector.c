@@ -85,9 +85,36 @@ void popFromVector(Vector *vector, void deleteValue(void *)) {
 
     vector->size--;
 
-    if (deleteValue != NULL) {
+    if (deleteValue != NULL && vector->data[vector->size] != NULL) {
         deleteValue(vector->data[vector->size]);
     }
+
+    vector->data[vector->size] = NULL;
+}
+
+static void swap(void **arr, size_t i, size_t j) {
+    void *tmp = arr[i];
+    arr[i] = arr[j];
+    arr[j] = tmp;
+}
+
+bool deleteFromVector(Vector *vector, void deleteValue(void *), int compare(void *, void *), void *value) {
+    if (vector == NULL) {
+        return false;
+    }
+
+    size_t position = vector->size;
+
+    while (position >= 0) {
+        if (compare(vector->data[position], value) == 0) {
+            swap(vector->data, position, vector->size);
+            popFromVector(vector, deleteValue);
+
+            return true;
+        }
+    }
+
+    return false;
 }
 
 bool isEmptyVector(Vector *vector) {

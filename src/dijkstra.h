@@ -7,7 +7,9 @@
 
 #include "map.h"
 #include "definitions.h"
+#include "list.h"
 
-Route *dijkstra(City *start, City *end);
+
+Route *dijkstra(City *source, City *destination, List *restrictedCities);
 
 #endif //DROGI_DIJKSTRA_H

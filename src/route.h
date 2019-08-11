@@ -7,17 +7,29 @@
 
 #include "definitions.h"
 
-static const int MINIMAL_ROUTE_ID = 1;
-static const int MAXIMAL_ROUTE_ID = 999;
+static const unsigned MINIMAL_ROUTE_ID = 1;
+static const unsigned MAXIMAL_ROUTE_ID = 999;
 
-Route *initializeRoute();
+typedef struct PathNode PathNode;
 
-bool addNewRoute(Map *map, unsigned routeId, const char *city1, const char *city2);
+struct PathNode {
+    City *city;
+    Road *road;
+};
 
-bool insertToRoute(Map *map, unsigned routeId, const char *city1, const char *city2);
+int comparePathNodes(PathNode *a, PathNode *b);
 
-bool addToRoute(Map *map, unsigned routeId, const char *city);
+PathNode *getNewPathNode(City *city, Road *road);
 
-void deleteRoute(Route route);
+void deletePathNode(PathNode *pathNode)
+
+Route *getNewRoute();
+
+bool isCorrectRoute(Route *route);
+
+int *compareRoute(Route *route1, Route *route2);
+
+void deleteRoute(Route *route);
+
 
 #endif //DROGI_ROUTE_H

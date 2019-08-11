@@ -43,13 +43,14 @@ bool insertSet(Set *set, void *value) {
     return pushVector(set->vector, value);
 }
 
-void deleteLastAdded(Set *set, void deleteValue(void *)) {
+bool deleteFromSet(Set *set, void deleteValue(void *), void *value) {
     if (set == NULL) {
-        return;
+        return false;
     }
 
-    popFromVector(set->vector, deleteValue);
+    return deleteFromVector(set->vector, deleteValue, set->compare, value);
 }
+
 
 void deleteSet(Set *set, void deleteValue(void *)) {
     if (set == NULL) {
@@ -81,7 +82,7 @@ SetIterator *getNewSetIterator(Set *set) {
     return setIterator;
 }
 //TODO czy zrobić nowy moduł?
-bool *incrementSetIterator(SetIterator *setIterator) {
+bool incrementSetIterator(SetIterator *setIterator) {
     return incrementVectorIterator(setIterator->vectorIterator);
 }
 
