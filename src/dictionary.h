@@ -6,6 +6,7 @@
 #define DROGI_DICTIONARY_H
 
 #include <stdbool.h>
+#include <stddef.h>
 
 typedef struct Dictionary Dictionary;
 
@@ -37,6 +38,9 @@ void *searchDictionary(Dictionary *dictionary, const char *name);
  * w słowniku.
  */
 bool insertDictionary(Dictionary *dictionary, const char *name, void *value);
+
+//TODO opis
+size_t getId(Dictionary *dictionary);
 
 /**
  * @brief Usuwa wartość przypisaną do zadanego tekstu z zadanego słownika

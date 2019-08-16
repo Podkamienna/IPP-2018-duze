@@ -17,7 +17,7 @@ struct ListNode {
 
 struct List {
     ListNode *listNode;
-    int (*compare)(void *, void *)
+    int (*compare)(void *, void *);
 };
 
 /**
@@ -43,6 +43,11 @@ List *initializeList(int compare(void *, void *));
  */
 bool addToList(List *list, void *value);
 
+/**
+ * @brief Odwraca zadaną listę
+ * @param list — lista do odwrócenia
+ */
+void reverseList(List *list);
 /**
  * @brief Funkcja sprawdzająca, czy zadana
  * wartość jest obecna w liście.

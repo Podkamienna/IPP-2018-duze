@@ -10,10 +10,10 @@ struct Set {
     Vector *vector;
     int (*compare)(void *, void *);
 };
-
+/*
 struct SetIterator {
     VectorIterator *vectorIterator;
-};
+};*/
 Set *initializeSet(int compare(void *, void *)) {
     Set *newSet = malloc(sizeof(Set));
 
@@ -81,7 +81,7 @@ SetIterator *getNewSetIterator(Set *set) {
 
     return setIterator;
 }
-//TODO czy zrobić nowy moduł?
+//TODO usunąć?
 bool incrementSetIterator(SetIterator *setIterator) {
     return incrementVectorIterator(setIterator->vectorIterator);
 }

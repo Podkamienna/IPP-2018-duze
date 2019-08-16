@@ -1,5 +1,6 @@
 /** @file
  */
+ //TODO poogarniać te nagłówki
 
 #include "vector.h"
 
@@ -9,16 +10,15 @@
 typedef struct Vector Vector;
 typedef struct VectorIterator VectorIterator;
 
-bool resizeVector(Vector *vector) {
+static bool resizeVector(Vector *vector) {
     // TODO może static? nigdzie nie jest uzywane na zewnatrz modulu? czy kiedys bedzie?
-    void **newData;
     if (vector == NULL) {
         return false;
     }
 
     size_t newSize = 2 * vector->maxSize + 4;
 
-    newData = realloc(vector->data, newSize * sizeof(void *));
+    void **newData = realloc(vector->data, newSize * sizeof(void *));
 
     if (newData == NULL) {
         return false;
@@ -26,12 +26,12 @@ bool resizeVector(Vector *vector) {
 
     vector->data = newData;
     vector->maxSize = newSize;
+
     return true;
 }
 
 Vector *initializeVector() {
-    Vector *newVector = NULL;
-    newVector = malloc(sizeof(Vector));
+    Vector *newVector = malloc(sizeof(Vector));
 
     if (newVector == NULL) {
         return NULL;
@@ -52,7 +52,7 @@ void *searchVector(Vector *vector, int cmp(void *, void *), void *value) {
     }
 
     for (size_t i = 0; i < vector->size; i++) {
-        if (cmp(vector->data[i], value)) {
+        if (cmp(vector->data[i], value) == 0) {
             return vector->data[i];
         }
     }
@@ -75,6 +75,7 @@ bool pushVector(Vector *vector, void *value) {
         }
     }
     vector->data[vector->size++] = value;
+
     return true;
 }
 
@@ -103,15 +104,18 @@ bool deleteFromVector(Vector *vector, void deleteValue(void *), int compare(void
         return false;
     }
 
-    size_t position = vector->size;
+    size_t size = vector->size;
+    size_t position = 0;
 
-    while (position >= 0) {
-        if (compare(vector->data[position], value) == 0) {
+    while (position <= size) {
+        if (compare(vector->data[size - position], value) == 0) {
             swap(vector->data, position, vector->size);
             popFromVector(vector, deleteValue);
 
             return true;
         }
+
+        position++;
     }
 
     return false;
@@ -133,6 +137,7 @@ void deleteVector(Vector *vector, void deleteValue(void *)) {
     if (vector->data != NULL && deleteValue != NULL) {
         for (size_t i = 0; i < vector->size; i++) {
             deleteValue(vector->data[i]);
+            vector->data[i] = NULL;
         }
     }
 
@@ -140,7 +145,6 @@ void deleteVector(Vector *vector, void deleteValue(void *)) {
     free(vector);
 }
 
-//TODO czy nie wywalić tego do oddzielnego pliku?
 VectorIterator *getNewVectorIterator(Vector *vector) {
     if (vector == NULL) {
         return NULL;

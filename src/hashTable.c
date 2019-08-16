@@ -99,7 +99,7 @@ static bool insertEntryHashTable(HashTable *hashTable, Entry *entry) {
     return false;
 }
 
-//znajduje wejście w hash tablicy wyznaczone przez zadany napis
+//TODO Hmm...
 static Entry *searchEntryHashTable(HashTable *hashTable, const char *name) {
     size_t hash = getHash(name);
     size_t position = getPosition(hashTable, hash);
@@ -130,13 +130,6 @@ static void deleteEntry(Entry *entry, void deleteValue(void *)) {
     }
 
     free(entry);
-}
-
-void iterate(HashTable *hashTable, void fun(void *)) {
-    // TODO usunąć
-    for (size_t i = 0; i < hashTable->size; i++) {
-        fun(hashTable->table[i]->value);
-    }
 }
 
 HashTable *initializeHashTable(size_t initialSize) {
@@ -225,12 +218,6 @@ HashTable *resizeHashTable(HashTable *hashTable, size_t newSize) {
     deleteHashTableLeaveEntries(hashTable);
 
     return newHashTable;
-}
-
-void deleteFromHashTable(HashTable *hashTable, const char *name, void deleteValue(void *)) {
-    Entry *entry = searchEntryHashTable(hashTable, name);
-
-    deleteEntry(entry, deleteValue);
 }
 
 void deleteHashTable(HashTable *hashTable, void deleteValue(void *)) {

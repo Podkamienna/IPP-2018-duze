@@ -22,16 +22,6 @@ struct VectorIterator {
 };
 
 /**
- * @brief Zwiększa rozmiar wektora.
- * @param vector — wektor do powiększenia
- * @return Wartość @p true jeżeli udało się powiększyć
- * wektor, false gdy któryś z parametrów
- * ma niepoprawną wartość lub nie udało
- * się zaalokować pamięci.
- */
-bool resizeVector(Vector *vector);
-
-/**
  * @brief Tworzy nowy wektor.
  * @return Nowy wektor lub NULL, gdy nie udało
  * się zaalokować pamięci.
@@ -82,7 +72,8 @@ bool deleteFromVector(Vector *vector, void deleteValue(void *), int compare(void
 bool isEmptyVector(Vector *vector);
 
 /**
- * @brief Usuwa wektor.
+ * @brief Usuwa wektor. Jeżeli parametr deleteValue
+ * ma wartość NULL, to nie usuwa zawartości wektora.
  * @param vector — wektor do usunięcia
  * @param deleteValue — funkcja, która usuwa zawartość pola w wektorze
  */
