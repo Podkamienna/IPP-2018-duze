@@ -2,6 +2,8 @@
 // Created by alicja on 04.07.19.
 //
 
+#define _GNU_SOURCE
+
 #include "citiesAndRoads.h"
 #include "definitions.h"
 #include "dictionary.h"
@@ -16,17 +18,6 @@ static bool addCity(Map *map, City *city) {
     }
 
     return insertDictionary(map->cities, city->name, city);
-}
-
-static Road getRoad(int year, int length, City *city1, City *city2) {
-    Road newRoad;
-
-    newRoad.year = year;
-    newRoad.length = length;
-    newRoad.city1 = city1;
-    newRoad.city2 = city2;
-
-    return newRoad;
 }
 
 //zakladam, ze nie sa NULLami
@@ -49,14 +40,14 @@ bool isCityName(const char *city) {
     }
 
     for (size_t i = 0; city[i] != '\0'; i++) {
-        if (city[i] <= 31 || city[i] == 59) {
+        if ((city[i] >= 0 && city[i] <= 31) || city[i] == 59) {
             return false;
         }
     }
     return true;
 }
 
-City *getNewCity(const char *name) {
+City *getNewCity(Map *map, const char *name) {
     if (name == NULL) {
         return NULL;
     }
@@ -71,22 +62,22 @@ City *getNewCity(const char *name) {
         return NULL;
     }
 
-    newCity->roads = initializeSet(compareRoads);
+    newCity->roads = initializeSet((void *) compareRoads);
 
     if (newCity->roads == NULL) {
         free(newCity);
         return NULL;
     }
 
-    newCity->name = name;
-    newCity->visited = 0;
+    newCity->id = getId(map->cities);
+    newCity->name = strdup(name); // TODO JAK SIE WYPIEPRZY
 
     return newCity;
 }
 
 //zakladam, ze nie sa NULLami
 int compareCities(City *city1, City *city2) {
-    if (strcmp(city1->name, city2->name)) {
+    if (strcmp(city1->name, city2->name) == 0) {
         return 0;
     }
 
@@ -103,30 +94,6 @@ City *searchCity(Map *map, const char *city) {
     }
 
     return searchDictionary(map->cities, city);
-}
-
-void visit(City *city) {
-    if (city == NULL) {
-        return;
-    }
-
-    city->visited = 1;
-}
-
-void unvisit(City *city) {
-    if (city == NULL) {
-        return;
-    }
-
-    city->visited = 0;
-}
-
-bool isVisited(City *city) {
-    if (city == NULL) {
-        return false;
-    }
-
-    return city->visited != 0;
 }
 
 City *getNeighbour(Road *road, City *city) {
@@ -154,7 +121,8 @@ void deleteCity(City *city) {
         return;
     }
 
-    deleteSet(city->roads, deleteRoad);
+    deleteSet(city->roads, NULL);
+
     free(city->name);
     free(city);
     // TODO jak są usuwane odcinki drogowe? Hmm?
@@ -188,7 +156,7 @@ bool addNewRoad(Map *map, const char *city1, const char *city2, int year, int le
     City *newCity2 = searchCity(map, city2);
 
     if (newCity1 == NULL) {
-        newCity1 = getNewCity(city1);
+        newCity1 = getNewCity(map, city1);
 
         if (newCity1 == NULL || !addCity(map, newCity1)) {
             return false;
@@ -196,7 +164,7 @@ bool addNewRoad(Map *map, const char *city1, const char *city2, int year, int le
     }
 
     if (newCity2 == NULL) {
-        newCity2 = getNewCity(city2);
+        newCity2 = getNewCity(map, city2);
 
         if (newCity2 == NULL || !addCity(map, newCity2)) {
             return false;
@@ -213,7 +181,14 @@ bool addNewRoad(Map *map, const char *city1, const char *city2, int year, int le
         return false;
     }
 
+    if (!pushVector(map->roads, newRoad)) {
+        deleteRoad(newRoad);
+
+        return false;
+    }
+
     if (!insertSet(newCity2->roads, newRoad)) {
+        popFromVector(map->roads, (void(*)(void *))deleteRoad);
         deleteRoad(newRoad);
 
         return false;
@@ -221,6 +196,7 @@ bool addNewRoad(Map *map, const char *city1, const char *city2, int year, int le
 
     if (!insertSet(newCity1->roads, newRoad)) {
         deleteFromSet(newCity2->roads, deleteRoad, newRoad);
+        popFromVector(map->roads, (void(*)(void *))deleteRoad);
         deleteRoad(newRoad);
 
         return false;
@@ -242,6 +218,8 @@ bool removeSomeRoad(Map *map, City *city1, City *city2) {
 
     deleteFromSet(city1->roads, NULL, tmpRoad);
     deleteFromSet(city2->roads, NULL, tmpRoad);
+
+    return true;
 }
 
 Road *searchRoad(Map *map, City *city1, City *city2) {
@@ -255,10 +233,19 @@ Road *searchRoad(Map *map, City *city1, City *city2) {
 
     Road tmpRoad1, tmpRoad2;
 
-    tmpRoad1 = getRoad(0, 0, city1, city2);
-    tmpRoad2 = getRoad(0, 0, city2, city1);
+    tmpRoad1.length = 0;
+    tmpRoad1.year = 0;
+    tmpRoad1.city1 = city1;
+    tmpRoad1.city2 = city2;
 
-    Road *searchResult1, *searchResult2;
+    tmpRoad2.length = 0;
+    tmpRoad2.year = 0;
+    tmpRoad2.city1 = city1;
+    tmpRoad2.city2 = city2;
+   // setRoad(tmpRoad1, 0, 0, city1, city2); TODO czemu nie działa? :'(
+   // setRoad(tmpRoad2, 0, 0, city2, city1);
+
+    Road *searchResult1, *searchResult2; //TODO wystarczy jednego z tych wyszukać, bo komparator jest miły
 
     searchResult1 = searchSet(city1->roads, &tmpRoad1);
     searchResult2 = searchSet(city1->roads, &tmpRoad2);
@@ -308,5 +295,9 @@ bool updateYearRoad(Map *map, const char *city1, const char *city2, int year) {
 }
 
 void deleteRoad(Road *road) {
+    if (road == NULL) {
+        return;
+    }
+
     free(road);
 }

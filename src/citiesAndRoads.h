@@ -7,6 +7,10 @@
 
 #include "definitions.h"
 
+#include <stdbool.h>
+
+
+void seeRoads(City *city); // TODO usunac
 /**
  * @brief Sprawdza, czy zadany napis jest poprawną nazwą miasta.
  * @param city — wskaźnik na napis do sprawdzenia
@@ -23,7 +27,7 @@ bool isCityName(const char *city);
  * Wartość @p false jeżeli nie udało się zaalokować pamięci,
  * lub jeżeli zadany napis nie jest poprawną nazwą miasta.
  */
-City *getNewCity(const char *name);
+City *getNewCity(Map *map, const char *name);
 
 /**
  * @brief Wyszukuje miasta zadanego danym napisem w danej mapie.
@@ -39,23 +43,6 @@ bool removeSomeRoad(Map *map, City *city1, City *city2);
 int compareCities(City *city1, City *city2);
 
 City *searchCity(Map *map, const char *city);
-
-//TODO
-void visit(City *city);
-/**
- * @brief Zmienia zadane miasto na oznaczone jako nie odwiedzone
- * @param city — miasto do ododwiedzenia
- */
-void unvisit(City *city);
-
-/**
- * @brief Sprawdza, czy miasto było odwiedzone
- * @param city — wskaźnik na miasto do sprawdzenia, czy był odwiedzone
- * @return Wartość @p true jeżeli miasto nie jest odwiedzone,
- * Wartość @p false, jeżeli miasto jest odwiedzone, lub zadany wskaźnik
- * ma wartość NULL.
- */
-bool isVisited(City *city);
 
 //TODO komentarz
 City *getNeighbour(Road *road, City *city);

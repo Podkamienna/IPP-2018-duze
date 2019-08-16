@@ -19,12 +19,11 @@ typedef struct HashTable HashTable;
 typedef struct Entry Entry;
 
 struct Dictionary {
-    size_t id; // TODO zupełnie zapomniane. Usunąć, użyć?
+    size_t id;
     size_t size;
     size_t numberOfElements;
     HashTable *hashTable;
 };
-
 
 static bool isFull(Dictionary *dictionary) {
     return LOAD_FACTOR_DIVIDER * dictionary->numberOfElements >= LOAD_FACTOR_MULTIPLIER * dictionary->size;
@@ -58,6 +57,10 @@ void *searchDictionary(Dictionary *dictionary, const char *name) {
     return searchHashTable(dictionary->hashTable, name);
 }
 
+size_t getId(Dictionary *dictionary) {
+    return dictionary->id;
+}
+
 bool insertDictionary(Dictionary *dictionary, const char *name, void *value) {
     if (dictionary == NULL || name == NULL || value == NULL || dictionary->hashTable == NULL) {
         return false;
@@ -77,11 +80,9 @@ bool insertDictionary(Dictionary *dictionary, const char *name, void *value) {
         return false;
     }
 
-    return true;
-}
+    dictionary->id++;
 
-void deleteFromDictionary(Dictionary *dictionary, const char *name, void deleteValue(void *)) {
-    deleteFromHashTable(dictionary->hashTable, name, deleteValue);
+    return true;
 }
 
 void deleteDictionary(Dictionary *dictionary, void deleteValue(void *)) {

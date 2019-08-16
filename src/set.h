@@ -5,10 +5,15 @@
 #define DROGI_SET_H
 
 #include <stdbool.h>
+#include "vector.h"
 
 typedef struct Set Set;
 typedef struct SetIterator SetIterator;
 
+struct SetIterator {
+    VectorIterator *vectorIterator;
+};
+//TODO usunac
 /**
  * @brief Funkcja alokująca pamięć pod i zwracająca nowy Set.
  * @return Nowy Set lub NULL, gdy nie udało się zaalokować pamięci.

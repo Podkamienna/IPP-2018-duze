@@ -6,6 +6,7 @@
 #include "definitions.h"
 #include "dijkstra.h"
 #include "citiesAndRoads.h"
+#include "dictionary.h"
 
 #include <stdlib.h>
 #include <string.h>
@@ -19,6 +20,12 @@ int comparePathNodes(PathNode *a, PathNode *b) {
 Route *getNewRoute() {
     Route *newRoute = malloc(sizeof(Route));
 
+    if (newRoute == NULL) {
+        return NULL;
+    }
+
+    newRoute->path = initializeList((int(*)(void*, void*))comparePathNodes);
+
     return newRoute;
 }
 
@@ -31,7 +38,7 @@ bool addNewRoute(Map *map, unsigned routeId, const char *city1, const char *city
         return false;
     }
 
-    Route *newRoute = dijkstra(searchDictionary(map->cities, city1), searchDictionary(map->cities, city2), NULL);
+    Route *newRoute = dijkstra(map, searchDictionary(map->cities, city1), searchDictionary(map->cities, city2), NULL);
 
     if (newRoute == NULL) {
         return false;
@@ -54,7 +61,7 @@ bool isCorrectRoute(Route *route) {
     return true;
 }
 
-int min(int a, int b) {
+static int min(int a, int b) {
     if (a > b) {
         return b;
     }
@@ -63,7 +70,7 @@ int min(int a, int b) {
 }
 
 //jezeli pierwsze wieksze to 1
-int *compareRoute(Route *route1, Route *route2) {
+int compareRoute(Route *route1, Route *route2) {
     if (!isCorrectRoute(route1) && !isCorrectRoute(route2)) {
         return 0;
     }
@@ -130,15 +137,17 @@ bool addToRoute(Map *map, unsigned routeId, const char *city) {
         return false;
     }
 
-    List *restrictedCities = map->routes[routeId];
+    List *restrictedCities = map->routes[routeId]->path;
 
-    Route *tempRoute1 = dijkstra(searchDictionary(map->cities, city), map->routes[routeId]->source, restrictedCities);
+    Route *tempRoute1 = dijkstra(map, searchDictionary(map->cities, city), map->routes[routeId]->source,
+                                 restrictedCities);
 
     if (tempRoute1 == NULL) {
         return false;
     }
 
-    Route *tempRoute2 = dijkstra(map->routes[routeId]->destination, searchDictionary(map->cities, city), restrictedCities);
+    Route *tempRoute2 = dijkstra(map, map->routes[routeId]->destination, searchDictionary(map->cities, city),
+                                 restrictedCities);
 
     if (tempRoute2 == NULL) {
         deleteRoute(tempRoute1);
@@ -158,7 +167,7 @@ bool addToRoute(Map *map, unsigned routeId, const char *city) {
     if (compareResult == 1) {
         deleteRoute(tempRoute2);
 
-        insertToList(map->routes[routeId]->path, tempRoute1);
+        insertToList(map->routes[routeId]->path, tempRoute1->path);
         map->routes[routeId]->source = tempRoute1->source;
         map->routes[routeId]->minimalYear = min(map->routes[routeId]->minimalYear, tempRoute1->minimalYear);
         map->routes[routeId]->length += tempRoute1->length;
@@ -167,7 +176,7 @@ bool addToRoute(Map *map, unsigned routeId, const char *city) {
     if (compareResult == -1) {
         deleteRoute(tempRoute2);
 
-        insertToList(map->routes[routeId]->path, tempRoute2);
+        insertToList(map->routes[routeId]->path, tempRoute2->path);
         map->routes[routeId]->destination = tempRoute1->destination;
         map->routes[routeId]->minimalYear = min(map->routes[routeId]->minimalYear, tempRoute1->minimalYear);
         map->routes[routeId]->length += tempRoute1->length;
@@ -182,7 +191,7 @@ void deleteRoute(Route *route) {
         return;
     }
 
-    deleteList(route->path, deletePathNode);
+    deleteList(route->path, (void(*)(void *))deletePathNode);
 
     free(route);
 }

@@ -1,5 +1,6 @@
 /** @file
  */
+ //TODO poogarniać te nagłówki
 
 #include "vector.h"
 
@@ -9,7 +10,7 @@
 typedef struct Vector Vector;
 typedef struct VectorIterator VectorIterator;
 
-bool resizeVector(Vector *vector) {
+static bool resizeVector(Vector *vector) {
     // TODO może static? nigdzie nie jest uzywane na zewnatrz modulu? czy kiedys bedzie?
     if (vector == NULL) {
         return false;
@@ -51,7 +52,7 @@ void *searchVector(Vector *vector, int cmp(void *, void *), void *value) {
     }
 
     for (size_t i = 0; i < vector->size; i++) {
-        if (cmp(vector->data[i], value)) {
+        if (cmp(vector->data[i], value) == 0) {
             return vector->data[i];
         }
     }
@@ -103,15 +104,18 @@ bool deleteFromVector(Vector *vector, void deleteValue(void *), int compare(void
         return false;
     }
 
-    size_t position = vector->size;
+    size_t size = vector->size;
+    size_t position = 0;
 
-    while (position >= 0) {
-        if (compare(vector->data[position], value) == 0) {
+    while (position <= size) {
+        if (compare(vector->data[size - position], value) == 0) {
             swap(vector->data, position, vector->size);
             popFromVector(vector, deleteValue);
 
             return true;
         }
+
+        position++;
     }
 
     return false;
@@ -133,6 +137,7 @@ void deleteVector(Vector *vector, void deleteValue(void *)) {
     if (vector->data != NULL && deleteValue != NULL) {
         for (size_t i = 0; i < vector->size; i++) {
             deleteValue(vector->data[i]);
+            vector->data[i] = NULL;
         }
     }
 
@@ -140,7 +145,6 @@ void deleteVector(Vector *vector, void deleteValue(void *)) {
     free(vector);
 }
 
-//TODO czy nie wywalić tego do oddzielnego pliku?
 VectorIterator *getNewVectorIterator(Vector *vector) {
     if (vector == NULL) {
         return NULL;

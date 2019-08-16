@@ -50,6 +50,31 @@ bool addToList(List *list, void *value) {
     return true;
 }
 
+void reverseList(List *list) {
+    if (list == NULL) {
+        return;
+    }
+
+    if (list->listNode == NULL) {
+        return;
+    }
+
+    ListNode *position = list->listNode;
+    ListNode *prevPosition = NULL;
+    ListNode *nextPosition = position->next;
+
+    while (position != NULL) {
+        position->next = prevPosition;
+        prevPosition = position;
+        position = nextPosition;
+        if (nextPosition != NULL) {
+            nextPosition = nextPosition->next;
+        }
+    }
+
+    list->listNode = prevPosition;
+}
+
 bool exists(List *list, void *value) {
     if (list == NULL) {
         return false;
@@ -96,6 +121,7 @@ bool insertToList(List *list, List *toInsert) {
 
     if (list->compare(position, endInsert) == 0) {
         free(position);
+
         endInsert->next = position->next;
         list->listNode = beginInsert;
 
@@ -107,6 +133,7 @@ bool insertToList(List *list, List *toInsert) {
         if (list->compare(beginInsert->data, position->data) == 0) {
             if (position->next == NULL) {
                 position->next = beginInsert->next;
+
                 free(beginInsert);
 
                 return true;
@@ -114,9 +141,11 @@ bool insertToList(List *list, List *toInsert) {
 
             if (list->compare(endInsert->data, position->next->data) == 0) {
                 endInsert->next = position->next->next;
+
                 free(position->next);
 
                 position->next = beginInsert->next;
+
                 free(beginInsert);
 
                 return true;
@@ -128,6 +157,7 @@ bool insertToList(List *list, List *toInsert) {
 
     if (list->compare(endList->data, beginInsert->data) == 0) {
         endList->next = beginInsert->next;
+
         free(beginInsert);
     }
 
@@ -141,14 +171,15 @@ void deleteList(List *list, void deleteValue(void *)) {
 
     ListNode *position = list->listNode, *tmp;
 
-    while(position->next != NULL) {
-        tmp = position;
+    while(position != NULL) {
+        tmp = position->next;
+
         if (deleteValue != NULL) {
-            deleteValue(tmp->data);
+            deleteValue(position->data);
         }
 
-        free(tmp);
-        position = position->next;
+        free(position);
+        position = tmp;
     }
 
     free(list);

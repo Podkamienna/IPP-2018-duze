@@ -44,17 +44,6 @@ static void swap(void **arr, size_t i, size_t j) {
     arr[j] = tmp;
 }
 
-
-#include <stdio.h> // TODO usunąć
-
-void seeHeap(Heap *heap) {
-    // void *pom = NULL;
-    for (size_t i = 0; i < heap->vector->size; i++) {
-        //pom = (heap->vector->data)[i];
-        printf("%lu\n", i);
-    }
-}
-
 bool isEmptyHeap(Heap *heap) {
     if (heap == NULL) {
         return true;
@@ -93,10 +82,13 @@ bool pushHeap(Heap *heap, void *value) {
 
     while (true) { //TODO???, warunek do ciała wrzucićć, zmiennna opomcnicza parent
         size_t parent = getParent(position);
-        if (heap->compare(data[parent], data[position]) > 0 && position != 0) {
+
+        if (position != 0 && heap->compare(data[parent], data[position]) > 0) {
             swap(data, position, parent);
             position = parent;
-        } else {
+        }
+
+        else {
             break;
         }
     }

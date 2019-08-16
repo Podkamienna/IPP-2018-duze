@@ -1,5 +1,7 @@
 //
-// Created by alicja on 04.07.19.
+// Created by alicja on 12.08.2019.
 //
 
-#include "definitions.h"
+const char *SEMICOLON = ";";
+const char *MINUS = "-";
+const char ZERO = '0';

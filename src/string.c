@@ -14,7 +14,7 @@ static bool resizeString(String *string) {
 
     size_t newSize = 2 * string->maxSize + 4;
 
-    void **newData = realloc(string->data, newSize * sizeof(void *));
+    char *newData = realloc(string->data, newSize);
 
     if (newData == NULL) {
         return false;
@@ -71,7 +71,9 @@ char *numberToString(int number) {
         n = n/10;
     }
 
-    return string;
+    char *value = string->data;
+    deleteString(string, false);
+    return value;
 }
 
 
@@ -88,7 +90,7 @@ bool concatenateString(String *string1, const char *string2) {
         }
     }
 
-    strcpy(string1->data[string1->size+1], string2);
+    strcpy(&string1->data[string1->size], string2);
     string1->size += lengthString2;
 
 
