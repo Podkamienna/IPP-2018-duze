@@ -40,7 +40,7 @@ bool isCityName(const char *city) {
     }
 
     for (size_t i = 0; city[i] != '\0'; i++) {
-        if ((city[i] >= 0 && city[i] <= 31) || city[i] == 59) {
+        if ((city[i] >= 0 && city[i] <= 31) || city[i] == ';') {
             return false;
         }
     }
@@ -181,7 +181,7 @@ bool addNewRoad(Map *map, const char *city1, const char *city2, int year, int le
         return false;
     }
 
-    if (!pushVector(map->roads, newRoad)) {
+    if (!pushToVector(map->roads, newRoad)) {
         deleteRoad(newRoad);
 
         return false;

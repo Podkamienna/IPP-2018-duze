@@ -16,7 +16,7 @@ typedef struct Map Map;
 typedef struct Dictionary Dictionary;
 typedef struct Set Set;
 
-
+#define FAIL_IF(condition) do { if (condition) goto failure; } while(0)
 
 extern const char *SEMICOLON;
 extern const char *MINUS;
@@ -30,7 +30,7 @@ struct Map {
 
 struct City {
     size_t id;
-    const char *name;
+    char *name;
     Set *roads;
 };
 
@@ -43,8 +43,8 @@ struct Road {
 struct Route {
     List *path;
     City *source, *destination;
-    unsigned length;
-    int minimalYear;
+    unsigned length; // TODO większy typ?
+    int minimalYear; // TODO nieporzebe?
 };
 
 #endif //DROGI_DEFINITIONS_H

@@ -444,6 +444,9 @@ char const *getRouteDescription(Map *map, unsigned routeId) {
 
             return NULL;
         }
+
+        free(length);
+        free(year);
     }
 
     char *returnValue = string->data;

@@ -73,7 +73,7 @@ Heap *initializeHeap(int compare(void *, void *)) {
 }
 
 bool pushHeap(Heap *heap, void *value) {
-    if (heap == NULL || !pushVector(heap->vector, value)) {
+    if (heap == NULL || !pushToVector(heap->vector, value)) {
         return false;
     }
 

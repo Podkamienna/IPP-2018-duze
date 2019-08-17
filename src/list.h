@@ -15,7 +15,7 @@ struct ListNode {
     ListNode *next;
 };
 
-struct List {
+struct List {// TODO dodać koniec, poprawić konkatencje
     ListNode *listNode;
     int (*compare)(void *, void *);
 };

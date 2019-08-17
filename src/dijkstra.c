@@ -163,7 +163,7 @@ bool pushNeighbours(RouteSection *graph, Heap *heap, Vector *routes, List *restr
                 return false;
             }
 
-            if (!pushVector(routes, temp1)) {
+            if (!pushToVector(routes, temp1)) {
                 deleteSetIterator(setIterator);
 
                 return false;
@@ -220,7 +220,7 @@ Route *dijkstra(Map *map, City *source, City *destination, List *restrictedPaths
         return NULL;
     }
 
-    if (!pushVector(routes, temp)) {
+    if (!pushToVector(routes, temp)) {
         deleteHeap(priorityQueue, NULL); //TODO jak memleaki, to pewnie tu
         deleteVector(routes, deleteRouteSection);
 

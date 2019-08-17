@@ -10,8 +10,10 @@
 typedef struct Vector Vector;
 typedef struct VectorIterator VectorIterator;
 
+static bool resizeVector(Vector *vector);
+static void swap(void **arr, size_t i, size_t j);
+
 static bool resizeVector(Vector *vector) {
-    // TODO może static? nigdzie nie jest uzywane na zewnatrz modulu? czy kiedys bedzie?
     if (vector == NULL) {
         return false;
     }
@@ -28,6 +30,12 @@ static bool resizeVector(Vector *vector) {
     vector->maxSize = newSize;
 
     return true;
+}
+
+static void swap(void **arr, size_t i, size_t j) {
+    void *tmp = arr[i];
+    arr[i] = arr[j];
+    arr[j] = tmp;
 }
 
 Vector *initializeVector() {
@@ -60,7 +68,7 @@ void *searchVector(Vector *vector, int cmp(void *, void *), void *value) {
     return NULL;
 }
 
-bool pushVector(Vector *vector, void *value) {
+bool pushToVector(Vector *vector, void *value) {
     if (vector == NULL) {
         return false;
     }
@@ -84,19 +92,15 @@ void popFromVector(Vector *vector, void deleteValue(void *)) {
         return;
     }
 
-    vector->size--;
-
-    if (deleteValue != NULL && vector->data[vector->size] != NULL) {
-        deleteValue(vector->data[vector->size]);
+    if (vector->size == 0) {
+        return;
     }
 
-    vector->data[vector->size] = NULL;
-}
+    vector->size--;
 
-static void swap(void **arr, size_t i, size_t j) {
-    void *tmp = arr[i];
-    arr[i] = arr[j];
-    arr[j] = tmp;
+    if (deleteValue != NULL) {
+        deleteValue(vector->data[vector->size]);
+    }
 }
 
 bool deleteFromVector(Vector *vector, void deleteValue(void *), int compare(void *, void *), void *value) {
@@ -105,17 +109,14 @@ bool deleteFromVector(Vector *vector, void deleteValue(void *), int compare(void
     }
 
     size_t size = vector->size;
-    size_t position = 0;
 
-    while (position <= size) {
+    for(size_t position = 1; position <= size; position++) {
         if (compare(vector->data[size - position], value) == 0) {
-            swap(vector->data, position, vector->size);
+            swap(vector->data, size - position, vector->size - 1);
             popFromVector(vector, deleteValue);
 
             return true;
         }
-
-        position++;
     }
 
     return false;

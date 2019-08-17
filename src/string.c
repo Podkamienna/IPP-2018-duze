@@ -7,6 +7,8 @@
 
 #include <string.h>
 
+static bool resizeString(String *string);
+
 static bool resizeString(String *string) {
     if (string == NULL) {
         return false;
@@ -47,6 +49,7 @@ char *getData(String *string) {
 }
 
 char *numberToString(int number) {
+    // TODO użyć sprinttf
     int n = number;
 
     String *string = initializeString();
@@ -89,15 +92,21 @@ bool concatenateString(String *string1, const char *string2) {
             return false;
         }
     }
+    FAIL_IF(rand() == 0);
+
+    failure:;
 
     strcpy(&string1->data[string1->size], string2);
     string1->size += lengthString2;
-
 
     return true;
 }
 
 void deleteString(String *string, bool deleteData) {
+    if (string == NULL) {
+        return;
+    }
+
     if (deleteData) {
         free(string->data);
         free(string);

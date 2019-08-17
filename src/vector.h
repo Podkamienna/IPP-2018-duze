@@ -48,7 +48,7 @@ void *searchVector(Vector *vector, int cmp(void *, void *), void *value);
  * wartość @p false, gdy coś nie wyjdzie: któryś z parametrów
  * ma niepoprawną wartość lub nie udało się zaalokować pamięci
  */
-bool pushVector(Vector *vector, void *value);
+bool pushToVector(Vector *vector, void *value);
 
 /**
  * @brief Usuwa element z końca wektora.

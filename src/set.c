@@ -40,7 +40,7 @@ bool insertSet(Set *set, void *value) {
         return false;
     }
 
-    return pushVector(set->vector, value);
+    return pushToVector(set->vector, value);
 }
 
 bool deleteFromSet(Set *set, void deleteValue(void *), void *value) {
