@@ -176,9 +176,9 @@ bool pushNeighbours(RouteSection *graph, Heap *heap, Vector *routes, List *restr
                 return false;
             }
         }
-        }
-        return true;
     }
+    return true;
+}
 
 //TODO pozmieniać jakoś te wszystkie nazwy i wgl, nowa struktura na drogi krajowe (tu zrobić jakąś inną)
 //i potem przepisac te drogi krajowe
@@ -189,16 +189,16 @@ Route *dijkstra(Map *map, City *source, City *destination, List *restrictedPaths
         return NULL;
     }
 
-    Heap *priorityQueue = initializeHeap(compareRouteSection);
+    Heap *heap = initializeHeap(compareRouteSection);
 
-    if (priorityQueue == NULL) {
+    if (heap == NULL) {
         return NULL;
     }
 
     RouteSection *temp = getNewRouteSection(source, NULL, 0, 0, NULL); //wierzcholek poczatkowy
 
     if (temp == NULL) {
-        deleteHeap(priorityQueue, deleteRouteDijkstra);
+        deleteHeap(heap, deleteRouteDijkstra);
 
         return NULL;
     }
@@ -206,14 +206,14 @@ Route *dijkstra(Map *map, City *source, City *destination, List *restrictedPaths
     Vector *routes = initializeVector();
 
     if (routes == NULL) {
-        deleteHeap(priorityQueue, NULL);
+        deleteHeap(heap, NULL);
         deleteRouteDijkstra(temp);
 
         return NULL;
     }
 
-    if (!pushHeap(priorityQueue, temp)) {
-        deleteHeap(priorityQueue, NULL);
+    if (!pushHeap(heap, temp)) {
+        deleteHeap(heap, NULL);
         deleteRouteDijkstra(temp);
         deleteVector(routes, deleteRouteSection);
 
@@ -221,17 +221,17 @@ Route *dijkstra(Map *map, City *source, City *destination, List *restrictedPaths
     }
 
     if (!pushToVector(routes, temp)) {
-        deleteHeap(priorityQueue, NULL); //TODO jak memleaki, to pewnie tu
+        deleteHeap(heap, NULL); //TODO jak memleaki, to pewnie tu
         deleteVector(routes, deleteRouteSection);
 
         return NULL;
     }
 
     size_t visitedSize = getId(map->cities);
-    bool *isVisited = calloc(sizeof(bool), visitedSize);
+    bool *isVisited = calloc(visitedSize, sizeof(bool));
 
     if (isVisited == NULL) {
-        deleteHeap(priorityQueue, NULL); //TODO jak memleaki, to pewnie tu
+        deleteHeap(heap, NULL); //TODO jak memleaki, to pewnie tu
         deleteVector(routes, deleteRouteSection);
 
         return NULL;
@@ -239,19 +239,25 @@ Route *dijkstra(Map *map, City *source, City *destination, List *restrictedPaths
 
 
     RouteSection *worseEnd = NULL, *tempEnd = NULL; //zmienna przechowujaca graf koncowy przed ostatnia zmiana na lepsze (zeby sprawdzic, czy jednoznaczne)
-    while (!isEmptyHeap(priorityQueue) && worseEnd == NULL) {
-        temp = popHeap(priorityQueue);
+    while (!isEmptyHeap(heap)) {
+        temp = popHeap(heap);
+
+        if (isVisited[temp->city->id]) {
+            continue;
+
+        }
 
         if(tempEnd != NULL && compareCities(temp->city, destination) == 0) {
             worseEnd = temp;
+            break;
         }
 
         if(tempEnd == NULL && compareCities(temp->city, destination) == 0) {
             tempEnd = temp;
         }
 
-        if (!pushNeighbours(temp, priorityQueue, routes, restrictedPaths, isVisited)) { //przechodzimy po sasiadach zadanego wierzcholka, jezeli nie byli odw to ich wrzucamy na kopiec
-            deleteHeap(priorityQueue, NULL);
+        if (!pushNeighbours(temp, heap, routes, restrictedPaths, isVisited)) { //przechodzimy po sasiadach zadanego wierzcholka, jezeli nie byli odw to ich wrzucamy na kopiec
+            deleteHeap(heap, NULL);
             deleteVector(routes, deleteRouteSection);
 
             return NULL;
@@ -263,7 +269,7 @@ Route *dijkstra(Map *map, City *source, City *destination, List *restrictedPaths
     Route *newRoute = createRoute(tempEnd, source, destination);
 
     if (newRoute == NULL) {
-        deleteHeap(priorityQueue, NULL);
+        deleteHeap(heap, NULL);
         deleteVector(routes, deleteRouteSection);
 
         return NULL;
@@ -273,7 +279,7 @@ Route *dijkstra(Map *map, City *source, City *destination, List *restrictedPaths
         newRoute->minimalYear = 0;
     }
 
-    deleteHeap(priorityQueue, NULL);
+    deleteHeap(heap, NULL);
     deleteVector(routes, deleteRouteSection);
 
     return newRoute;

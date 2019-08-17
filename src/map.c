@@ -30,35 +30,22 @@ static int min(int a, int b) {
  * @return Wskaźnik na utworzoną strukturę lub NULL, gdy nie udało się
  * zaalokować pamięci.
  */
-Map *newMap(void) {
-    Map *newMap = malloc(sizeof(Map));
-
-    if (newMap == NULL) {
-        return NULL;
-    }
+Map *newMap() {
+    Map *newMap = calloc(1, sizeof(Map));
+    FAIL_IF(newMap == NULL);
 
     newMap->cities = initializeDictionary();
-
-    if (newMap->cities == NULL) {
-        free(newMap);
-
-        return NULL;
-    }
+    FAIL_IF(newMap->cities == NULL);
 
     newMap->roads = initializeVector();
-
-    if (newMap->roads == NULL) {
-        deleteDictionary(newMap->cities, (void(*)(void *))deleteCity);
-        free(newMap);
-
-        return NULL;
-    }
-
-    for (int i = 0; i < 1000; i++) {
-        newMap->routes[i] = NULL;
-    }
+    FAIL_IF(newMap->roads == NULL);
 
     return newMap;
+
+    failure:;
+    deleteMap(newMap);
+
+    return NULL;
 }
 
 /** @brief Usuwa strukturę.
@@ -71,8 +58,10 @@ void deleteMap(Map *map) {
         return;
     }
 
-    for (int i = 0; i < 1000; i++) {
-        deleteRoute(map->routes[i]);
+    if (map->routes != NULL) {
+        for (int i = 0; i < 1000; i++) {
+            deleteRoute(map->routes[i]);
+        }
     }
 
     deleteDictionary(map->cities, (void(*)(void *))deleteCity);
@@ -301,7 +290,7 @@ bool removeRoad(Map *map, const char *city1, const char *city2) {
         return false;
     }
 
-    List **RoutesToInsert = calloc(sizeof(List), 1000);
+    List **RoutesToInsert = calloc(1000, sizeof(List)); // TODO 1000->stała
 
     if (RoutesToInsert == NULL) {
         deletePathNode(pathNode);
@@ -372,7 +361,7 @@ char const *getRouteDescription(Map *map, unsigned routeId) {
     }
 
     if (map->routes[routeId] == NULL) {
-        return calloc(sizeof(char), 1);
+        return calloc(1, sizeof(char));
     }
 
     String *string = initializeString();

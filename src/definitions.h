@@ -17,6 +17,7 @@ typedef struct Dictionary Dictionary;
 typedef struct Set Set;
 
 #define FAIL_IF(condition) do { if (condition) goto failure; } while(0)
+#define FAIL_IF_NAMED(condition, label) do { if (condition) goto failure##label; } while(0)
 
 extern const char *SEMICOLON;
 extern const char *MINUS;
