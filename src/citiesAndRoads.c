@@ -87,7 +87,15 @@ int compareCities(City *city1, City *city2) {
         return -1;
     }
 
-    return strcmp(city1->name, city2->name);
+    if (city1->id > city2->id) {
+        return 1;
+    }
+
+    if (city1->id < city2->id) {
+        return -1;
+    }
+
+    return 0;
 }
 
 City *searchCity(Map *map, const char *city) {
@@ -104,6 +112,10 @@ City *searchCity(Map *map, const char *city) {
 
 City *getNeighbour(Road *road, City *city) {
     if (road == NULL || city == NULL) {
+        return NULL;
+    }
+
+    if (road->isBlocked) {
         return NULL;
     }
 
@@ -140,8 +152,9 @@ Road *getNewRoad(int year, int length, City *city1, City *city2) {
         return NULL;
     }
 
-    newRoad->year = year;
+    newRoad->isBlocked = false;
     newRoad->length = length;
+    newRoad->year = year;
     newRoad->city1 = city1;
     newRoad->city2 = city2;
 

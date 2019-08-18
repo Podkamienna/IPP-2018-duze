@@ -11,9 +11,9 @@
 #include <stdlib.h>
 #include <string.h>
 
-typedef struct PathNode PathNode;
+//TODO czy powinny być wszystkie typdefy
 
-int comparePathNodes(PathNode *a, PathNode *b) {
+int comparePathNodes(Path *a, Path *b) {
     return compareRoads(a->road, b->road);
 }
 
@@ -25,6 +25,7 @@ Route *getNewRoute() {
     }
 
     newRoute->path = initializeList((int(*)(void*, void*))comparePathNodes);
+    newRoute->isUnique = true;
 
     return newRoute;
 }
@@ -102,8 +103,8 @@ int compareRoute(Route *route1, Route *route2) {
     return 0;
 }
 
-PathNode *getNewPathNode(City *city, Road *road) {
-    PathNode *pathNode = malloc(sizeof(PathNode));
+Path *getNewPathNode(City *city, Road *road) {
+    Path *pathNode = malloc(sizeof(Path));
 
     if (pathNode == NULL) {
         return NULL;
@@ -115,7 +116,7 @@ PathNode *getNewPathNode(City *city, Road *road) {
     return pathNode;
 }
 
-void deletePathNode(PathNode *pathNode) {
+void deletePathNode(Path *pathNode) {
     free(pathNode);
 }
 

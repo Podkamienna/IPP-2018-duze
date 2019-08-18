@@ -284,7 +284,7 @@ bool removeRoad(Map *map, const char *city1, const char *city2) {
         return false;
     }
 
-    PathNode *pathNode = getNewPathNode(NULL, toRemove);
+    Path *pathNode = getNewPathNode(NULL, toRemove);
 
     if (pathNode == NULL) {
         return false;
@@ -367,7 +367,7 @@ char const *getRouteDescription(Map *map, unsigned routeId) {
     String *string = initializeString();
 
     ListNode *position = map->routes[routeId]->path->listNode;
-    PathNode *pathNode = position->data;
+    Path *pathNode = position->data;
 
     if (!concatenateString(string, pathNode->city->name)) {
         deleteString(string, true);

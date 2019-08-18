@@ -9,6 +9,7 @@
 
 typedef struct ListNode ListNode;
 typedef struct List List;
+typedef struct ListIterator ListIterator;
 
 struct ListNode {
     void *data;
@@ -18,6 +19,10 @@ struct ListNode {
 struct List {// TODO dodać koniec, poprawić konkatencje
     ListNode *listNode;
     int (*compare)(void *, void *);
+};
+
+struct ListIterator {
+    ListNode *listNode;
 };
 
 /**
@@ -88,5 +93,14 @@ bool insertToList(List *list, List *toInsert);
  * @param deleteValue — funkcja usuwająca elementy listy
  */
 void deleteList(List *list, void deleteValue(void *));
+
+VectorIterator *getNewListIterator(List *list);
+
+bool incrementListIterator(ListIterator *listIterator);
+
+void *getNextListIterator(ListIterator *listIterator);
+
+void deleteListIterator(ListIterator *listIterator);
+
 
 #endif //DROGI_LIST_H

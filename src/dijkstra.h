@@ -10,6 +10,6 @@
 #include "list.h"
 
 
-Route *dijkstra(Map *map, City *source, City *destination, List *restrictedPaths);
+Route *dijkstra(Map *map, City *source, City *destination, List *restrictedCities);
 
 #endif //DROGI_DIJKSTRA_H
