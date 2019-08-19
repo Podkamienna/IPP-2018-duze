@@ -374,77 +374,35 @@ char const *getRouteDescription(Map *map, unsigned routeId) {
     }
 
     String *string = initializeString();
+    const char *length, *year;
 
     ListNode *position = map->routes[routeId]->path->listNode;
     Path *pathNode = position->data;
 
-    if (!concatenateString(string, unsignedToString(routeId))) {
-        deleteString(string, true);
-
-        return false;
-    }
-
-    if (!concatenateString(string, SEMICOLON)) {
-        deleteString(string, true);
-
-        return NULL;
-    }
+    FAIL_IF(!concatenateString(string, unsignedToString(routeId)));
+    FAIL_IF(!concatenateString(string, SEMICOLON));
 
     while (position != NULL) {
+        year = NULL;
+        length = NULL;
+
         pathNode = position->data;
 
-        if (!concatenateString(string, pathNode->city->name)) {
-            deleteString(string, true);
-
-            return NULL;
-        }
+        FAIL_IF(!concatenateString(string, pathNode->city->name));
 
         if (pathNode->road != NULL) {
-            if (!concatenateString(string, SEMICOLON)) {
-                deleteString(string, true);
+            FAIL_IF(!concatenateString(string, SEMICOLON));
 
-                return NULL;
-            }
+            year = intToString(pathNode->road->year);
+            FAIL_IF(year == NULL);
 
-            const char *year = intToString(pathNode->road->year);
+            length = intToString(pathNode->road->length);
+            FAIL_IF(length == NULL);
 
-            if (year == NULL) {
-                deleteString(string, true);
-
-                return false;
-            }
-
-            const char *length = intToString(pathNode->road->length);
-
-            if (length == NULL) {
-                deleteString(string, true);
-
-                return false;
-            }
-
-            if (!concatenateString(string, length)) {
-                deleteString(string, true);
-
-                return NULL;
-            }
-
-            if (!concatenateString(string, SEMICOLON)) {
-                deleteString(string, true);
-
-                return NULL;
-            }
-
-            if (!concatenateString(string, year)) {
-                deleteString(string, true);
-
-                return false;
-            }
-
-            if (!concatenateString(string, SEMICOLON)) {
-                deleteString(string, true);
-
-                return NULL;
-            }
+            FAIL_IF(!concatenateString(string, length));
+            FAIL_IF(!concatenateString(string, SEMICOLON));
+            FAIL_IF(!concatenateString(string, year));
+            FAIL_IF(!concatenateString(string, SEMICOLON));
 
             free((void *) length);
             free((void *) year);
@@ -456,6 +414,13 @@ char const *getRouteDescription(Map *map, unsigned routeId) {
     deleteString(string, false);
 
     return returnValue;
+
+    failure:;
+    deleteString(string, true);
+    free((void *) length);
+    free((void *) year);
+
+    return NULL;
 }
 
 
