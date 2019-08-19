@@ -4,6 +4,7 @@
 
 #include "dictionary.h"
 #include "hashTable.h"
+#include "definitions.h"
 
 #include <stdbool.h>
 #include <string.h>
@@ -62,27 +63,25 @@ size_t getId(Dictionary *dictionary) {
 }
 
 bool insertDictionary(Dictionary *dictionary, const char *name, void *value) {
-    if (dictionary == NULL || name == NULL || value == NULL || dictionary->hashTable == NULL) {
-        return false;
-    }
+    FAIL_IF(dictionary == NULL);
+    FAIL_IF(name == NULL);
+    FAIL_IF(value == NULL);
 
     if (isFull(dictionary)) {
         HashTable *newHashTable = resizeHashTable(dictionary->hashTable, 2 * dictionary->size);
-
-        if (newHashTable == NULL) {
-            return false;
-        }
+        FAIL_IF(newHashTable == NULL);
 
         dictionary->hashTable = newHashTable;
     }
 
-    if (!insertHashTable(dictionary->hashTable, name, value)) {
-        return false;
-    }
+    FAIL_IF(!insertHashTable(dictionary->hashTable, name, value));
 
     dictionary->id++;
 
     return true;
+
+    failure:;
+    return false;
 }
 
 void deleteDictionary(Dictionary *dictionary, void deleteValue(void *)) {

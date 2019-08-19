@@ -30,35 +30,22 @@ static int min(int a, int b) {
  * @return Wskaźnik na utworzoną strukturę lub NULL, gdy nie udało się
  * zaalokować pamięci.
  */
-Map *newMap(void) {
-    Map *newMap = malloc(sizeof(Map));
-
-    if (newMap == NULL) {
-        return NULL;
-    }
+Map *newMap() {
+    Map *newMap = calloc(1, sizeof(Map));
+    FAIL_IF(newMap == NULL);
 
     newMap->cities = initializeDictionary();
-
-    if (newMap->cities == NULL) {
-        free(newMap);
-
-        return NULL;
-    }
+    FAIL_IF(newMap->cities == NULL);
 
     newMap->roads = initializeVector();
-
-    if (newMap->roads == NULL) {
-        deleteDictionary(newMap->cities, (void(*)(void *))deleteCity);
-        free(newMap);
-
-        return NULL;
-    }
-
-    for (int i = 0; i < 1000; i++) {
-        newMap->routes[i] = NULL;
-    }
+    FAIL_IF(newMap->roads == NULL);
 
     return newMap;
+
+    failure:;
+    deleteMap(newMap);
+
+    return NULL;
 }
 
 /** @brief Usuwa strukturę.
@@ -71,8 +58,10 @@ void deleteMap(Map *map) {
         return;
     }
 
-    for (int i = 0; i < 1000; i++) {
-        deleteRoute(map->routes[i]);
+    if (map->routes != NULL) {
+        for (int i = 0; i < 1000; i++) {
+            deleteRoute(map->routes[i]);
+        }
     }
 
     deleteDictionary(map->cities, (void(*)(void *))deleteCity);
@@ -246,6 +235,10 @@ bool extendRoute(Map *map, unsigned routeId, const char *city) {
     if (compareResult == 1) {
         deleteRoute(tempRoute2);
 
+        if (!isCorrectRoute(tempRoute1)) {
+            deleteRoute(tempRoute1);
+        }
+
         insertToList(map->routes[routeId]->path, (void *) tempRoute1); //działa, bo w każdej drodze krajowej każde miasto występuje
         map->routes[routeId]->source = tempRoute1->source; //conajwyżej raz
         map->routes[routeId]->minimalYear = min(map->routes[routeId]->minimalYear, tempRoute1->minimalYear);
@@ -253,12 +246,16 @@ bool extendRoute(Map *map, unsigned routeId, const char *city) {
     }
 
     if (compareResult == -1) {
-        deleteRoute(tempRoute2);
+        deleteRoute(tempRoute1);
+
+        if (!isCorrectRoute(tempRoute2)) {
+            deleteRoute(tempRoute2);
+        }
 
         insertToList(map->routes[routeId]->path, (void *) tempRoute2); //jak wyżej
-        map->routes[routeId]->destination = tempRoute1->destination;
-        map->routes[routeId]->minimalYear = min(map->routes[routeId]->minimalYear, tempRoute1->minimalYear);
-        map->routes[routeId]->length += tempRoute1->length;
+        map->routes[routeId]->destination = tempRoute2->destination;
+        map->routes[routeId]->minimalYear = min(map->routes[routeId]->minimalYear, tempRoute2->minimalYear);
+        map->routes[routeId]->length += tempRoute2->length;
     }
 
     return true;
@@ -295,13 +292,13 @@ bool removeRoad(Map *map, const char *city1, const char *city2) {
         return false;
     }
 
-    PathNode *pathNode = getNewPathNode(NULL, toRemove);
+    Path *pathNode = getNewPathNode(NULL, toRemove);
 
     if (pathNode == NULL) {
         return false;
     }
 
-    List **RoutesToInsert = calloc(sizeof(List), 1000);
+    List **RoutesToInsert = calloc(1000, sizeof(List)); // TODO 1000->stała
 
     if (RoutesToInsert == NULL) {
         deletePathNode(pathNode);
@@ -372,13 +369,19 @@ char const *getRouteDescription(Map *map, unsigned routeId) {
     }
 
     if (map->routes[routeId] == NULL) {
-        return calloc(sizeof(char), 1);
+        return calloc(1, sizeof(char));
     }
 
     String *string = initializeString();
 
     ListNode *position = map->routes[routeId]->path->listNode;
-    PathNode *pathNode = position->data;
+    Path *pathNode = position->data;
+
+     if (!concatenateString(string, unsignedToString(routeId))) {
+         deleteString(string, true);
+
+         return false;
+     }
 
     if (!concatenateString(string, pathNode->city->name)) {
         deleteString(string, true);
@@ -399,7 +402,7 @@ char const *getRouteDescription(Map *map, unsigned routeId) {
             return NULL;
         }
 
-        const char *year = numberToString(pathNode->road->year);
+        const char *year = intToString(pathNode->road->year);
 
         if (year == NULL) {
             deleteString(string, true);
@@ -407,7 +410,7 @@ char const *getRouteDescription(Map *map, unsigned routeId) {
             return false;
         }
 
-        const char *length = numberToString(pathNode->road->length);
+        const char *length = intToString(pathNode->road->length);
 
         if (length == NULL) {
             deleteString(string, true);
@@ -445,8 +448,8 @@ char const *getRouteDescription(Map *map, unsigned routeId) {
             return NULL;
         }
 
-        free(length);
-        free(year);
+        free((void *) length);
+        free((void *) year);
     }
 
     char *returnValue = string->data;

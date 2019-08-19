@@ -34,8 +34,9 @@ String *initializeString();
  */
 char *getData(String *string);
 
-char *numberToString(int number);
+char *intToString(int number);
 
+char *unsignedToString(unsigned number);
 /**
  * @brief Dodaje zadaną wartość na koniec napisu.
  * @param string — struktura z napisem do którego coś ma być dodane

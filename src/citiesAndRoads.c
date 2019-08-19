@@ -48,40 +48,54 @@ bool isCityName(const char *city) {
 }
 
 City *getNewCity(Map *map, const char *name) {
-    if (name == NULL) {
-        return NULL;
-    }
+    City *newCity = NULL;
 
-    if (!isCityName(name)) {
-        return NULL;
-    }
+    FAIL_IF(name == NULL);
+    FAIL_IF(!isCityName(name));
 
-    City *newCity = malloc(sizeof(City));
+    newCity = malloc(sizeof(City));
+    FAIL_IF(newCity == NULL);
 
-    if (newCity == NULL) {
-        return NULL;
-    }
+    newCity->roads = initializeSet((int(*)(void *, void *))compareRoads);
+    FAIL_IF(newCity->roads == NULL);
 
-    newCity->roads = initializeSet((void *) compareRoads);
-
-    if (newCity->roads == NULL) {
-        free(newCity);
-        return NULL;
-    }
+    newCity->name = strdup(name);
+    FAIL_IF(newCity->name == NULL);
 
     newCity->id = getId(map->cities);
-    newCity->name = strdup(name); // TODO JAK SIE WYPIEPRZY
+
+    FAIL_IF(!addCity(map, newCity));
 
     return newCity;
+
+    failure:;
+    deleteCity(newCity);
+
+    return NULL;
 }
 
-//zakladam, ze nie sa NULLami
 int compareCities(City *city1, City *city2) {
-    if (strcmp(city1->name, city2->name) == 0) {
+    if (city1 == NULL && city2 == NULL) {
         return 0;
     }
 
-    return 1;
+    if (city1 == NULL) {
+        return 1;
+    }
+
+    if (city2 == NULL) {
+        return -1;
+    }
+
+    if (city1->id > city2->id) {
+        return 1;
+    }
+
+    if (city1->id < city2->id) {
+        return -1;
+    }
+
+    return 0;
 }
 
 City *searchCity(Map *map, const char *city) {
@@ -98,6 +112,10 @@ City *searchCity(Map *map, const char *city) {
 
 City *getNeighbour(Road *road, City *city) {
     if (road == NULL || city == NULL) {
+        return NULL;
+    }
+
+    if (road->isBlocked) {
         return NULL;
     }
 
@@ -125,18 +143,18 @@ void deleteCity(City *city) {
 
     free(city->name);
     free(city);
-    // TODO jak są usuwane odcinki drogowe? Hmm?
 }
 
-Road *getNewRoadPointer(int year, int length, City *city1, City *city2) {
+Road *getNewRoad(int year, int length, City *city1, City *city2) {
     Road *newRoad = malloc(sizeof(Road));
 
     if (newRoad == NULL) {
         return NULL;
     }
 
-    newRoad->year = year;
+    newRoad->isBlocked = false;
     newRoad->length = length;
+    newRoad->year = year;
     newRoad->city1 = city1;
     newRoad->city2 = city2;
 
@@ -144,65 +162,44 @@ Road *getNewRoadPointer(int year, int length, City *city1, City *city2) {
 }
 
 bool addNewRoad(Map *map, const char *city1, const char *city2, int year, int length) {
-    if (map == NULL) {
-        return false;
-    }
-
-    if (city1 == NULL || city2 == NULL) {
-        return false;
-    }
+    FAIL_IF_NAMED(map == NULL, 4);
+    FAIL_IF_NAMED(city1 == NULL || city2 == NULL, 4);
 
     City *newCity1 = searchCity(map, city1);
     City *newCity2 = searchCity(map, city2);
 
     if (newCity1 == NULL) {
         newCity1 = getNewCity(map, city1);
-
-        if (newCity1 == NULL || !addCity(map, newCity1)) {
-            return false;
-        }
+        FAIL_IF_NAMED(newCity1 == NULL, 4);
     }
 
     if (newCity2 == NULL) {
         newCity2 = getNewCity(map, city2);
-
-        if (newCity2 == NULL || !addCity(map, newCity2)) {
-            return false;
-        }
+        FAIL_IF_NAMED(newCity2 == NULL, 4);
     }
 
-    if (searchRoad(map, newCity1, newCity2)) {
-        return false;
-    }
+    FAIL_IF_NAMED(searchRoad(map, newCity1, newCity2), 4);
 
-    Road *newRoad = getNewRoadPointer(year, length, newCity1, newCity2);
+    Road *newRoad = getNewRoad(year, length, newCity1, newCity2);
+    FAIL_IF_NAMED(newRoad == NULL, 4);
 
-    if (newRoad == NULL) {
-        return false;
-    }
-
-    if (!pushToVector(map->roads, newRoad)) {
-        deleteRoad(newRoad);
-
-        return false;
-    }
-
-    if (!insertSet(newCity2->roads, newRoad)) {
-        popFromVector(map->roads, (void(*)(void *))deleteRoad);
-        deleteRoad(newRoad);
-
-        return false;
-    }
-
-    if (!insertSet(newCity1->roads, newRoad)) {
-        deleteFromSet(newCity2->roads, deleteRoad, newRoad);
-        popFromVector(map->roads, (void(*)(void *))deleteRoad);
-        deleteRoad(newRoad);
-
-        return false;
-    }
+    FAIL_IF_NAMED(!pushToVector(map->roads, newRoad), 3);
+    FAIL_IF_NAMED(!insertSet(newCity2->roads, newRoad), 2);
+    FAIL_IF_NAMED(!insertSet(newCity1->roads, newRoad), 1);
 
     return true;
+
+    failure1:;
+    deleteFromSet(newCity2->roads, NULL, newRoad);
+
+    failure2:;
+    popFromVector(map->roads, NULL);
+
+    failure3:;
+    deleteRoad(newRoad);
+
+    failure4:;
+    return false;
 }
 
 bool removeSomeRoad(Map *map, City *city1, City *city2) {
@@ -262,7 +259,7 @@ Road *searchRoad(Map *map, City *city1, City *city2) {
 //zobaczyć, czy to jest ok. Tylko tutaj raczej, więc nie aż tak tragicznie. Też trochę przypał z tym zerowaniem
 //odwiedzonych - lepiej by było robić to w Dijkstrze - cykliczne odwołania? Nie brzmi dobrze. Przecież nie bardzo
 //potem dodać repair road.
-//TODO
+//TODO do map.c
 bool updateYearRoad(Map *map, const char *city1, const char *city2, int year) {
     if (map == NULL) {
         return false;

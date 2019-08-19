@@ -12,18 +12,13 @@
 static const unsigned MINIMAL_ROUTE_ID = 1;
 static const unsigned MAXIMAL_ROUTE_ID = 999;
 
-typedef struct PathNode PathNode;
+typedef struct Path Path;
 
-struct PathNode {
-    City *city;
-    Road *road;
-};
+int comparePathNodes(Path *a, Path *b);
 
-int comparePathNodes(PathNode *a, PathNode *b);
+Path *getNewPathNode(City *city, Road *road);
 
-PathNode *getNewPathNode(City *city, Road *road);
-
-void deletePathNode(PathNode *pathNode);
+void deletePathNode(Path *pathNode);
 
 Route *getNewRoute();
 

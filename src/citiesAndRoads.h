@@ -61,7 +61,7 @@ void deleteCity(City *city);
  * @return Wskaźnik na nową drogę, jeżeli wszystko się uda.
  * Null jeżeli nie udało się zaalokować pamięci.
  */
-Road *getNewRoadPointer(int year, int length, City *city1, City *city2);
+Road *getNewRoad(int year, int length, City *city1, City *city2);
 
 /**
  * @brief Dodaje nową drogę do mapy.

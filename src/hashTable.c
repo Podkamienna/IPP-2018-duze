@@ -3,6 +3,7 @@
  */
 
 #include "hashTable.h"
+#include "definitions.h"
 
 #include <stdbool.h>
 #include <stdlib.h>
@@ -133,30 +134,34 @@ static void deleteEntry(Entry *entry, void deleteValue(void *)) {
 }
 
 HashTable *initializeHashTable(size_t initialSize) {
-    HashTable *newHashTable = malloc(sizeof(HashTable));
+    HashTable *newHashTable = NULL;
 
-    if (newHashTable == NULL) {
-        return NULL;
-    }
+    FAIL_IF(initialSize <= 0);
 
-    if (initialSize <= 0) {
-        return NULL;
-    }
+    newHashTable = malloc(sizeof(HashTable));
+
+    FAIL_IF(newHashTable == NULL);
 
     newHashTable->size = initialSize;
     newHashTable->table = calloc(newHashTable->size, sizeof(Entry));
 
-    if (newHashTable->table == NULL) {
-        free(newHashTable);
-        return NULL;
-    }
+    FAIL_IF(newHashTable->table == NULL);
 
     return newHashTable;
+
+    failure:;
+    free(newHashTable);
+
+    return NULL;
 }
 
 
 void *searchHashTable(HashTable *hashTable, const char *name) {
-    if (hashTable == NULL || name == NULL) {
+    if (hashTable == NULL) {
+        return NULL;
+    }
+
+    if (name == NULL) {
         return NULL;
     }
 
@@ -177,11 +182,13 @@ void *searchHashTable(HashTable *hashTable, const char *name) {
 }
 
 bool insertHashTable(HashTable *hashTable, const char *name, void *value) {
+    Entry *newEntry = NULL;
+
     if (hashTable == NULL || name == NULL || value == NULL) {
         return false;
     }
 
-    Entry *newEntry = initializeEntry(name, value);
+    newEntry = initializeEntry(name, value);
 
     if (newEntry == NULL) {
         return false;

@@ -1,11 +1,16 @@
 //
 // Created by alicja on 11.08.2019.
 //
+#define _GNU_SOURCE
 
 #include "string.h"
 #include "definitions.h"
 
+#include <stdlib.h>
 #include <string.h>
+#include <stdio.h>
+
+const size_t MAX_NUMBER_LENGTH = 100;
 
 static bool resizeString(String *string);
 
@@ -48,35 +53,44 @@ char *getData(String *string) {
     return string->data;
 }
 
-char *numberToString(int number) {
-    // TODO użyć sprinttf
-    int n = number;
+char *intToString(int number) {
+    char *tmpText = calloc(MAX_NUMBER_LENGTH, sizeof(char));
 
-    String *string = initializeString();
-
-    if (n < 0) {
-        if (!concatenateString(string, MINUS)) {
-            deleteString(string, true);
-
-            return NULL;
-        }
+    if (tmpText == NULL) {
+        return NULL;
     }
 
-    while (n != 0) {
-        char m = n%10 - ZERO; //czy tu nie trzeba zaalokować? chyba nie.
+    if (snprintf(tmpText, MAX_NUMBER_LENGTH, "%d", number) == -1)  {
+        free (tmpText);
 
-        if (!concatenateString(string, &m)){
-            deleteString(string, true);
-
-            return NULL;
-        }
-
-        n = n/10;
+        return NULL;
     }
 
-    char *value = string->data;
-    deleteString(string, false);
-    return value;
+    char *finalText = strdup(tmpText);
+
+    free(tmpText);
+
+    return finalText;
+}
+
+char *unsignedToString(unsigned number) {
+    char *tmpText = calloc(MAX_NUMBER_LENGTH, sizeof(char));
+
+    if (tmpText == NULL) {
+        return NULL;
+    }
+
+    if (snprintf(tmpText, MAX_NUMBER_LENGTH, "%u", number) == -1)  {
+        free (tmpText);
+
+        return NULL;
+    }
+
+    char *finalText = strdup(tmpText);
+
+    free(tmpText);
+
+    return finalText;
 }
 
 
@@ -92,9 +106,6 @@ bool concatenateString(String *string1, const char *string2) {
             return false;
         }
     }
-    FAIL_IF(rand() == 0);
-
-    failure:;
 
     strcpy(&string1->data[string1->size], string2);
     string1->size += lengthString2;

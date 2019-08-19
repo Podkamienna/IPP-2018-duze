@@ -185,3 +185,45 @@ void deleteList(List *list, void deleteValue(void *)) {
     free(list);
 }
 
+void *getLast(List *list) {
+    if (list == NULL) {
+        return NULL;
+    }
+
+    return list->listNode->data;
+}
+
+ListIterator *getNewListIterator(List *list) {
+    if (list == NULL) {
+        return NULL;
+    }
+
+    ListIterator *newListIterator = malloc(sizeof(ListIterator));
+    if (newListIterator == NULL) {
+        return NULL;
+    }
+
+    newListIterator->listNode = list->listNode;
+
+    return newListIterator;
+}
+
+void *getNextListIterator(ListIterator *listIterator) {//TODO pozmieniać resztę, żeby było tak samo
+    if (listIterator == NULL) {                         //TODO użyć tam gdzieś
+        return NULL;
+    }
+
+    if (listIterator->listNode == NULL) {
+        return NULL;
+    }
+
+    void *returnValue = listIterator->listNode->data;
+
+    listIterator->listNode = listIterator->listNode->next;
+
+    return returnValue;
+}
+
+void deleteListIterator(ListIterator *listIterator) {
+    free(listIterator);
+}

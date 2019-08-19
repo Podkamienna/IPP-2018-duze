@@ -17,6 +17,7 @@ typedef struct Dictionary Dictionary;
 typedef struct Set Set;
 
 #define FAIL_IF(condition) do { if (condition) goto failure; } while(0)
+#define FAIL_IF_NAMED(condition, label) do { if (condition) goto failure##label; } while(0)
 
 extern const char *SEMICOLON;
 extern const char *MINUS;
@@ -35,6 +36,7 @@ struct City {
 };
 
 struct Road {
+    bool isBlocked;
     int length;
     int year;
     City *city1, *city2;
@@ -45,6 +47,12 @@ struct Route {
     City *source, *destination;
     unsigned length; // TODO większy typ?
     int minimalYear; // TODO nieporzebe?
+    bool isUnique;
+};
+
+struct Path {
+    City *city; //jeżeli path nie jest NULLem, to path->city też
+    Road *road;
 };
 
 #endif //DROGI_DEFINITIONS_H
