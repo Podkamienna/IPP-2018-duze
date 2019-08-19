@@ -235,6 +235,10 @@ bool extendRoute(Map *map, unsigned routeId, const char *city) {
     if (compareResult == 1) {
         deleteRoute(tempRoute2);
 
+        if (!isCorrectRoute(tempRoute1)) {
+            deleteRoute(tempRoute1);
+        }
+
         insertToList(map->routes[routeId]->path, (void *) tempRoute1); //działa, bo w każdej drodze krajowej każde miasto występuje
         map->routes[routeId]->source = tempRoute1->source; //conajwyżej raz
         map->routes[routeId]->minimalYear = min(map->routes[routeId]->minimalYear, tempRoute1->minimalYear);
@@ -242,12 +246,16 @@ bool extendRoute(Map *map, unsigned routeId, const char *city) {
     }
 
     if (compareResult == -1) {
-        deleteRoute(tempRoute2);
+        deleteRoute(tempRoute1);
+
+        if (!isCorrectRoute(tempRoute2)) {
+            deleteRoute(tempRoute2);
+        }
 
         insertToList(map->routes[routeId]->path, (void *) tempRoute2); //jak wyżej
-        map->routes[routeId]->destination = tempRoute1->destination;
-        map->routes[routeId]->minimalYear = min(map->routes[routeId]->minimalYear, tempRoute1->minimalYear);
-        map->routes[routeId]->length += tempRoute1->length;
+        map->routes[routeId]->destination = tempRoute2->destination;
+        map->routes[routeId]->minimalYear = min(map->routes[routeId]->minimalYear, tempRoute2->minimalYear);
+        map->routes[routeId]->length += tempRoute2->length;
     }
 
     return true;
@@ -369,6 +377,12 @@ char const *getRouteDescription(Map *map, unsigned routeId) {
     ListNode *position = map->routes[routeId]->path->listNode;
     Path *pathNode = position->data;
 
+     if (!concatenateString(string, unsignedToString(routeId))) {
+         deleteString(string, true);
+
+         return false;
+     }
+
     if (!concatenateString(string, pathNode->city->name)) {
         deleteString(string, true);
 
@@ -388,7 +402,7 @@ char const *getRouteDescription(Map *map, unsigned routeId) {
             return NULL;
         }
 
-        const char *year = numberToString(pathNode->road->year);
+        const char *year = intToString(pathNode->road->year);
 
         if (year == NULL) {
             deleteString(string, true);
@@ -396,7 +410,7 @@ char const *getRouteDescription(Map *map, unsigned routeId) {
             return false;
         }
 
-        const char *length = numberToString(pathNode->road->length);
+        const char *length = intToString(pathNode->road->length);
 
         if (length == NULL) {
             deleteString(string, true);
@@ -434,8 +448,8 @@ char const *getRouteDescription(Map *map, unsigned routeId) {
             return NULL;
         }
 
-        free(length);
-        free(year);
+        free((void *) length);
+        free((void *) year);
     }
 
     char *returnValue = string->data;

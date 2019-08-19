@@ -173,8 +173,6 @@ Distance *calculateDistances(Map *map, City *source, City *destination, bool *is
         return NULL;
     }
 
-    isVisited[source->id] = true;
-
     for (size_t i = 0; i < cityCount; i++) {
         distances[i] = WORST_DISTANCE;
     }
@@ -208,7 +206,7 @@ Distance *calculateDistances(Map *map, City *source, City *destination, bool *is
     return distances;
 }
 
-Route *reconstructRoute(Map *map, City *source, City *destination, Distance *distances) {
+List *reconstructRoute(Map *map, City *source, City *destination, Distance *distances) {
     List *path = initializeList((int(*)(void *, void *))comparePathNodes); //sprawdzić wszystkie compare
 
     if (path == NULL) {
@@ -217,69 +215,51 @@ Route *reconstructRoute(Map *map, City *source, City *destination, Distance *dis
         return NULL;
     }
 
-    Route *result = getNewRoute();
-
-    if (result == NULL) {
-        free(distances);
-        deleteList(path, NULL);
-
-        return NULL;
-    }
-
     City *position = destination;
+    City *potentialNextPosition;
 
-    Distance currentDistance = BASE_DISTANCE;
-    Distance endDistance = distances[destination->id];
+    addToList(path, getNewPathNode(position, NULL));
 
-    while (compareCities(position, source) != 0) {
-        City *newPosition = NULL;
-        Distance newCurrentDistance = WORST_DISTANCE;
+    while (true) {
+        potentialNextPosition = NULL;
         SetIterator *setIterator = getNewSetIterator(position->roads);
+
+        if (setIterator == NULL) {
+            deleteList(path, (void(*)(void *))deletePathNode);
+
+            return NULL;
+        }
 
         for (Road *road = getNextSetIterator(setIterator); road != NULL; road = getNextSetIterator(setIterator)) {
             City *neighbour = getNeighbour(road, position);
 
-            if (neighbour == NULL) {
-                continue;
+            if (compareDistance(distances[position->id], addRoadToDistance(distances[neighbour->id], road)) == 0) {
+                if (potentialNextPosition != NULL) {
+                    deleteSetIterator(setIterator);
+
+                    return path;
+                }
+
+                potentialNextPosition = neighbour;
+                addToList(path, getNewPathNode(neighbour, road));
             }
 
-            Distance newDistance = addRoadToDistance(distances[neighbour->id], road);
-            newDistance = addDistance(newDistance, currentDistance);
-
-            if (compareDistance(newDistance, endDistance) == 0) {
-                if (newPosition != NULL) {
-                    result->isUnique = false;
-
-                    return result;
-                }
-
-                if (!addToList(path, getNewPathNode(position, road))) {
-                    return NULL;
-                }
-
-                newPosition = neighbour;
-                newCurrentDistance = addRoadToDistance(currentDistance, road);
+            if (compareCities(neighbour, source) == 0) {
+                return path;
             }
         }
 
-        if (newPosition == NULL) {
-            result->minimalYear = 0;
-
-            return result;
-        }
-
-        position = newPosition;
-        currentDistance = newCurrentDistance;
+        position = potentialNextPosition;
+        deleteSetIterator(setIterator);
     }
 
-    result->path = path;
-    return result;
+    return path;
 }
 
 Route *dijkstra(Map *map, City *source, City *destination, List *restrictedPaths) {
     ListIterator *listIterator = getNewListIterator(restrictedPaths);
 
-    if (listIterator == NULL) {
+    if (listIterator == NULL && restrictedPaths != NULL) {
         return NULL;
     }
 
@@ -296,7 +276,33 @@ Route *dijkstra(Map *map, City *source, City *destination, List *restrictedPaths
         isRestricted[path->city->id] = true;
     }
 
-    Distance *distances = dijkstra(map, source, destination, isRestricted);
+    Distance *distances = calculateDistances(map, source, destination, isRestricted);
+    if (compareDistance(distances[destination->id], WORST_DISTANCE) == 0) { //Jeżeli nie ma ścieżki
+        free(distances);
 
-    return reconstructRoute(map, source, destination, distances);
+        return NULL;
+    }
+
+    List *list = reconstructRoute(map, source, destination, distances);
+    Path *endOfList = getLast(list);
+    Route *route = getNewRoute();
+
+    if (route == NULL) {
+        return NULL;
+    }
+
+    route->source = source;
+    route->destination = destination;
+    route->minimalYear = distances[destination->id].minYear;
+    route->length = distances[destination->id].length;
+
+    if (compareCities(endOfList->city, source) != 0) {
+        route->path = NULL;
+
+        return route; //!!!!!!!!!!!!!trzeba najpierw wyifować, czy jest UNIQUE po wywołaniu
+    }
+
+    route->path = list;
+
+    return route;
 }

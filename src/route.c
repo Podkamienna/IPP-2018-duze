@@ -55,7 +55,7 @@ bool isCorrectRoute(Route *route) {
         return false;
     }
 
-    if (route->minimalYear == 0) {
+    if (route->isUnique == false) {
         return false;
     }
 

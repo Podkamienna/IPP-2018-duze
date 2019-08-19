@@ -185,6 +185,14 @@ void deleteList(List *list, void deleteValue(void *)) {
     free(list);
 }
 
+void *getLast(List *list) {
+    if (list == NULL) {
+        return NULL;
+    }
+
+    return list->listNode->data;
+}
+
 ListIterator *getNewListIterator(List *list) {
     if (list == NULL) {
         return NULL;

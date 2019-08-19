@@ -94,7 +94,9 @@ bool insertToList(List *list, List *toInsert);
  */
 void deleteList(List *list, void deleteValue(void *));
 
-VectorIterator *getNewListIterator(List *list);
+void *getLast(List *list);
+
+ListIterator *getNewListIterator(List *list);
 
 bool incrementListIterator(ListIterator *listIterator);
 

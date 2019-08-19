@@ -188,7 +188,7 @@ bool insertHashTable(HashTable *hashTable, const char *name, void *value) {
         return false;
     }
 
-    Entry *newEntry = initializeEntry(name, value);
+    newEntry = initializeEntry(name, value);
 
     if (newEntry == NULL) {
         return false;

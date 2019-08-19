@@ -56,11 +56,11 @@ City *getNewCity(Map *map, const char *name) {
     newCity = malloc(sizeof(City));
     FAIL_IF(newCity == NULL);
 
-    newCity->roads = initializeSet((void *) compareRoads);
+    newCity->roads = initializeSet((int(*)(void *, void *))compareRoads);
     FAIL_IF(newCity->roads == NULL);
 
     newCity->name = strdup(name);
-    FAIL_IF(newCity->name);
+    FAIL_IF(newCity->name == NULL);
 
     newCity->id = getId(map->cities);
 
