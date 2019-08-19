@@ -24,6 +24,7 @@ static int min(int a, int b) {
 
     return a;
 }
+
 /** @brief Tworzy nową strukturę.
  * Tworzy nową, pustą strukturę niezawierającą żadnych miast, odcinków dróg ani
  * dróg krajowych.
@@ -64,8 +65,8 @@ void deleteMap(Map *map) {
         }
     }
 
-    deleteDictionary(map->cities, (void(*)(void *))deleteCity);
-    deleteVector(map->roads, (void(*)(void*))deleteRoad);
+    deleteDictionary(map->cities, (void (*)(void *)) deleteCity);
+    deleteVector(map->roads, (void (*)(void *)) deleteRoad);
 
     free(map);
 }
@@ -239,7 +240,8 @@ bool extendRoute(Map *map, unsigned routeId, const char *city) {
             deleteRoute(tempRoute1);
         }
 
-        insertToList(map->routes[routeId]->path, (void *) tempRoute1); //działa, bo w każdej drodze krajowej każde miasto występuje
+        insertToList(map->routes[routeId]->path,
+                     (void *) tempRoute1); //działa, bo w każdej drodze krajowej każde miasto występuje
         map->routes[routeId]->source = tempRoute1->source; //conajwyżej raz
         map->routes[routeId]->minimalYear = min(map->routes[routeId]->minimalYear, tempRoute1->minimalYear);
         map->routes[routeId]->length += tempRoute1->length;
@@ -358,7 +360,6 @@ bool removeRoad(Map *map, const char *city1, const char *city2) {
  * @param[in] routeId    – numer drogi krajowej.
  * @return Wskaźnik na napis lub NULL, gdy nie udało się zaalokować pamięci.
  */
- //TODO naprawić tę funkcję - drogi są ze złej strony miast :'(
 char const *getRouteDescription(Map *map, unsigned routeId) {
     if (map == NULL) {
         return NULL;
@@ -377,70 +378,20 @@ char const *getRouteDescription(Map *map, unsigned routeId) {
     ListNode *position = map->routes[routeId]->path->listNode;
     Path *pathNode = position->data;
 
-     if (!concatenateString(string, unsignedToString(routeId))) {
-         deleteString(string, true);
-
-         return false;
-     }
-
-    if (!concatenateString(string, pathNode->city->name)) {
+    if (!concatenateString(string, unsignedToString(routeId))) {
         deleteString(string, true);
 
         return false;
     }
 
+    if (!concatenateString(string, SEMICOLON)) {
+        deleteString(string, true);
+
+        return NULL;
+    }
+
     while (position != NULL) {
-        position = position->next;
-
-        if (position != NULL) {
-            pathNode = position->data;
-        }
-
-        if (!concatenateString(string, SEMICOLON)) {
-            deleteString(string, true);
-
-            return NULL;
-        }
-
-        const char *year = intToString(pathNode->road->year);
-
-        if (year == NULL) {
-            deleteString(string, true);
-
-            return false;
-        }
-
-        const char *length = intToString(pathNode->road->length);
-
-        if (length == NULL) {
-            deleteString(string, true);
-
-            return false;
-        }
-
-        if (!concatenateString(string, length)) {
-            deleteString(string, true);
-
-            return NULL;
-        }
-
-        if (!concatenateString(string, SEMICOLON)) {
-            deleteString(string, true);
-
-            return NULL;
-        }
-
-        if (!concatenateString(string, year)) {
-            deleteString(string, true);
-
-            return false;
-        }
-
-        if (!concatenateString(string, SEMICOLON)) {
-            deleteString(string, true);
-
-            return NULL;
-        }
+        pathNode = position->data;
 
         if (!concatenateString(string, pathNode->city->name)) {
             deleteString(string, true);
@@ -448,11 +399,60 @@ char const *getRouteDescription(Map *map, unsigned routeId) {
             return NULL;
         }
 
-        free((void *) length);
-        free((void *) year);
+        if (pathNode->road != NULL) {
+            if (!concatenateString(string, SEMICOLON)) {
+                deleteString(string, true);
+
+                return NULL;
+            }
+
+            const char *year = intToString(pathNode->road->year);
+
+            if (year == NULL) {
+                deleteString(string, true);
+
+                return false;
+            }
+
+            const char *length = intToString(pathNode->road->length);
+
+            if (length == NULL) {
+                deleteString(string, true);
+
+                return false;
+            }
+
+            if (!concatenateString(string, length)) {
+                deleteString(string, true);
+
+                return NULL;
+            }
+
+            if (!concatenateString(string, SEMICOLON)) {
+                deleteString(string, true);
+
+                return NULL;
+            }
+
+            if (!concatenateString(string, year)) {
+                deleteString(string, true);
+
+                return false;
+            }
+
+            if (!concatenateString(string, SEMICOLON)) {
+                deleteString(string, true);
+
+                return NULL;
+            }
+
+            free((void *) length);
+            free((void *) year);
+        }
+        position = position->next;
     }
 
-    char *returnValue = string->data;
+    char *returnValue = getData(string);
     deleteString(string, false);
 
     return returnValue;

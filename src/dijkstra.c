@@ -252,8 +252,6 @@ List *reconstructRoute(Map *map, City *source, City *destination, Distance *dist
         position = potentialNextPosition;
         deleteSetIterator(setIterator);
     }
-
-    return path;
 }
 
 Route *dijkstra(Map *map, City *source, City *destination, List *restrictedPaths) {
