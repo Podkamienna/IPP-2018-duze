@@ -85,6 +85,10 @@ bool addNewRoad(Map *map, const char *city1, const char *city2, int year, int le
  * z argumentów ma niepoprawną wartość
  */
 
+void blockRoad(Road *road);
+
+void unblockRoad(Road *road);
+
 int compareRoads(Road *road1, Road *road2);
 
 Road *searchRoad(Map *map, City *city1, City *city2);

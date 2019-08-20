@@ -82,10 +82,6 @@ SetIterator *getNewSetIterator(Set *set) {
 
     return setIterator;
 }
-//TODO usunąć?
-bool incrementSetIterator(SetIterator *setIterator) {
-    return incrementVectorIterator(setIterator->vectorIterator);
-}
 
 void *getNextSetIterator(SetIterator *setIterator) {
     if (setIterator == NULL) {

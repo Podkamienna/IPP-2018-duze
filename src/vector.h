@@ -1,4 +1,6 @@
 /** @file
+ * Interfejs struktury wektor reprezentującej dynamicznie alokowane tablice
+ * o zmiennym rozmiarze.
  */
 
 #ifndef DROGI_VECTOR_H
@@ -7,7 +9,9 @@
 #include <stdlib.h>
 #include <stdbool.h>
 
+/** Struktura przechowująca wektor. */
 typedef struct Vector Vector;
+/** Struktura przechowująca iterator do wektora*/
 typedef struct VectorIterator VectorIterator;
 
 struct Vector {
@@ -23,18 +27,18 @@ struct VectorIterator {
 
 /**
  * @brief Tworzy nowy wektor.
- * @return Nowy wektor lub NULL, gdy nie udało
+ * @return Nowy wektor lub @p NULL, gdy nie udało
  * się zaalokować pamięci.
  */
 Vector *initializeVector();
 
 /**
- * @brief Wyszukuje i zwraca pola w wektorze związanego z
+ * @brief Wyszukuje i zwraca pole w wektorze związane z
  * z zadaną wartością.
  * @param vector — wektor w którym jest szukane
- * @param cmp — funkcja sprawdzająca, czy 2 wartości są równe
+ * @param cmp — funkcja zadająca porządek na elementach wektora
  * @param value — wartość która jest wyszukiwana
- * @return Zwraca znalezioną wartość lub NULL, gdy nie jest ona
+ * @return Zwraca znalezioną wartość lub @p NULL, gdy nie jest ona
  * obecna w wektorze, lub któryś z parametrów
  * ma niepoprawną wartość
  */
@@ -53,7 +57,8 @@ bool pushToVector(Vector *vector, void *value);
 /**
  * @brief Usuwa element z końca wektora.
  * @param vector — wektor z którego ma być usuwane
- * @param deleteValue — funkcja, która usuwa zawartość pola w wektorze
+ * @param deleteValue — funkcja, która usuwa zawartość pola w wektorze,
+ * jeżeli ma wartość NULL, to zawartość nie jest usuwana
  */
 void popFromVector(Vector *vector, void deleteValue(void *));
 
@@ -64,11 +69,16 @@ void popFromVector(Vector *vector, void deleteValue(void *));
  * @param value — element do usunięcia
  * @return Wartość @p true jeżeli udało się usunąć.
  * Wartość @p false, jeżeli element do usunięcia nie jest zawarty
- * z wektora..
+ * w wektorze lub któryś z parametrów jest niepoprawny.
  */
 bool deleteFromVector(Vector *vector, void deleteValue(void *), int compare(void *, void *), void *value);
 
-//TODO
+/**
+ * @brief Funkcja sprawdzająca, czy wektor jest pusty.
+ * @param vector — wektor do sprawdzenia jego pustości
+ * @return Wartość @p true, jeżeli wektor ma rozmiar 0, lub
+ * jest NULLem. Wartość @p false w innym wypadku.
+ */
 bool isEmptyVector(Vector *vector);
 
 /**
@@ -79,12 +89,30 @@ bool isEmptyVector(Vector *vector);
  */
 void deleteVector(Vector *vector, void deleteValue(void *));
 
+/**
+ * @brief Alokuje pamięć pod i zwraca wskaźnik na
+ * nowy iterator na zadanym wektorze.
+ * @param vector — wektor dla którego tworzony będzie
+ * iterator
+ * @return Wskaźnik na zaalokowaną strukturę, jeżeli wszystko się udało,
+ * @p NULL, jeżeli nie udało się zaalokować pamięci, lub zadany wektor jest
+ * NULLem.
+ */
 VectorIterator *getNewVectorIterator(Vector *vector);
 
-bool incrementVectorIterator(VectorIterator *vectorIterator);
-
+/**
+ * @brief Zwraca kolejny element wektora.
+ * @param vectorIterator — iterator, który
+ * wie, jaki element zwrócić
+ * @return Kolejny element wektora, lub wartość
+ * @p NULL, jeżeli koniec wektora został osiągnięty
+ */
 void *getNextVectorIterator(VectorIterator *vectorIterator);
 
+/**
+ * @brief Funkcja usuwająca zadany iterator wektora.
+ * @param vectorIterator — iterator do usunięcia.
+ */
 void deleteVectorIterator(VectorIterator *vectorIterator);
 
 #endif /* DROGI_VECTOR_H */

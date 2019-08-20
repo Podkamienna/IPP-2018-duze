@@ -161,6 +161,10 @@ bool newRoute(Map *map, unsigned routeId,
         return false;
     }
 
+    if (strcmp(city1, city2) == 0) {
+        return false;
+    }
+
     if (routeId < MINIMAL_ROUTE_ID || routeId > MAXIMAL_ROUTE_ID) {
         return false;
     }
@@ -186,7 +190,7 @@ bool newRoute(Map *map, unsigned routeId,
  * wariant z odcinkiem, który jest najmłodszy.
  * @param[in,out] map    – wskaźnik na strukturę przechowującą mapę dróg;
  * @param[in] routeId    – numer drogi krajowej;
- * @param[in] city       – wskaźnik na napis reprezentujący nazwę miasta.
+ * @param[in] cityName       – wskaźnik na napis reprezentujący nazwę miasta.
  * @return Wartość @p true, jeśli droga krajowa została wydłużona.
  * Wartość @p false, jeśli wystąpił błąd: któryś z parametrów ma niepoprawną
  * nazwę, nie istnieje droga krajowa o podanym numerze, nie ma miasta o podanej
@@ -195,12 +199,20 @@ bool newRoute(Map *map, unsigned routeId,
  * wyznaczyć nowego fragmentu drogi krajowej lub nie udało się zaalokować
  * pamięci.
  */
-bool extendRoute(Map *map, unsigned routeId, const char *city) {
+bool extendRoute(Map *map, unsigned routeId, const char *cityName) {
     if (map == NULL) {
         return false;
     }
 
-    if (city == NULL) {
+    if (cityName == NULL) {
+        return false;
+    }
+
+    if (!isCityName(cityName)) {
+        return false;
+    }
+
+    if (routeId < MINIMAL_ROUTE_ID || routeId > MAXIMAL_ROUTE_ID) {
         return false;
     }
 
@@ -208,15 +220,36 @@ bool extendRoute(Map *map, unsigned routeId, const char *city) {
         return false;
     }
 
-    Route *tempRoute1 = dijkstra(map, searchDictionary(map->cities, city), map->routes[routeId]->source,
+    City *city = searchCity(map, cityName);
+
+    if (city == NULL) {
+        return false;
+    }
+
+    Path *path = getNewPathNode(city, NULL);
+
+    if (path == NULL) {
+        deleteCity(city);
+
+        return false;
+    }
+
+    if (exists(map->routes[routeId]->path, path)) {
+        deletePathNode(path);
+
+        return false;
+    }
+
+    deletePathNode(path);
+
+    Route *tempRoute1 = dijkstra(map, city, map->routes[routeId]->source,
                                  map->routes[routeId]->path);
 
     if (tempRoute1 == NULL) {
         return false;
     }
 
-    Route *tempRoute2 = dijkstra(map, map->routes[routeId]->destination, searchDictionary(map->cities, city),
-                                 map->routes[routeId]->path);
+    Route *tempRoute2 = dijkstra(map, map->routes[routeId]->destination, city, map->routes[routeId]->path);
 
     if (tempRoute2 == NULL) {
         deleteRoute(tempRoute1, false);
@@ -227,8 +260,8 @@ bool extendRoute(Map *map, unsigned routeId, const char *city) {
     int compareResult = compareRoute(tempRoute1, tempRoute2);
 
     if (compareResult == 0) {
-        deleteRoute(tempRoute1,true);
-        deleteRoute(tempRoute2,true);
+        deleteRoute(tempRoute1, true);
+        deleteRoute(tempRoute2, true);
 
         return false;
     }
@@ -242,7 +275,7 @@ bool extendRoute(Map *map, unsigned routeId, const char *city) {
             return false;
         }
 
-        insertAtTheBeginning(map->routes[routeId]->path,tempRoute1->path, (void(*)(void*))deletePathNode);
+        insertAtTheBeginning(map->routes[routeId]->path, tempRoute1->path, (void (*)(void *)) deletePathNode);
         map->routes[routeId]->source = tempRoute1->source;
         map->routes[routeId]->minimalYear = min(map->routes[routeId]->minimalYear, tempRoute1->minimalYear);
         map->routes[routeId]->length += tempRoute1->length;
@@ -252,7 +285,7 @@ bool extendRoute(Map *map, unsigned routeId, const char *city) {
     }
 
     if (compareResult == -1) {
-        deleteRoute(tempRoute1,true);
+        deleteRoute(tempRoute1, true);
 
         if (!isCorrectRoute(tempRoute2)) {
             deleteRoute(tempRoute2, true);
@@ -260,7 +293,7 @@ bool extendRoute(Map *map, unsigned routeId, const char *city) {
             return false;
         }
 
-        insertAtTheEnd(map->routes[routeId]->path,tempRoute2->path, (void(*)(void*))deletePathNode);
+        insertAtTheEnd(map->routes[routeId]->path, tempRoute2->path, (void (*)(void *)) deletePathNode);
         map->routes[routeId]->destination = tempRoute2->destination;
         map->routes[routeId]->minimalYear = min(map->routes[routeId]->minimalYear, tempRoute2->minimalYear);
         map->routes[routeId]->length += tempRoute2->length;
@@ -303,9 +336,13 @@ bool removeRoad(Map *map, const char *city1, const char *city2) {
         return false;
     }
 
+    blockRoad(toRemove);
+
     Path *pathNode = getNewPathNode(NULL, toRemove);
 
     if (pathNode == NULL) {
+        unblockRoad(toRemove);
+
         return false;
     }
 
@@ -313,11 +350,16 @@ bool removeRoad(Map *map, const char *city1, const char *city2) {
 
     if (RoutesToInsert == NULL) {
         deletePathNode(pathNode);
+        unblockRoad(toRemove);
 
         return false;
     }
 
     for (unsigned i = MINIMAL_ROUTE_ID; i <= MAXIMAL_ROUTE_ID; i++) {
+        if (map->routes[i] == NULL) {
+            continue;
+        }
+
         List *restrictedPaths = map->routes[i]->path;
         if (exists(restrictedPaths, pathNode)) {
             Route *newRoute = dijkstra(map, tmpCity1, tmpCity2, restrictedPaths);
@@ -333,6 +375,7 @@ bool removeRoad(Map *map, const char *city1, const char *city2) {
 
                 deletePathNode(pathNode);
                 free(RoutesToInsert);
+                unblockRoad(toRemove);
 
                 return false;
             }
@@ -342,7 +385,9 @@ bool removeRoad(Map *map, const char *city1, const char *city2) {
     }
 
     for (unsigned i = MINIMAL_ROUTE_ID; i <= MAXIMAL_ROUTE_ID; i++) {
-        insertToList(map->routes[i]->path, RoutesToInsert[i], (void(*)(void*))deletePathNode);
+        if (map->routes[i] != NULL) {
+            insertToList(map->routes[i]->path, RoutesToInsert[i], (void (*)(void *)) deletePathNode);
+        }
     }
 
     removeSomeRoad(map, tmpCity1, tmpCity2);
@@ -387,7 +432,7 @@ char const *getRouteDescription(Map *map, unsigned routeId) {
 
     ListNode *position = map->routes[routeId]->path->beginning;
     Path *pathNode = position->data;
-    char* routeIdString = unsignedToString(routeId);
+    char *routeIdString = unsignedToString(routeId);
 
     FAIL_IF(!concatenateString(string, routeIdString));
     FAIL_IF(!concatenateString(string, SEMICOLON));

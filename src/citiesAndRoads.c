@@ -38,6 +38,10 @@ bool isCityName(const char *city) {
         return false;
     }
 
+    if (strlen(city) == 0) {
+        return false;
+    }
+
     for (size_t i = 0; city[i] != '\0'; i++) {
         if ((city[i] >= 0 && city[i] <= 31) || city[i] == ';') {
             return false;
@@ -199,6 +203,22 @@ bool addNewRoad(Map *map, const char *city1, const char *city2, int year, int le
 
     failure4:;
     return false;
+}
+
+void blockRoad(Road *road) {
+    if (road == NULL) {
+        return;
+    }
+
+    road->isBlocked = true;
+}
+
+void unblockRoad(Road *road) {
+    if (road == NULL) {
+        return;
+    }
+
+    road->isBlocked = false;
 }
 
 bool removeSomeRoad(Map *map, City *city1, City *city2) {

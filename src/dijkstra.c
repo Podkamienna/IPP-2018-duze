@@ -241,6 +241,10 @@ List *reconstructRoute(Map *map, City *source, City *destination, Distance *dist
         for (Road *road = getNextSetIterator(setIterator); road != NULL; road = getNextSetIterator(setIterator)) {
             City *neighbour = getNeighbour(road, position);
 
+            if (neighbour == NULL) {
+                continue;
+            }
+
             if (compareDistance(distances[position->id], addRoadToDistance(distances[neighbour->id], road)) == 0) {
                 if (potentialNextPosition != NULL) {
                     deleteSetIterator(setIterator);
@@ -289,22 +293,23 @@ Route *dijkstra(Map *map, City *source, City *destination, List *restrictedPaths
     }
 
     Distance *distances = calculateDistances(map, source, destination, isRestricted);
-
-    if (compareDistance(distances[destination->id], WORST_DISTANCE) == 0) { //Jeżeli nie ma ścieżki
-        free(distances);
-        free(isRestricted);
-        deleteListIterator(listIterator);
-
-        return NULL;
-    }
-
-    List *list = reconstructRoute(map, source, destination, distances);
-    Path *endOfList = getLast(list);
     Route *route = getNewRoute();
 
     if (route == NULL) {
         return NULL;
     }
+
+    if (compareDistance(distances[destination->id], WORST_DISTANCE) == 0) { //Jeżeli nie ma ścieżki
+        free(distances);
+        free(isRestricted);
+        deleteListIterator(listIterator);
+        route->minimalYear = 0;
+
+        return route;
+    }
+
+    List *list = reconstructRoute(map, source, destination, distances);
+    Path *endOfList = getLast(list);
 
     route->source = source;
     route->destination = destination;

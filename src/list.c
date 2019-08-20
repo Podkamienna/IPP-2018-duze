@@ -174,7 +174,7 @@ bool insertToList(List *list, List *toInsert, void deleteValue(void *)) {
     while (position->next != NULL) {
         if (list->compare(position->data, toInsert->beginning) == 0) {
             if (list->compare(position->next->data, toInsert->end) == 0) {
-                if (position->prev == NULL) { //Jeżeli jest wstawiane na początku
+                if (position->prev == NULL) {
                     ListNode *toDelete1 = toInsert->end;
                     ListNode *toDelete2 = list->beginning;
 

@@ -1,16 +1,31 @@
 /** @file
+ * Implementacja struktury wektor reprezentującej dynamicznie alokowane tablice
+ * o zmiennym rozmiarze.
  */
- //TODO poogarniać te nagłówki
+
 
 #include "vector.h"
+#include "definitions.h"
 
 #include <stdlib.h>
 #include <stdbool.h>
 
-typedef struct Vector Vector;
-typedef struct VectorIterator VectorIterator;
-
+/**
+ * @brief Funckja zwiększająca zadany wektor.
+ * @param vector — wektor do zwiększenia
+ * @return Wartość @p true jeżeli wszystko się powiodło.
+ * Wartość @p false jeżeli nie udało się zaalokować pamięci,
+ * lub zadany wektor był NULLem.
+ */
 static bool resizeVector(Vector *vector);
+
+/**
+ * @brief Funckcja zamieniająca 2 miejsca w tablicy,
+ * używana na tablicy będącej przechowywaną przez wektor.
+ * @param arr — tablica w której elementy będą zamieniane
+ * @param i — pozycja pierwszego elementu do zamienienia
+ * @param j — pozycja drugiego elementu do zamienienia
+ */
 static void swap(void **arr, size_t i, size_t j);
 
 static bool resizeVector(Vector *vector) {
@@ -69,22 +84,19 @@ void *searchVector(Vector *vector, int cmp(void *, void *), void *value) {
 }
 
 bool pushToVector(Vector *vector, void *value) {
-    if (vector == NULL) {
-        return false;
-    }
-
-    if (value == NULL) {
-        return false;
-    }
+    FAIL_IF(vector == NULL);
+    FAIL_IF(value == NULL);
 
     if (vector->size + 1 > vector->maxSize) {
-        if (!resizeVector(vector)) {
-            return false;
-        }
+        FAIL_IF(!resizeVector(vector));
     }
+
     vector->data[vector->size++] = value;
 
     return true;
+
+    failure:;
+    return false;
 }
 
 void popFromVector(Vector *vector, void deleteValue(void *)) {
@@ -105,6 +117,10 @@ void popFromVector(Vector *vector, void deleteValue(void *)) {
 
 bool deleteFromVector(Vector *vector, void deleteValue(void *), int compare(void *, void *), void *value) {
     if (vector == NULL) {
+        return false;
+    }
+
+    if (value == NULL) {
         return false;
     }
 
@@ -162,28 +178,16 @@ VectorIterator *getNewVectorIterator(Vector *vector) {
     return newVectorIterator;
 }
 
-bool incrementVectorIterator(VectorIterator *vectorIterator) {
-    if (vectorIterator == NULL) {
-        return false;
-    }
-
-    if (vectorIterator->position + 1 >= vectorIterator->vector->size) {
-        return false;
-    }
-
-    vectorIterator->position++;
-
-    return true;
-}
-
 void *getNextVectorIterator(VectorIterator *vectorIterator) {
     if (vectorIterator == NULL || vectorIterator->vector == NULL) {
         return NULL;
     }
 
-    if (!incrementVectorIterator(vectorIterator)) {
+    if (vectorIterator->position + 1 >= vectorIterator->vector->size) {
         return NULL;
     }
+
+    vectorIterator->position++;
 
     return vectorIterator->vector->data[vectorIterator->position];
 }
