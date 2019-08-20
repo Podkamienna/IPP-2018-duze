@@ -11,9 +11,12 @@
 #include <stdlib.h>
 #include <string.h>
 
-//TODO czy powinny być wszystkie typdefy
 
 int comparePathNodes(Path *a, Path *b) {
+    if (a->road == NULL || b->road == NULL) {
+        return compareCities(a->city, b->city);
+    }
+
     return compareRoads(a->road, b->road);
 }
 
@@ -24,7 +27,7 @@ Route *getNewRoute() {
         return NULL;
     }
 
-    newRoute->path = initializeList((int(*)(void*, void*))comparePathNodes);
+    newRoute->path = NULL;
     newRoute->isUnique = true;
 
     return newRoute;
@@ -55,22 +58,9 @@ bool isCorrectRoute(Route *route) {
         return false;
     }
 
-    if (route->isUnique == false) {
-        return false;
-    }
-
-    return true;
+    return route->isUnique;
 }
 
-static int min(int a, int b) {
-    if (a > b) {
-        return b;
-    }
-
-    return a;
-}
-
-//jezeli pierwsze wieksze to 1
 int compareRoute(Route *route1, Route *route2) {
     if (!isCorrectRoute(route1) && !isCorrectRoute(route2)) {
         return 0;
@@ -120,79 +110,15 @@ void deletePathNode(Path *pathNode) {
     free(pathNode);
 }
 
-//extendRoute
-//wszystkie miasta, które już są w drodze krajowej, nie mogą być w rozszerzeniu
-//puszczam dijkstrę z obu końców i wybieram lepszy, ale nie NULL
-//jest problem, jeżeli alokacja się nie udała? Bo wtedy
-//zakłada, że ścieżka już istnieje
-bool addToRoute(Map *map, unsigned routeId, const char *city) {
-    if (map == NULL) {
-        return false;
-    }
-
-    if (city == NULL) {
-        return false;
-    }
-
-    if (map->routes[routeId] == NULL) {
-        return false;
-    }
-
-    List *restrictedCities = map->routes[routeId]->path;
-
-    Route *tempRoute1 = dijkstra(map, searchDictionary(map->cities, city), map->routes[routeId]->source,
-                                 restrictedCities);
-
-    if (tempRoute1 == NULL) {
-        return false;
-    }
-
-    Route *tempRoute2 = dijkstra(map, map->routes[routeId]->destination, searchDictionary(map->cities, city),
-                                 restrictedCities);
-
-    if (tempRoute2 == NULL) {
-        deleteRoute(tempRoute1);
-
-        return false;
-    }
-
-    int compareResult = compareRoute(tempRoute1, tempRoute2);
-
-    if (compareResult == 0) {
-        deleteRoute(tempRoute1);
-        deleteRoute(tempRoute2);
-
-        return false;
-    }
-
-    if (compareResult == 1) {
-        deleteRoute(tempRoute2);
-
-        insertToList(map->routes[routeId]->path, tempRoute1->path);
-        map->routes[routeId]->source = tempRoute1->source;
-        map->routes[routeId]->minimalYear = min(map->routes[routeId]->minimalYear, tempRoute1->minimalYear);
-        map->routes[routeId]->length += tempRoute1->length;
-    }
-
-    if (compareResult == -1) {
-        deleteRoute(tempRoute2);
-
-        insertToList(map->routes[routeId]->path, tempRoute2->path);
-        map->routes[routeId]->destination = tempRoute1->destination;
-        map->routes[routeId]->minimalYear = min(map->routes[routeId]->minimalYear, tempRoute1->minimalYear);
-        map->routes[routeId]->length += tempRoute1->length;
-    }
-
-    return true;
-}
-
 //Nie usuwa miast!!!
-void deleteRoute(Route *route) {
+void deleteRoute(Route *route, bool deletePath) {
     if (route == NULL) {
         return;
     }
 
-    deleteList(route->path, (void(*)(void *))deletePathNode);
+    if (deletePath) {
+        deleteList(route->path, (void (*)(void *)) deletePathNode);
+    }
 
     free(route);
 }

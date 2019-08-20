@@ -20,8 +20,7 @@ static bool addCity(Map *map, City *city) {
     return insertDictionary(map->cities, city->name, city);
 }
 
-//zakladam, ze nie sa NULLami
-int compareRoads(Road *road1, Road *road2) {//TODO static????
+int compareRoads(Road *road1, Road *road2) {
     if (road1->city1 == road2->city1 && road1->city2 == road2->city2) {
         return 0;
     }

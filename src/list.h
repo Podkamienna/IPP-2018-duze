@@ -14,10 +14,12 @@ typedef struct ListIterator ListIterator;
 struct ListNode {
     void *data;
     ListNode *next;
+    ListNode *prev;
 };
 
-struct List {// TODO dodać koniec, poprawić konkatencje
-    ListNode *listNode;
+struct List {
+    ListNode *beginning; //wskaźnik na początek listy
+    ListNode *end; //wskaźnik na koniec listy
     int (*compare)(void *, void *);
 };
 
@@ -65,26 +67,17 @@ void reverseList(List *list);
  */
 bool exists(List *list, void *value);
 
+bool insertAtTheBeginning(List *list, List *toInsert, void deleteValue(void *));
+
+bool insertAtTheEnd(List *list, List *toInsert, void deleteValue(void *));
+
 /**
- * @brief Znajduje w zadanej liście elementy, pomiędzy którymi
- * ma wstawić listę do wstawienia i ją wstawia. Jeżeli zadana
- * para elementów występuje obok siebie więcej niż raz, to
- * wstawia tylko przy pierwszym jej wystąpieniu. Jeżeli początek ma
- * wartość NULL to wstawiwa na początek listy, a jeżeli koniec to
- * na koniec listy. Jeżeli oba mają wartość NULL i lista jest pusta
- * to wstawia zamiast tej listy. Jeżeli list jest pusta i koniec lub
- * początek nie jest NULLem, to nic nie robi
- * @param list — lista do której ma być wstawiane
- * @param toInsert — lista która ma być wstawiana
- * @param beginning — element po którym ma być wstawiona
- * @return Wartość @p true, jeżeli udało się wstawić.
- * Wartość @p false, jeżeli któraś z list ma wartość NULL,
- * początek lub koniec listy do wstawienia nie są zawarte
- * w liście, początek i koniec listy nie są 2 kolejnymi elementami
- * listy, z których początek jest pierwszy. Jeżeli początek i koniec
- * mają wartość NULL, a zadana lista jest niepusta, to zwraca false.
+ * @brief Ws
+ * @param list
+ * @param toInsert
+ * @return
  */
-bool insertToList(List *list, List *toInsert);
+bool insertToList(List *list, List *toInsert, void deleteValue(void *));
 
 /**
  * @brief Usuwa zadaną listę. Jeżeli deleteValue to NULL,

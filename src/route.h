@@ -26,7 +26,7 @@ bool isCorrectRoute(Route *route);
 
 int compareRoute(Route *route1, Route *route2);
 
-void deleteRoute(Route *route);
+void deleteRoute(Route *route, bool deletePath);
 
 
 #endif //DROGI_ROUTE_H

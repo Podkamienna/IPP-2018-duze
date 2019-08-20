@@ -76,6 +76,7 @@ SetIterator *getNewSetIterator(Set *set) {
 
     if (setIterator->vectorIterator == NULL) {
         free(setIterator);
+
         return NULL;
     }
 

@@ -21,7 +21,8 @@ List *initializeList(int compare(void *, void *)) {
         return NULL;
     }
 
-    newList->listNode = NULL;
+    newList->beginning = NULL;
+    newList->end = NULL;
     newList->compare = compare;
 
     return newList;
@@ -42,14 +43,26 @@ bool addToList(List *list, void *value) {
         return false;
     }
 
-    newListNode->next = list->listNode;
+    newListNode->next = list->beginning;
+
+    if (list->beginning != NULL) {
+        list->beginning->prev = newListNode;
+    }
+
+    newListNode->prev = NULL;
     newListNode->data = value;
 
-    list->listNode = newListNode;
+    list->beginning = newListNode;
+
+    if (list->end == NULL) {
+        list->end = newListNode;
+    }
 
     return true;
 }
 
+//TODO chyba usunąć
+/*
 void reverseList(List *list) {
     if (list == NULL) {
         return;
@@ -74,7 +87,7 @@ void reverseList(List *list) {
 
     list->listNode = prevPosition;
 }
-
+*/
 bool exists(List *list, void *value) {
     if (list == NULL) {
         return false;
@@ -84,7 +97,7 @@ bool exists(List *list, void *value) {
         return false;
     }
 
-    ListNode *position = list->listNode;
+    ListNode *position = list->beginning;
 
     while (position != NULL) {
         if (list->compare(value, position->data) == 0) {
@@ -96,69 +109,97 @@ bool exists(List *list, void *value) {
     return false;
 }
 
-bool insertToList(List *list, List *toInsert) {
+void deleteListNode(ListNode *listNode, void deleteValue(void *)) {
+    if (listNode == NULL) {
+        return;
+    }
+
+    if (deleteValue != NULL) {
+        deleteValue(listNode->data);
+    }
+
+    free(listNode);
+}
+
+//zakładam, że listy mają przynajmniej długość 2
+bool insertAtTheBeginning(List *list, List *toInsert, void deleteValue(void *)) {
     if (list == NULL || toInsert == NULL) {
         return false;
     }
 
-    if (toInsert->listNode == NULL) {
+    if (list->compare(toInsert->end->data, list->beginning->data) != 0) {
         return false;
     }
 
-    if (list->listNode == NULL) {
+    toInsert->end->prev->next = list->beginning;
+    list->beginning->prev = toInsert->end->prev;
+
+    deleteListNode(list->beginning, deleteValue);
+
+    list->beginning = toInsert->beginning;
+
+    return true;
+}
+
+bool insertAtTheEnd(List *list, List *toInsert, void deleteValue(void *)) {
+    if (list == NULL || toInsert == NULL) {
         return false;
     }
 
-    ListNode *beginInsert = toInsert->listNode;
-    ListNode *endInsert = toInsert->listNode;
-
-    ListNode *position = list->listNode;
-    ListNode *endList = NULL;
-
-    while (endInsert->next != NULL) {
-        endInsert = endInsert->next;
+    if (list->compare(toInsert->beginning->data, list->end->data) != 0) {
+        return false;
     }
 
-    if (list->compare(position, endInsert) == 0) {
-        free(position);
+    list->end->prev->next = toInsert->beginning;
+    toInsert->beginning->prev = list->end->prev;
 
-        endInsert->next = position->next;
-        list->listNode = beginInsert;
+    deleteListNode(list->end, deleteValue);
 
-        return true;
+    list->end = toInsert->end;
+
+    return true;
+}
+
+bool insertToList(List *list, List *toInsert, void deleteValue(void *)) {
+    if (list == NULL || toInsert == NULL) {
+        return false;
     }
 
-    while (position != NULL) {
-        endList = position;
-        if (list->compare(beginInsert->data, position->data) == 0) {
-            if (position->next == NULL) {
-                position->next = beginInsert->next;
+    ListNode *position = list->beginning;
 
-                free(beginInsert);
+    if (list->beginning == list->end || toInsert->beginning == toInsert->end) {
+        return false;
+    }
 
-                return true;
-            }
+    while (position->next != NULL) {
+        if (list->compare(position->data, toInsert->beginning) == 0) {
+            if (list->compare(position->next->data, toInsert->end) == 0) {
+                if (position->prev == NULL) { //Jeżeli jest wstawiane na początku
+                    ListNode *toDelete1 = toInsert->end;
+                    ListNode *toDelete2 = list->beginning;
 
-            if (list->compare(endInsert->data, position->next->data) == 0) {
-                endInsert->next = position->next->next;
+                    toInsert->end->prev->next = list->beginning->next;
+                    list->beginning = toInsert->beginning;
 
-                free(position->next);
+                    deleteListNode(toDelete1, deleteValue);
+                    deleteListNode(toDelete2, deleteValue);
 
-                position->next = beginInsert->next;
+                    return true;
+                }
 
-                free(beginInsert);
+                ListNode *toDelete1 = toInsert->end;
+                ListNode *toDelete2 = position;
+
+                position->prev->next = toInsert->beginning;
+                toInsert->end->prev->next = position->next;
+
+                deleteListNode(toDelete1, deleteValue);
+                deleteListNode(toDelete2, deleteValue);
 
                 return true;
             }
         }
-
         position = position->next;
-    }
-
-    if (list->compare(endList->data, beginInsert->data) == 0) {
-        endList->next = beginInsert->next;
-
-        free(beginInsert);
     }
 
     return false;
@@ -169,9 +210,9 @@ void deleteList(List *list, void deleteValue(void *)) {
         return;
     }
 
-    ListNode *position = list->listNode, *tmp;
+    ListNode *position = list->beginning, *tmp;
 
-    while(position != NULL) {
+    while (position != NULL) {
         tmp = position->next;
 
         if (deleteValue != NULL) {
@@ -190,7 +231,7 @@ void *getLast(List *list) {
         return NULL;
     }
 
-    return list->listNode->data;
+    return list->beginning->data;
 }
 
 ListIterator *getNewListIterator(List *list) {
@@ -203,7 +244,7 @@ ListIterator *getNewListIterator(List *list) {
         return NULL;
     }
 
-    newListIterator->listNode = list->listNode;
+    newListIterator->listNode = list->beginning;
 
     return newListIterator;
 }

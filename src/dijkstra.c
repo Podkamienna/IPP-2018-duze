@@ -125,10 +125,13 @@ bool pushNeighbours(HeapEntry *entry, Heap *heap, bool *isVisited, bool *isRestr
 
         if (!pushHeap(heap, newEntry)) {
             deleteSetIterator(setIterator);
+            deleteHeapEntry(newEntry);
 
             return false;
         }
     }
+
+    deleteSetIterator(setIterator);
 
     return true;
 }
@@ -169,6 +172,8 @@ Distance *calculateDistances(Map *map, City *source, City *destination, bool *is
 
     if (isVisited == NULL || distances == NULL) {
         deleteHeap(heap, (void (*)(void *)) deleteHeapEntry);
+        free(isVisited);
+        free(distances);
 
         return NULL;
     }
@@ -188,6 +193,8 @@ Distance *calculateDistances(Map *map, City *source, City *destination, bool *is
         distances[temp->city->id] = temp->distance;
 
         if (compareCities(temp->city, destination) == 0) {
+            deleteHeapEntry(temp);
+
             break;
         }
 
@@ -198,6 +205,7 @@ Distance *calculateDistances(Map *map, City *source, City *destination, bool *is
             return NULL;
         }
 
+        deleteHeapEntry(temp);
     }
 
     deleteHeap(heap, (void(*)(void *)) deleteHeapEntry);
@@ -207,7 +215,7 @@ Distance *calculateDistances(Map *map, City *source, City *destination, bool *is
 }
 
 List *reconstructRoute(Map *map, City *source, City *destination, Distance *distances) {
-    List *path = initializeList((int(*)(void *, void *))comparePathNodes); //sprawdzić wszystkie compare
+    List *path = initializeList((int(*)(void *, void *))comparePathNodes);
 
     if (path == NULL) {
         free(distances);
@@ -245,6 +253,8 @@ List *reconstructRoute(Map *map, City *source, City *destination, Distance *dist
             }
 
             if (compareCities(neighbour, source) == 0) {
+                deleteSetIterator(setIterator);
+
                 return path;
             }
         }
@@ -271,12 +281,19 @@ Route *dijkstra(Map *map, City *source, City *destination, List *restrictedPaths
             break;
         }
 
+        if (compareCities(path->city, source) == 0 || compareCities(path->city, destination) == 0) {
+            continue;
+        }
+
         isRestricted[path->city->id] = true;
     }
 
     Distance *distances = calculateDistances(map, source, destination, isRestricted);
+
     if (compareDistance(distances[destination->id], WORST_DISTANCE) == 0) { //Jeżeli nie ma ścieżki
         free(distances);
+        free(isRestricted);
+        deleteListIterator(listIterator);
 
         return NULL;
     }
@@ -295,10 +312,18 @@ Route *dijkstra(Map *map, City *source, City *destination, List *restrictedPaths
     route->length = distances[destination->id].length;
 
     if (compareCities(endOfList->city, source) != 0) {
+        free(distances);
+        free(isRestricted);
+        deleteListIterator(listIterator);
+
         route->path = NULL;
 
         return route; //!!!!!!!!!!!!!trzeba najpierw wyifować, czy jest UNIQUE po wywołaniu
     }
+
+    free(distances);
+    free(isRestricted);
+    deleteListIterator(listIterator);
 
     route->path = list;
 

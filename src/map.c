@@ -61,7 +61,7 @@ void deleteMap(Map *map) {
 
     if (map->routes != NULL) {
         for (int i = 0; i < 1000; i++) {
-            deleteRoute(map->routes[i]);
+            deleteRoute(map->routes[i], true);
         }
     }
 
@@ -168,7 +168,7 @@ bool newRoute(Map *map, unsigned routeId,
     Route *newRoute = dijkstra(map, searchDictionary(map->cities, city1), searchDictionary(map->cities, city2), NULL);
 
     if (!isCorrectRoute(newRoute)) { //sprawdzam, czy udalo sie wyznaczyc droge i czy jednznacznie
-        deleteRoute(newRoute);
+        deleteRoute(newRoute, true);
 
         return false;
     }
@@ -207,7 +207,7 @@ bool extendRoute(Map *map, unsigned routeId, const char *city) {
     if (map->routes[routeId] == NULL) {
         return false;
     }
-//TODO porobić zmienne na miasta/restricted itd
+
     Route *tempRoute1 = dijkstra(map, searchDictionary(map->cities, city), map->routes[routeId]->source,
                                  map->routes[routeId]->path);
 
@@ -219,7 +219,7 @@ bool extendRoute(Map *map, unsigned routeId, const char *city) {
                                  map->routes[routeId]->path);
 
     if (tempRoute2 == NULL) {
-        deleteRoute(tempRoute1);
+        deleteRoute(tempRoute1, false);
 
         return false;
     }
@@ -227,37 +227,46 @@ bool extendRoute(Map *map, unsigned routeId, const char *city) {
     int compareResult = compareRoute(tempRoute1, tempRoute2);
 
     if (compareResult == 0) {
-        deleteRoute(tempRoute1);
-        deleteRoute(tempRoute2);
+        deleteRoute(tempRoute1,true);
+        deleteRoute(tempRoute2,true);
 
         return false;
     }
 
     if (compareResult == 1) {
-        deleteRoute(tempRoute2);
+        deleteRoute(tempRoute2, true);
 
         if (!isCorrectRoute(tempRoute1)) {
-            deleteRoute(tempRoute1);
+            deleteRoute(tempRoute1, true);
+
+            return false;
         }
 
-        insertToList(map->routes[routeId]->path,
-                     (void *) tempRoute1); //działa, bo w każdej drodze krajowej każde miasto występuje
-        map->routes[routeId]->source = tempRoute1->source; //conajwyżej raz
+        insertAtTheBeginning(map->routes[routeId]->path,tempRoute1->path, (void(*)(void*))deletePathNode);
+        map->routes[routeId]->source = tempRoute1->source;
         map->routes[routeId]->minimalYear = min(map->routes[routeId]->minimalYear, tempRoute1->minimalYear);
         map->routes[routeId]->length += tempRoute1->length;
+
+        free(tempRoute1->path);
+        deleteRoute(tempRoute1, false);
     }
 
     if (compareResult == -1) {
-        deleteRoute(tempRoute1);
+        deleteRoute(tempRoute1,true);
 
         if (!isCorrectRoute(tempRoute2)) {
-            deleteRoute(tempRoute2);
+            deleteRoute(tempRoute2, true);
+
+            return false;
         }
 
-        insertToList(map->routes[routeId]->path, (void *) tempRoute2); //jak wyżej
+        insertAtTheEnd(map->routes[routeId]->path,tempRoute2->path, (void(*)(void*))deletePathNode);
         map->routes[routeId]->destination = tempRoute2->destination;
         map->routes[routeId]->minimalYear = min(map->routes[routeId]->minimalYear, tempRoute2->minimalYear);
         map->routes[routeId]->length += tempRoute2->length;
+
+        free(tempRoute2->path);
+        deleteRoute(tempRoute2, false);
     }
 
     return true;
@@ -315,7 +324,7 @@ bool removeRoad(Map *map, const char *city1, const char *city2) {
 
             if (!isCorrectRoute(newRoute)) {
                 if (newRoute != NULL) {
-                    deleteRoute(newRoute);
+                    deleteRoute(newRoute, true);
                 }
 
                 for (unsigned j = i; j >= MINIMAL_ROUTE_ID; j--) {
@@ -333,7 +342,7 @@ bool removeRoad(Map *map, const char *city1, const char *city2) {
     }
 
     for (unsigned i = MINIMAL_ROUTE_ID; i <= MAXIMAL_ROUTE_ID; i++) {
-        insertToList(map->routes[i]->path, RoutesToInsert[i]);
+        insertToList(map->routes[i]->path, RoutesToInsert[i], (void(*)(void*))deletePathNode);
     }
 
     removeSomeRoad(map, tmpCity1, tmpCity2);
@@ -374,12 +383,13 @@ char const *getRouteDescription(Map *map, unsigned routeId) {
     }
 
     String *string = initializeString();
-    const char *length, *year;
+    const char *length = NULL, *year = NULL;
 
-    ListNode *position = map->routes[routeId]->path->listNode;
+    ListNode *position = map->routes[routeId]->path->beginning;
     Path *pathNode = position->data;
+    char* routeIdString = unsignedToString(routeId);
 
-    FAIL_IF(!concatenateString(string, unsignedToString(routeId)));
+    FAIL_IF(!concatenateString(string, routeIdString));
     FAIL_IF(!concatenateString(string, SEMICOLON));
 
     while (position != NULL) {
@@ -412,6 +422,9 @@ char const *getRouteDescription(Map *map, unsigned routeId) {
 
     char *returnValue = getData(string);
     deleteString(string, false);
+    free((void *) length);
+    free((void *) year);
+    free((void *) routeIdString);
 
     return returnValue;
 
@@ -419,6 +432,7 @@ char const *getRouteDescription(Map *map, unsigned routeId) {
     deleteString(string, true);
     free((void *) length);
     free((void *) year);
+    free((void *) routeIdString);
 
     return NULL;
 }
