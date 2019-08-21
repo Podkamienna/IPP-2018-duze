@@ -1,6 +1,7 @@
-//
-// Created by alicja on 11.08.2019.
-//
+/** @file
+ * Implementacja struktury string, reprezentującej napis o zmiennej długości.
+ */
+
 #define _GNU_SOURCE
 
 #include "string.h"
@@ -10,8 +11,23 @@
 #include <string.h>
 #include <stdio.h>
 
+//stała reprezentująca maksymalną długość liczby
+//w systemie dziesiętnym do zamiany na napis
 const size_t MAX_NUMBER_LENGTH = 100;
 
+struct String {
+    size_t size;
+    size_t maxSize;
+    char *data;
+};
+
+/**
+ * @brief Funckja zwiększająca zadany napis.
+ * @param string — wektor do zwiększenia
+ * @return Wartość @p true jeżeli wszystko się powiodło.
+ * Wartość @p false jeżeli nie udało się zaalokować pamięci,
+ * lub zadany napis był NULLem.
+ */
 static bool resizeString(String *string);
 
 static bool resizeString(String *string) {
@@ -41,12 +57,25 @@ String *initializeString() {
     }
 
     newString->data = NULL;
-
-
     newString->size = 0;
     newString->maxSize = 0;
 
     return newString;
+}
+
+void deleteString(String *string, bool deleteData) {
+    if (string == NULL) {
+        return;
+    }
+
+    if (deleteData) {
+        free(string->data);
+        free(string);
+    }
+
+    else {
+        free(string);
+    }
 }
 
 char *getData(String *string) {
@@ -66,6 +95,8 @@ char *intToString(int number) {
         return NULL;
     }
 
+    //zamiana napisu na taki, który nie ma z tyłu za wiele zaalokowanej pamięci
+    //by uniknąć błędów pamięci przy konkatynacji
     char *finalText = strdup(tmpText);
 
     free(tmpText);
@@ -86,6 +117,8 @@ char *unsignedToString(unsigned number) {
         return NULL;
     }
 
+    //zamiana napisu na taki, który nie ma z tyłu za wiele zaalokowanej pamięci
+    //by uniknąć błędów pamięci przy konkatynacji
     char *finalText = strdup(tmpText);
 
     free(tmpText);
@@ -113,17 +146,4 @@ bool concatenateString(String *string1, const char *string2) {
     return true;
 }
 
-void deleteString(String *string, bool deleteData) {
-    if (string == NULL) {
-        return;
-    }
 
-    if (deleteData) {
-        free(string->data);
-        free(string);
-    }
-
-    else {
-        free(string);
-    }
-}

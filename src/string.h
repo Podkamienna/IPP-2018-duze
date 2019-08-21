@@ -1,23 +1,16 @@
-//
-// Created by alicja on 11.08.2019.
-//
+/** @file
+ * Interfejs struktury string, reprezentującej napis o zmiennej długości.
+ */
 
 #ifndef DROGI_STRING_H
 #define DROGI_STRING_H
 
-/** @file
- */
 
 #include <stdlib.h>
 #include <stdbool.h>
 
+/** Struktura przechowująca napis. */
 typedef struct String String;
-
-struct String {
-    size_t size;
-    size_t maxSize;
-    char *data;
-};
 
 /**
  * @brief Tworzy nową strukturę przechowującą napis.
@@ -27,16 +20,41 @@ struct String {
 String *initializeString();
 
 /**
- * Zwraca napis trzymany przez
+ * @brief Usuwa strukturę przechowującą napis,
+ * @param string — struktura z napisem do usunięcia
+ * @param deleteData — parametr wskazujący na to, czy usunąć napis
+ * @param deleteValue — funkcja, która usuwa zawartość pola w wektorze
+ */
+void deleteString(String *string, bool deleteData);
+
+/**
+ * @brief Zwraca napis trzymany przez
  * zadaną strukturę.
  * @param string — struktura trzumająca napis
  * @return Napis trzymany przez strukturę.
  */
 char *getData(String *string);
 
+/**
+ * @brief Zamienia liczbę całkowitą na napis.
+ * Alokuje pamięć na niego i zwraca wskaźnik
+ * na tak uzyskaną strukturę.
+ * @param number — liczba do zamienienia
+ * @return wartość @p NULL jeżeli nie udało się zaalokować pamięci.
+ * Utworzony napis, jeżeli wszystko poszłó dobrze.
+ */
 char *intToString(int number);
 
+/**
+ * @brief Zamienia liczbę całkowitą bez znaku
+ * na napis. Alokuje pamięć na niego i zwraca wskaźnik
+ * na tak uzyskaną strukturę.
+ * @param number — liczba do zamienienia
+ * @return wartość @p NULL jeżeli nie udało się zaalokować pamięci.
+ * Utworzony napis, jeżeli wszystko poszłó dobrze.
+ */
 char *unsignedToString(unsigned number);
+
 /**
  * @brief Dodaje zadaną wartość na koniec napisu.
  * @param string — struktura z napisem do którego coś ma być dodane
@@ -47,12 +65,5 @@ char *unsignedToString(unsigned number);
  */
 bool concatenateString(String *string1, const char *string2);
 
-/**
- * @brief Usuwa strukturę przechowującą napis,
- * @param string — struktura z napisem do usunięcia
- * @param deleteData — parametr wskazujący na to, czy usunąć napis
- * @param deleteValue — funkcja, która usuwa zawartość pola w wektorze
- */
-void deleteString(String *string, bool deleteData);
 
 #endif //DROGI_STRING_H

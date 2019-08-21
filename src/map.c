@@ -169,6 +169,10 @@ bool newRoute(Map *map, unsigned routeId,
         return false;
     }
 
+    if (map->routes[routeId] != NULL) {
+        return false;
+    }
+
     Route *newRoute = dijkstra(map, searchDictionary(map->cities, city1), searchDictionary(map->cities, city2), NULL);
 
     if (!isCorrectRoute(newRoute)) { //sprawdzam, czy udalo sie wyznaczyc droge i czy jednznacznie
@@ -234,7 +238,7 @@ bool extendRoute(Map *map, unsigned routeId, const char *cityName) {
         return false;
     }
 
-    if (exists(map->routes[routeId]->path, path)) {
+    if (searchList(map->routes[routeId]->path, path, (int (*)(void *, void *)) comparePathNodes)) {
         deletePathNode(path);
 
         return false;
@@ -275,7 +279,7 @@ bool extendRoute(Map *map, unsigned routeId, const char *cityName) {
             return false;
         }
 
-        insertAtTheBeginning(map->routes[routeId]->path, tempRoute1->path, (void (*)(void *)) deletePathNode);
+        insertAtTheBeginning(map->routes[routeId]->path, tempRoute1->path, (void (*)(void *)) deletePathNode, (int(*)(void *, void *)) comparePathNodes);
         map->routes[routeId]->source = tempRoute1->source;
         map->routes[routeId]->minimalYear = min(map->routes[routeId]->minimalYear, tempRoute1->minimalYear);
         map->routes[routeId]->length += tempRoute1->length;
@@ -293,7 +297,7 @@ bool extendRoute(Map *map, unsigned routeId, const char *cityName) {
             return false;
         }
 
-        insertAtTheEnd(map->routes[routeId]->path, tempRoute2->path, (void (*)(void *)) deletePathNode);
+        insertAtTheEnd(map->routes[routeId]->path, tempRoute2->path, (void (*)(void *)) deletePathNode, (int(*)(void *, void *)) comparePathNodes);
         map->routes[routeId]->destination = tempRoute2->destination;
         map->routes[routeId]->minimalYear = min(map->routes[routeId]->minimalYear, tempRoute2->minimalYear);
         map->routes[routeId]->length += tempRoute2->length;
@@ -346,9 +350,9 @@ bool removeRoad(Map *map, const char *city1, const char *city2) {
         return false;
     }
 
-    List **RoutesToInsert = calloc(1000, sizeof(List)); // TODO 1000->stała
+    List **routesToInsert = calloc(1000, sizeof(List));
 
-    if (RoutesToInsert == NULL) {
+    if (routesToInsert == NULL) {
         deletePathNode(pathNode);
         unblockRoad(toRemove);
 
@@ -361,8 +365,16 @@ bool removeRoad(Map *map, const char *city1, const char *city2) {
         }
 
         List *restrictedPaths = map->routes[i]->path;
-        if (exists(restrictedPaths, pathNode)) {
-            Route *newRoute = dijkstra(map, tmpCity1, tmpCity2, restrictedPaths);
+        Path *searchResult = searchList(restrictedPaths, pathNode, (int (*)(void *, void *)) comparePathNodes);
+        Route *newRoute;
+
+        if (searchResult != NULL) {
+            if (compareCities(tmpCity1, searchResult->city) == 0) {
+               newRoute = dijkstra(map, tmpCity1, tmpCity2, restrictedPaths);
+            }
+            else {
+                newRoute = dijkstra(map, tmpCity2, tmpCity1, restrictedPaths);
+            }
 
             if (!isCorrectRoute(newRoute)) {
                 if (newRoute != NULL) {
@@ -370,30 +382,32 @@ bool removeRoad(Map *map, const char *city1, const char *city2) {
                 }
 
                 for (unsigned j = i; j >= MINIMAL_ROUTE_ID; j--) {
-                    deleteList(RoutesToInsert[j], (void *) deletePathNode);
+                    deleteList(routesToInsert[j], (void(*)(void*))deletePathNode);
                 }
 
                 deletePathNode(pathNode);
-                free(RoutesToInsert);
+                free(routesToInsert);
                 unblockRoad(toRemove);
 
                 return false;
             }
 
-            RoutesToInsert[i] = newRoute->path;
+            routesToInsert[i] = newRoute->path;
+            //TODO ustawić reversed routes i posprawdza
         }
     }
 
     for (unsigned i = MINIMAL_ROUTE_ID; i <= MAXIMAL_ROUTE_ID; i++) {
         if (map->routes[i] != NULL) {
-            insertToList(map->routes[i]->path, RoutesToInsert[i], (void (*)(void *)) deletePathNode);
+            insertToList(map->routes[i]->path, routesToInsert[i], (void (*)(void *)) deletePathNode, (int(*)(void *, void *))comparePathNodes2);
+            insertToList(map->routes[i]->path, routesToInsert[i], (void (*)(void *)) deletePathNode, (int(*)(void *, void *))comparePathNodes2);
         }
     }
 
     removeSomeRoad(map, tmpCity1, tmpCity2);
 
     deletePathNode(pathNode);
-    free(RoutesToInsert);
+    free(routesToInsert);
 
     return true;
     //TODO dokończyć!!! Przejrzeć wszystkie drogi krajowe i powkładać tam rzeczy

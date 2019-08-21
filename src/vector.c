@@ -69,6 +69,22 @@ Vector *initializeVector() {
     return newVector;
 }
 
+void deleteVector(Vector *vector, void deleteValue(void *)) {
+    if (vector == NULL) {
+        return;
+    }
+
+    if (vector->data != NULL && deleteValue != NULL) {
+        for (size_t i = 0; i < vector->size; i++) {
+            deleteValue(vector->data[i]);
+            vector->data[i] = NULL;
+        }
+    }
+
+    free(vector->data);
+    free(vector);
+}
+
 void *searchVector(Vector *vector, int cmp(void *, void *), void *value) {
     if (vector == NULL) {
         return NULL;
@@ -144,22 +160,6 @@ bool isEmptyVector(Vector *vector) {
     }
 
     return vector->size == 0;
-}
-
-void deleteVector(Vector *vector, void deleteValue(void *)) {
-    if (vector == NULL) {
-        return;
-    }
-
-    if (vector->data != NULL && deleteValue != NULL) {
-        for (size_t i = 0; i < vector->size; i++) {
-            deleteValue(vector->data[i]);
-            vector->data[i] = NULL;
-        }
-    }
-
-    free(vector->data);
-    free(vector);
 }
 
 VectorIterator *getNewVectorIterator(Vector *vector) {

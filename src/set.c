@@ -1,4 +1,5 @@
 /** @file
+ * Implementacja struktury zbiór.
  */
 
 #include "set.h"
@@ -10,10 +11,11 @@ struct Set {
     Vector *vector;
     int (*compare)(void *, void *);
 };
-/*
+
 struct SetIterator {
     VectorIterator *vectorIterator;
-};*/
+};
+
 Set *initializeSet(int compare(void *, void *)) {
     Set *newSet = malloc(sizeof(Set));
 
@@ -25,6 +27,15 @@ Set *initializeSet(int compare(void *, void *)) {
     newSet->compare = compare;
 
     return newSet;
+}
+
+void deleteSet(Set *set, void deleteValue(void *)) {
+    if (set == NULL) {
+        return;
+    }
+
+    deleteVector(set->vector, deleteValue);
+    free(set);
 }
 
 void *searchSet(Set *set, void *value) {
@@ -51,16 +62,6 @@ bool deleteFromSet(Set *set, void deleteValue(void *), void *value) {
     return deleteFromVector(set->vector, deleteValue, set->compare, value);
 }
 
-
-void deleteSet(Set *set, void deleteValue(void *)) {
-    if (set == NULL) {
-        return;
-    }
-
-    deleteVector(set->vector, deleteValue);
-    free(set);
-}
-
 SetIterator *getNewSetIterator(Set *set) {
     if (set == NULL) {
         return NULL;
@@ -82,6 +83,7 @@ SetIterator *getNewSetIterator(Set *set) {
 
     return setIterator;
 }
+
 
 void *getNextSetIterator(SetIterator *setIterator) {
     if (setIterator == NULL) {

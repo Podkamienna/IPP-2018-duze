@@ -1,5 +1,5 @@
 /** @file
- * Interfejs struktury wektor reprezentującej dynamicznie alokowane tablice
+ * Interfejs struktury wektor, reprezentującej dynamicznie alokowane tablice
  * o zmiennym rozmiarze.
  */
 
@@ -11,7 +11,7 @@
 
 /** Struktura przechowująca wektor. */
 typedef struct Vector Vector;
-/** Struktura przechowująca iterator do wektora*/
+/** Struktura przechowująca iterator po wektorze*/
 typedef struct VectorIterator VectorIterator;
 
 struct Vector {
@@ -31,6 +31,14 @@ struct VectorIterator {
  * się zaalokować pamięci.
  */
 Vector *initializeVector();
+
+/**
+ * @brief Usuwa wektor. Jeżeli parametr deleteValue
+ * ma wartość NULL, to nie usuwa zawartości wektora.
+ * @param vector — wektor do usunięcia
+ * @param deleteValue — funkcja, która usuwa zawartość pola w wektorze
+ */
+void deleteVector(Vector *vector, void deleteValue(void *));
 
 /**
  * @brief Wyszukuje i zwraca pole w wektorze związane z
@@ -82,14 +90,6 @@ bool deleteFromVector(Vector *vector, void deleteValue(void *), int compare(void
 bool isEmptyVector(Vector *vector);
 
 /**
- * @brief Usuwa wektor. Jeżeli parametr deleteValue
- * ma wartość NULL, to nie usuwa zawartości wektora.
- * @param vector — wektor do usunięcia
- * @param deleteValue — funkcja, która usuwa zawartość pola w wektorze
- */
-void deleteVector(Vector *vector, void deleteValue(void *));
-
-/**
  * @brief Alokuje pamięć pod i zwraca wskaźnik na
  * nowy iterator na zadanym wektorze.
  * @param vector — wektor dla którego tworzony będzie
@@ -101,6 +101,12 @@ void deleteVector(Vector *vector, void deleteValue(void *));
 VectorIterator *getNewVectorIterator(Vector *vector);
 
 /**
+ * @brief Funkcja usuwająca zadany iterator wektora.
+ * @param vectorIterator — iterator do usunięcia.
+ */
+void deleteVectorIterator(VectorIterator *vectorIterator);
+
+/**
  * @brief Zwraca kolejny element wektora.
  * @param vectorIterator — iterator, który
  * wie, jaki element zwrócić
@@ -108,11 +114,5 @@ VectorIterator *getNewVectorIterator(Vector *vector);
  * @p NULL, jeżeli koniec wektora został osiągnięty
  */
 void *getNextVectorIterator(VectorIterator *vectorIterator);
-
-/**
- * @brief Funkcja usuwająca zadany iterator wektora.
- * @param vectorIterator — iterator do usunięcia.
- */
-void deleteVectorIterator(VectorIterator *vectorIterator);
 
 #endif /* DROGI_VECTOR_H */

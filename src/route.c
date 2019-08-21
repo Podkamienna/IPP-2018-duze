@@ -11,13 +11,16 @@
 #include <stdlib.h>
 #include <string.h>
 
-
 int comparePathNodes(Path *a, Path *b) {
     if (a->road == NULL || b->road == NULL) {
         return compareCities(a->city, b->city);
     }
 
     return compareRoads(a->road, b->road);
+}
+
+int comparePathNodes2(Path *a, Path *b) {
+    return compareCities(a->city, b->city);
 }
 
 Route *getNewRoute() {
@@ -33,28 +36,16 @@ Route *getNewRoute() {
     return newRoute;
 }
 
-bool addNewRoute(Map *map, unsigned routeId, const char *city1, const char *city2) {
-    if (map == NULL) {
-        return false;
-    }
-
-    if (city1 == NULL || city2 == NULL) {
-        return false;
-    }
-
-    Route *newRoute = dijkstra(map, searchDictionary(map->cities, city1), searchDictionary(map->cities, city2), NULL);
-
-    if (newRoute == NULL) {
-        return false;
-    }
-
-    map->routes[routeId] = newRoute;
-
-    return true;
-}
-
 bool isCorrectRoute(Route *route) {
     if (route == NULL) {
+        return false;
+    }
+
+    if (route->path == NULL) {
+        return false;
+    }
+
+    if (route->minimalYear == 0) {
         return false;
     }
 
@@ -110,7 +101,6 @@ void deletePathNode(Path *pathNode) {
     free(pathNode);
 }
 
-//Nie usuwa miast!!!
 void deleteRoute(Route *route, bool deletePath) {
     if (route == NULL) {
         return;

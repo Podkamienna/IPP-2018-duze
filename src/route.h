@@ -16,6 +16,8 @@ typedef struct Path Path;
 
 int comparePathNodes(Path *a, Path *b);
 
+int comparePathNodes2(Path *a, Path *b);
+
 Path *getNewPathNode(City *city, Road *road);
 
 void deletePathNode(Path *pathNode);

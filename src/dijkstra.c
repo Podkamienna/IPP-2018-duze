@@ -47,11 +47,11 @@ static int compareDistance(Distance distance1, Distance distance2) {
         return -1;
     }
 
-    if (distance1.minYear > distance2.minYear) {
+    if (distance1.minYear < distance2.minYear) {
         return 1;
     }
 
-    if (distance1.minYear < distance2.minYear) {
+    if (distance1.minYear > distance2.minYear) {
         return -1;
     }
 
@@ -215,7 +215,7 @@ Distance *calculateDistances(Map *map, City *source, City *destination, bool *is
 }
 
 List *reconstructRoute(Map *map, City *source, City *destination, Distance *distances) {
-    List *path = initializeList((int(*)(void *, void *))comparePathNodes);
+    List *path = initializeList();
 
     if (path == NULL) {
         free(distances);
@@ -225,10 +225,12 @@ List *reconstructRoute(Map *map, City *source, City *destination, Distance *dist
 
     City *position = destination;
     City *potentialNextPosition;
+    Distance potentialNewDistance;
+    Distance currentDistance = BASE_DISTANCE;
 
     addToList(path, getNewPathNode(position, NULL));
 
-    while (true) {
+    while (compareCities(position, source) != 0) {
         potentialNextPosition = NULL;
         SetIterator *setIterator = getNewSetIterator(position->roads);
 
@@ -245,7 +247,9 @@ List *reconstructRoute(Map *map, City *source, City *destination, Distance *dist
                 continue;
             }
 
-            if (compareDistance(distances[position->id], addRoadToDistance(distances[neighbour->id], road)) == 0) {
+            Distance distanceThroughNeighbour = addDistance(currentDistance, addRoadToDistance(distances[neighbour->id], road));
+
+            if (compareDistance(distances[destination->id], distanceThroughNeighbour) == 0) {
                 if (potentialNextPosition != NULL) {
                     deleteSetIterator(setIterator);
 
@@ -253,19 +257,20 @@ List *reconstructRoute(Map *map, City *source, City *destination, Distance *dist
                 }
 
                 potentialNextPosition = neighbour;
+                potentialNewDistance = addRoadToDistance(currentDistance, road);
+
                 addToList(path, getNewPathNode(neighbour, road));
             }
 
-            if (compareCities(neighbour, source) == 0) {
-                deleteSetIterator(setIterator);
-
-                return path;
-            }
         }
 
         position = potentialNextPosition;
+        currentDistance = potentialNewDistance;
+
         deleteSetIterator(setIterator);
     }
+
+    return path;
 }
 
 Route *dijkstra(Map *map, City *source, City *destination, List *restrictedPaths) {

@@ -20,7 +20,6 @@ struct ListNode {
 struct List {
     ListNode *beginning; //wskaźnik na początek listy
     ListNode *end; //wskaźnik na koniec listy
-    int (*compare)(void *, void *);
 };
 
 struct ListIterator {
@@ -36,7 +35,7 @@ struct ListIterator {
  * jeżeli nie udało się zaalokować pamięci lub parametr ma
  * wartość NULL.
  */
-List *initializeList(int compare(void *, void *));
+List *initializeList();
 
 /**
  * @brief Alokuje pamięć pod i wstawia na początek listy nowy
@@ -65,11 +64,11 @@ void reverseList(List *list);
  * Wartość @p false, jeżeli któryś z elementów wejściowych
  * ma wartość NULL lub wyszukiwany element nie istnieje.
  */
-bool exists(List *list, void *value);
+void * searchList(List *list, void *value, int compare (void *, void *));
 
-bool insertAtTheBeginning(List *list, List *toInsert, void deleteValue(void *));
+bool insertAtTheBeginning(List *list, List *toInsert, void deleteValue(void *), int compare (void *, void *));
 
-bool insertAtTheEnd(List *list, List *toInsert, void deleteValue(void *));
+bool insertAtTheEnd(List *list, List *toInsert, void deleteValue(void *), int compare (void *, void *));
 
 /**
  * @brief Ws
@@ -77,7 +76,7 @@ bool insertAtTheEnd(List *list, List *toInsert, void deleteValue(void *));
  * @param toInsert
  * @return
  */
-bool insertToList(List *list, List *toInsert, void deleteValue(void *));
+bool insertToList(List *list, List *toInsert, void deleteValue(void *), int compare (void *, void *));
 
 /**
  * @brief Usuwa zadaną listę. Jeżeli deleteValue to NULL,

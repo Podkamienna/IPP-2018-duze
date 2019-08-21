@@ -10,11 +10,7 @@
 typedef struct ListNode ListNode;
 typedef struct List List;
 
-List *initializeList(int compare(void *, void *)) {
-    if (compare == NULL) {
-        return NULL;
-    }
-
+List *initializeList() {
     List *newList = malloc(sizeof(List));
 
     if (newList == NULL) {
@@ -23,7 +19,6 @@ List *initializeList(int compare(void *, void *)) {
 
     newList->beginning = NULL;
     newList->end = NULL;
-    newList->compare = compare;
 
     return newList;
 }
@@ -88,25 +83,25 @@ void reverseList(List *list) {
     list->listNode = prevPosition;
 }
 */
-bool exists(List *list, void *value) {
+void * searchList(List *list, void *value, int compare (void *, void *)) {
     if (list == NULL) {
-        return false;
+        return NULL;
     }
 
     if (value == NULL) {
-        return false;
+        return NULL;
     }
 
     ListNode *position = list->beginning;
 
     while (position != NULL) {
-        if (list->compare(value, position->data) == 0) {
-            return true;
+        if (compare(value, position->data) == 0) {
+            return position->data;
         }
         position = position->next;
     }
 
-    return false;
+    return NULL;
 }
 
 void deleteListNode(ListNode *listNode, void deleteValue(void *)) {
@@ -122,12 +117,12 @@ void deleteListNode(ListNode *listNode, void deleteValue(void *)) {
 }
 
 //zakładam, że listy mają przynajmniej długość 2
-bool insertAtTheBeginning(List *list, List *toInsert, void deleteValue(void *)) {
+bool insertAtTheBeginning(List *list, List *toInsert, void deleteValue(void *), int compare(void *, void *)) {
     if (list == NULL || toInsert == NULL) {
         return false;
     }
 
-    if (list->compare(toInsert->end->data, list->beginning->data) != 0) {
+    if (compare(toInsert->end->data, list->beginning->data) != 0) {
         return false;
     }
 
@@ -141,12 +136,12 @@ bool insertAtTheBeginning(List *list, List *toInsert, void deleteValue(void *)) 
     return true;
 }
 
-bool insertAtTheEnd(List *list, List *toInsert, void deleteValue(void *)) {
+bool insertAtTheEnd(List *list, List *toInsert, void deleteValue(void *), int compare (void *, void *)) {
     if (list == NULL || toInsert == NULL) {
         return false;
     }
 
-    if (list->compare(toInsert->beginning->data, list->end->data) != 0) {
+    if (compare(toInsert->beginning->data, list->end->data) != 0) {
         return false;
     }
 
@@ -160,7 +155,7 @@ bool insertAtTheEnd(List *list, List *toInsert, void deleteValue(void *)) {
     return true;
 }
 
-bool insertToList(List *list, List *toInsert, void deleteValue(void *)) {
+bool insertToList(List *list, List *toInsert, void deleteValue(void *), int compare (void *, void *)) {
     if (list == NULL || toInsert == NULL) {
         return false;
     }
@@ -172,8 +167,8 @@ bool insertToList(List *list, List *toInsert, void deleteValue(void *)) {
     }
 
     while (position->next != NULL) {
-        if (list->compare(position->data, toInsert->beginning) == 0) {
-            if (list->compare(position->next->data, toInsert->end) == 0) {
+        if (compare(position->data, toInsert->beginning->data) == 0) {
+            if (compare(position->next->data, toInsert->end->data) == 0) {
                 if (position->prev == NULL) {
                     ListNode *toDelete1 = toInsert->end;
                     ListNode *toDelete2 = list->beginning;
