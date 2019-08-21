@@ -3,5 +3,3 @@
 //
 
 const char *SEMICOLON = ";"; // TODO zmienić nazwa
-const char *MINUS = "-"; // TODO usunąć to i kolejne
-const char ZERO = '0';

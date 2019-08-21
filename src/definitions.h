@@ -6,25 +6,29 @@
 #define DROGI_DEFINITIONS_H
 
 #include <stddef.h>
-#include "vector.h"
+#include <stdint.h>
+#include <stdbool.h>
 
 typedef struct City City;
 typedef struct Road Road;
+typedef struct DijkstraReturnValue DijkstraReturnValue;
 typedef struct Route Route;
 typedef struct List List;
 typedef struct Map Map;
 typedef struct Dictionary Dictionary;
 typedef struct Set Set;
+typedef struct Vector Vector;
 
 #define FAIL_IF(condition) do { if (condition) goto failure; } while(0)
-#define FAIL_IF_NAMED(condition, label) do { if (condition) goto failure##label; } while(0)
+#define FAIL_IF_LABELED(condition, label) do { if (condition) goto failure##label; } while(0)
+
+/** Stała z ilością dróg krajowych */
+#define ROUTE_COUNT 1000
 
 extern const char *SEMICOLON;
-extern const char *MINUS;
-extern const char ZERO;
 
 struct Map {
-    Route *routes[1000];
+    Route *routes[ROUTE_COUNT];
     Dictionary *cities;
     Vector *roads;
 };
@@ -42,15 +46,20 @@ struct Road {
     City *city1, *city2;
 };
 
-struct Route {
+struct DijkstraReturnValue {
     List *path;
     City *source, *destination;
-    unsigned length; // TODO większy typ?
-    int minimalYear; // TODO nieporzebe?
+    uint64_t length;
+    int minimalYear;
     bool isUnique;
 };
 
-struct Path {
+struct Route {
+    List *path;
+    City *source, *destination;
+};
+
+struct PathNode {
     City *city; //jeżeli path nie jest NULLem, to path->city też
     Road *road;
 };

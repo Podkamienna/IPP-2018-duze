@@ -95,6 +95,92 @@ static void deleteHeapEntry(HeapEntry *heapEntry) {
     free(heapEntry);
 }
 
+DijkstraReturnValue *getNewDijkstraReturnValue() {
+    DijkstraReturnValue *newDijkstraReturnValue = malloc(sizeof(DijkstraReturnValue));
+
+    if (newDijkstraReturnValue == NULL) {
+        return NULL;
+    }
+
+    newDijkstraReturnValue->path = NULL;
+    newDijkstraReturnValue->isUnique = true;
+
+    return newDijkstraReturnValue;
+}
+
+bool isCorrectDijkstraReturnValue(DijkstraReturnValue *dijkstraReturnValue) {
+    if (dijkstraReturnValue == NULL) {
+        return false;
+    }
+
+    if (dijkstraReturnValue->path == NULL) {
+        return false;
+    }
+
+    if (dijkstraReturnValue->minimalYear == 0) {
+        return false;
+    }
+
+    return dijkstraReturnValue->isUnique;
+}
+
+Route *dijkstraReturnValueToRoute(DijkstraReturnValue *dijkstraReturnValue) {
+    Route *newRoute = getNewRoute();
+
+    if (newRoute == NULL || dijkstraReturnValue == NULL) {
+        return NULL;
+    }
+
+    newRoute->path = dijkstraReturnValue->path;
+    newRoute->destination = dijkstraReturnValue->destination;
+    newRoute->source = dijkstraReturnValue->source;
+
+    return newRoute;
+}
+
+int compareDijkstraReturnValues(DijkstraReturnValue *a, DijkstraReturnValue *b) {
+    if (!isCorrectDijkstraReturnValue(a) && !isCorrectDijkstraReturnValue(b)) {
+        return 0;
+    }
+
+    if (!isCorrectDijkstraReturnValue(a)) {
+        return -1;
+    }
+
+    if (!isCorrectDijkstraReturnValue(b)) {
+        return 1;
+    }
+
+    if (a->length > b->length) {
+        return -1;
+    }
+
+    if (b->length > a->length) {
+        return 1;
+    }
+
+    if (a->minimalYear > b->minimalYear) {
+        return 1;
+    }
+
+    if (b->minimalYear > a->minimalYear) {
+        return -1;
+    }
+
+    return 0;
+}
+void deleteDijkstraReturnValue(DijkstraReturnValue *dijkstraReturnValue, bool deletePath) {
+    if (dijkstraReturnValue == NULL) {
+        return;
+    }
+
+    if (deletePath) {
+        deleteList(dijkstraReturnValue->path, (void (*)(void *))deletePathNode);
+    }
+
+    free(dijkstraReturnValue);
+}
+
 bool pushNeighbours(HeapEntry *entry, Heap *heap, bool *isVisited, bool *isRestricted) {
     SetIterator *setIterator = getNewSetIterator(entry->city->roads);
 
@@ -273,7 +359,7 @@ List *reconstructRoute(Map *map, City *source, City *destination, Distance *dist
     return path;
 }
 
-Route *dijkstra(Map *map, City *source, City *destination, List *restrictedPaths) {
+DijkstraReturnValue *dijkstra(Map *map, City *source, City *destination, List *restrictedPaths) {
     ListIterator *listIterator = getNewListIterator(restrictedPaths);
 
     if (listIterator == NULL && restrictedPaths != NULL) {
@@ -284,7 +370,7 @@ Route *dijkstra(Map *map, City *source, City *destination, List *restrictedPaths
     bool *isRestricted = calloc(cityCount, sizeof(bool));
 
     while (true) {
-        Path *path = getNextListIterator(listIterator);
+        PathNode *path = getNextListIterator(listIterator);
 
         if (path == NULL) {
             break;
@@ -298,7 +384,7 @@ Route *dijkstra(Map *map, City *source, City *destination, List *restrictedPaths
     }
 
     Distance *distances = calculateDistances(map, source, destination, isRestricted);
-    Route *route = getNewRoute();
+    DijkstraReturnValue *route = getNewDijkstraReturnValue();
 
     if (route == NULL) {
         return NULL;
@@ -314,7 +400,7 @@ Route *dijkstra(Map *map, City *source, City *destination, List *restrictedPaths
     }
 
     List *list = reconstructRoute(map, source, destination, distances);
-    Path *endOfList = getLast(list);
+    PathNode *endOfList = getLast(list);
 
     route->source = source;
     route->destination = destination;

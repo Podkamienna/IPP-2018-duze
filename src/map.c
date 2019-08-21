@@ -5,6 +5,8 @@
 #include "list.h"
 #include "dijkstra.h"
 #include "string.h"
+#include "vector.h"
+#include "set.h"
 
 #include <stdbool.h>
 #include <stdlib.h>
@@ -15,15 +17,6 @@
  * Struktura przechowująca mapę dróg krajowych.
  */
 typedef struct Map Map;
-
-//TODO to gdzieś indziej. Gdzie?
-static int min(int a, int b) {
-    if (a > b) {
-        return b;
-    }
-
-    return a;
-}
 
 /** @brief Tworzy nową strukturę.
  * Tworzy nową, pustą strukturę niezawierającą żadnych miast, odcinków dróg ani
@@ -71,158 +64,106 @@ void deleteMap(Map *map) {
     free(map);
 }
 
-/** @brief Dodaje do mapy odcinek drogi między dwoma różnymi miastami.
- * Jeśli któreś z podanych miast nie istnieje, to dodaje go do mapy, a następnie
- * dodaje do mapy odcinek drogi między tymi miastami.
- * @param[in,out] map    – wskaźnik na strukturę przechowującą mapę dróg;
- * @param[in] city1      – wskaźnik na napis reprezentujący nazwę miasta;
- * @param[in] city2      – wskaźnik na napis reprezentujący nazwę miasta;
- * @param[in] length     – długość w km odcinka drogi;
- * @param[in] builtYear  – rok budowy odcinka drogi.
- * @return Wartość @p true, jeśli odcinek drogi został dodany.
- * Wartość @p false, jeśli wystąpił błąd: któryś z parametrów ma niepoprawną
- * wartość, obie podane nazwy miast są identyczne, odcinek drogi między tymi
- * miastami już istnieje lub nie udało się zaalokować pamięci.
- */
 bool addRoad(Map *map, const char *city1, const char *city2,
              unsigned length, int builtYear) {
-    if (map == NULL) {
-        return false;
+    FAIL_IF_LABELED(map == NULL, 4);
+    FAIL_IF_LABELED(!isCityName(city1) || !isCityName(city2) || strcmp(city1, city2) == 0, 4);
+    FAIL_IF_LABELED(length == 0 || builtYear == 0, 4);
+
+    City *newCity1 = searchCity(map, city1);
+    City *newCity2 = searchCity(map, city2);
+
+    if (newCity1 == NULL) {
+        newCity1 = getNewCity(map, city1);
+        FAIL_IF_LABELED(newCity1 == NULL, 4);
     }
 
-    if (!isCityName(city1) || !isCityName(city2) || strcmp(city1, city2) == 0) {
-        return false;
+    if (newCity2 == NULL) {
+        newCity2 = getNewCity(map, city2);
+        FAIL_IF_LABELED(newCity2 == NULL, 4);
     }
 
-    if (length == 0 || builtYear == 0) {
-        return false;
-    }
+    FAIL_IF_LABELED(searchRoad(map, newCity1, newCity2), 4);
 
-    return addNewRoad(map, city1, city2, builtYear, length);
-}
+    Road *newRoad = getNewRoad(builtYear, length, newCity1, newCity2);
+    FAIL_IF_LABELED(newRoad == NULL, 4);
 
-/** @brief Modyfikuje rok ostatniego remontu odcinka drogi.
- * Dla odcinka drogi między dwoma miastami zmienia rok jego ostatniego remontu
- * lub ustawia ten rok, jeśli odcinek nie był jeszcze remontowany.
- * @param[in,out] map    – wskaźnik na strukturę przechowującą mapę dróg;
- * @param[in] city1      – wskaźnik na napis reprezentujący nazwę miasta;
- * @param[in] city2      – wskaźnik na napis reprezentujący nazwę miasta;
- * @param[in] repairYear – rok ostatniego remontu odcinka drogi.
- * @return Wartość @p true, jeśli modyfikacja się powiodła.
- * Wartość @p false, jeśli wystąpił błąd: któryś z parametrów ma niepoprawną
- * wartość, któreś z podanych miast nie istnieje, nie ma odcinka drogi między
- * podanymi miastami, podany rok jest wcześniejszy niż zapisany dla tego odcinka
- * drogi rok budowy lub ostatniego remontu.
- */
-bool repairRoad(Map *map, const char *city1, const char *city2, int repairYear) {
-    if (map == NULL) {
-        return false;
-    }
-
-    if (!isCityName(city1) || !isCityName(city2)) {
-        return false;
-    }
-
-    if (repairYear == 0) {
-        return false;
-    }
-
-    return updateYearRoad(map, city1, city2, repairYear);
-}
-
-/** @brief Łączy dwa różne miasta drogą krajową.
- * Tworzy drogę krajową pomiędzy dwoma miastami i nadaje jej podany numer.
- * Wśród istniejących odcinków dróg wyszukuje najkrótszą drogę. Jeśli jest
- * więcej niż jeden sposób takiego wyboru, to dla każdego wariantu wyznacza
- * wśród wybranych w nim odcinków dróg ten, który był najdawniej wybudowany lub
- * remontowany i wybiera wariant z odcinkiem, który jest najmłodszy.
- * @param[in,out] map    – wskaźnik na strukturę przechowującą mapę dróg;
- * @param[in] routeId    – numer drogi krajowej;
- * @param[in] city1      – wskaźnik na napis reprezentujący nazwę miasta;
- * @param[in] city2      – wskaźnik na napis reprezentujący nazwę miasta.
- * @return Wartość @p true, jeśli droga krajowa została utworzona.
- * Wartość @p false, jeśli wystąpił błąd: któryś z parametrów ma niepoprawną
- * wartość, istnieje już droga krajowa o podanym numerze, któreś z podanych
- * miast nie istnieje, obie podane nazwy miast są identyczne, nie można
- * jednoznacznie wyznaczyć drogi krajowej między podanymi miastami lub nie udało
- * się zaalokować pamięci.
- */
-bool newRoute(Map *map, unsigned routeId,
-              const char *city1, const char *city2) {
-    if (map == NULL) {
-        return false;
-    }
-
-    if (city1 == NULL || city2 == NULL) {
-        return false;
-    }
-
-    if (!isCityName(city1) || !isCityName(city2)) {
-        return false;
-    }
-
-    if (strcmp(city1, city2) == 0) {
-        return false;
-    }
-
-    if (routeId < MINIMAL_ROUTE_ID || routeId > MAXIMAL_ROUTE_ID) {
-        return false;
-    }
-
-    if (map->routes[routeId] != NULL) {
-        return false;
-    }
-
-    Route *newRoute = dijkstra(map, searchDictionary(map->cities, city1), searchDictionary(map->cities, city2), NULL);
-
-    if (!isCorrectRoute(newRoute)) { //sprawdzam, czy udalo sie wyznaczyc droge i czy jednznacznie
-        deleteRoute(newRoute, true);
-
-        return false;
-    }
-
-    map->routes[routeId] = newRoute;
+    FAIL_IF_LABELED(!pushToVector(map->roads, newRoad), 3);
+    FAIL_IF_LABELED(!insertSet(newCity2->roads, newRoad), 2);
+    FAIL_IF_LABELED(!insertSet(newCity1->roads, newRoad), 1);
 
     return true;
+
+    failure1:;
+    deleteFromSet(newCity2->roads, NULL, newRoad);
+
+    failure2:;
+    popFromVector(map->roads, NULL);
+
+    failure3:;
+    deleteRoad(newRoad);
+
+    failure4:;
+    return false;
 }
 
-/** @brief Wydłuża drogę krajową do podanego miasta.
- * Dodaje do drogi krajowej nowe odcinki dróg do podanego miasta w taki sposób,
- * aby nowy fragment drogi krajowej był najkrótszy. Jeśli jest więcej niż jeden
- * sposób takiego wydłużenia, to dla każdego wariantu wyznacza wśród dodawanych
- * odcinków dróg ten, który był najdawniej wybudowany lub remontowany i wybiera
- * wariant z odcinkiem, który jest najmłodszy.
- * @param[in,out] map    – wskaźnik na strukturę przechowującą mapę dróg;
- * @param[in] routeId    – numer drogi krajowej;
- * @param[in] cityName       – wskaźnik na napis reprezentujący nazwę miasta.
- * @return Wartość @p true, jeśli droga krajowa została wydłużona.
- * Wartość @p false, jeśli wystąpił błąd: któryś z parametrów ma niepoprawną
- * nazwę, nie istnieje droga krajowa o podanym numerze, nie ma miasta o podanej
- * nazwie, przez podane miasto już przechodzi droga krajowa o podanym numerze,
- * podana droga krajowa kończy się w podanym mieście, nie można jednoznacznie
- * wyznaczyć nowego fragmentu drogi krajowej lub nie udało się zaalokować
- * pamięci.
- */
+bool repairRoad(Map *map, const char *city1, const char *city2, int repairYear) {
+    FAIL_IF(map == NULL);
+    FAIL_IF(!isCityName(city1) || !isCityName(city2));
+    FAIL_IF(repairYear == 0);
+
+    City *tmpCity1 = searchCity(map, city1), *tmpCity2 = searchCity(map, city2);
+    FAIL_IF(tmpCity1 == NULL || tmpCity2 == NULL);
+
+    Road *tmpRoad = searchRoad(map, tmpCity1, tmpCity2);
+    FAIL_IF(tmpRoad == NULL);
+
+    FAIL_IF(tmpRoad->year > repairYear);
+
+    tmpRoad->year = repairYear;
+
+    return true;
+
+    failure:;
+    return false;
+}
+
+bool newRoute(Map *map, unsigned routeId,
+              const char *city1, const char *city2) {
+    DijkstraReturnValue *dijkstraResult = NULL;
+
+    FAIL_IF(map == NULL);
+    FAIL_IF(city1 == NULL || city2 == NULL);
+    FAIL_IF(!isCityName(city1) || !isCityName(city2) || strcmp(city1, city2) == 0);
+    FAIL_IF(routeId < MINIMAL_ROUTE_ID || routeId > MAXIMAL_ROUTE_ID);
+    FAIL_IF(map->routes[routeId] != NULL);
+
+    dijkstraResult = dijkstra(map, searchDictionary(map->cities, city1), searchDictionary(map->cities, city2), NULL);
+
+    FAIL_IF(!isCorrectDijkstraReturnValue(dijkstraResult)); //sprawdzam, czy udalo sie wyznaczyc droge i czy jednznacznie
+
+    Route *newRoute = dijkstraReturnValueToRoute(dijkstraResult);
+    map->routes[routeId] = newRoute;
+
+    deleteDijkstraReturnValue(dijkstraResult, false);
+
+    return true;
+
+    failure:;
+    deleteDijkstraReturnValue(dijkstraResult, true);
+
+    return false;
+}
+
 bool extendRoute(Map *map, unsigned routeId, const char *cityName) {
-    if (map == NULL) {
-        return false;
-    }
+    DijkstraReturnValue *dijkstraResult1 = NULL;
+    DijkstraReturnValue *dijkstraResult2 = NULL;
 
-    if (cityName == NULL) {
-        return false;
-    }
-
-    if (!isCityName(cityName)) {
-        return false;
-    }
-
-    if (routeId < MINIMAL_ROUTE_ID || routeId > MAXIMAL_ROUTE_ID) {
-        return false;
-    }
-
-    if (map->routes[routeId] == NULL) {
-        return false;
-    }
+    FAIL_IF_LABELED(map == NULL, 1);
+    FAIL_IF_LABELED(cityName == NULL, 1);
+    FAIL_IF_LABELED(!isCityName(cityName), 1);
+    FAIL_IF_LABELED(routeId < MINIMAL_ROUTE_ID || routeId > MAXIMAL_ROUTE_ID, 1);
+    FAIL_IF_LABELED(map->routes[routeId] == NULL, 1);
 
     City *city = searchCity(map, cityName);
 
@@ -230,7 +171,7 @@ bool extendRoute(Map *map, unsigned routeId, const char *cityName) {
         return false;
     }
 
-    Path *path = getNewPathNode(city, NULL);
+    PathNode *path = getNewPathNode(city, NULL);
 
     if (path == NULL) {
         deleteCity(city);
@@ -246,67 +187,66 @@ bool extendRoute(Map *map, unsigned routeId, const char *cityName) {
 
     deletePathNode(path);
 
-    Route *tempRoute1 = dijkstra(map, city, map->routes[routeId]->source,
-                                 map->routes[routeId]->path);
+    dijkstraResult1 = dijkstra(map, city, map->routes[routeId]->source,
+                                                    map->routes[routeId]->path);
 
-    if (tempRoute1 == NULL) {
+    if (dijkstraResult1 == NULL) {
         return false;
     }
 
-    Route *tempRoute2 = dijkstra(map, map->routes[routeId]->destination, city, map->routes[routeId]->path);
+    dijkstraResult2 = dijkstra(map, map->routes[routeId]->destination, city, map->routes[routeId]->path);
 
-    if (tempRoute2 == NULL) {
-        deleteRoute(tempRoute1, false);
+    if (dijkstraResult2 == NULL) {
+        deleteDijkstraReturnValue(dijkstraResult1, false);
 
         return false;
     }
 
-    int compareResult = compareRoute(tempRoute1, tempRoute2);
+    int compareResult = compareDijkstraReturnValues(dijkstraResult1, dijkstraResult2);
 
     if (compareResult == 0) {
-        deleteRoute(tempRoute1, true);
-        deleteRoute(tempRoute2, true);
+        deleteDijkstraReturnValue(dijkstraResult1, true);
+        deleteDijkstraReturnValue(dijkstraResult2, true);
 
         return false;
     }
 
     if (compareResult == 1) {
-        deleteRoute(tempRoute2, true);
+        deleteDijkstraReturnValue(dijkstraResult2, true);
 
-        if (!isCorrectRoute(tempRoute1)) {
-            deleteRoute(tempRoute1, true);
+        if (!isCorrectDijkstraReturnValue(dijkstraResult1)) {
+            deleteDijkstraReturnValue(dijkstraResult1, true);
 
             return false;
         }
 
-        insertAtTheBeginning(map->routes[routeId]->path, tempRoute1->path, (void (*)(void *)) deletePathNode, (int(*)(void *, void *)) comparePathNodes);
-        map->routes[routeId]->source = tempRoute1->source;
-        map->routes[routeId]->minimalYear = min(map->routes[routeId]->minimalYear, tempRoute1->minimalYear);
-        map->routes[routeId]->length += tempRoute1->length;
+        insertAtTheBeginning(map->routes[routeId]->path, dijkstraResult1->path, (void (*)(void *)) deletePathNode, (int(*)(void *, void *)) comparePathNodes);
+        map->routes[routeId]->source = dijkstraResult1->source;
 
-        free(tempRoute1->path);
-        deleteRoute(tempRoute1, false);
+        free(dijkstraResult1->path);
+        deleteDijkstraReturnValue(dijkstraResult1, false);
     }
 
     if (compareResult == -1) {
-        deleteRoute(tempRoute1, true);
+        deleteDijkstraReturnValue(dijkstraResult1, true);
 
-        if (!isCorrectRoute(tempRoute2)) {
-            deleteRoute(tempRoute2, true);
+        if (!isCorrectDijkstraReturnValue(dijkstraResult2)) {
+            deleteDijkstraReturnValue(dijkstraResult2, true);
 
             return false;
         }
 
-        insertAtTheEnd(map->routes[routeId]->path, tempRoute2->path, (void (*)(void *)) deletePathNode, (int(*)(void *, void *)) comparePathNodes);
-        map->routes[routeId]->destination = tempRoute2->destination;
-        map->routes[routeId]->minimalYear = min(map->routes[routeId]->minimalYear, tempRoute2->minimalYear);
-        map->routes[routeId]->length += tempRoute2->length;
+        insertAtTheEnd(map->routes[routeId]->path, dijkstraResult2->path, (void (*)(void *)) deletePathNode, (int(*)(void *, void *)) comparePathNodes);
+        map->routes[routeId]->destination = dijkstraResult2->destination;
 
-        free(tempRoute2->path);
-        deleteRoute(tempRoute2, false);
+        free(dijkstraResult2->path);
+        deleteDijkstraReturnValue(dijkstraResult2, false);
     }
 
     return true;
+
+    failure1:;
+    return false;
 }
 
 /** @brief Usuwa odcinek drogi między dwoma różnymi miastami.
@@ -342,7 +282,7 @@ bool removeRoad(Map *map, const char *city1, const char *city2) {
 
     blockRoad(toRemove);
 
-    Path *pathNode = getNewPathNode(NULL, toRemove);
+    PathNode *pathNode = getNewPathNode(NULL, toRemove);
 
     if (pathNode == NULL) {
         unblockRoad(toRemove);
@@ -350,7 +290,7 @@ bool removeRoad(Map *map, const char *city1, const char *city2) {
         return false;
     }
 
-    List **routesToInsert = calloc(1000, sizeof(List));
+    List **routesToInsert = calloc(ROUTE_COUNT, sizeof(List));
 
     if (routesToInsert == NULL) {
         deletePathNode(pathNode);
@@ -365,20 +305,20 @@ bool removeRoad(Map *map, const char *city1, const char *city2) {
         }
 
         List *restrictedPaths = map->routes[i]->path;
-        Path *searchResult = searchList(restrictedPaths, pathNode, (int (*)(void *, void *)) comparePathNodes);
-        Route *newRoute;
+        PathNode *searchResult = searchList(restrictedPaths, pathNode, (int (*)(void *, void *)) comparePathNodes);
+        DijkstraReturnValue *dijkstraResult;
 
         if (searchResult != NULL) {
             if (compareCities(tmpCity1, searchResult->city) == 0) {
-               newRoute = dijkstra(map, tmpCity1, tmpCity2, restrictedPaths);
+                dijkstraResult = dijkstra(map, tmpCity1, tmpCity2, restrictedPaths);
             }
             else {
-                newRoute = dijkstra(map, tmpCity2, tmpCity1, restrictedPaths);
+                dijkstraResult = dijkstra(map, tmpCity2, tmpCity1, restrictedPaths);
             }
 
-            if (!isCorrectRoute(newRoute)) {
-                if (newRoute != NULL) {
-                    deleteRoute(newRoute, true);
+            if (!isCorrectDijkstraReturnValue(dijkstraResult)) {
+                if (dijkstraResult != NULL) {
+                    deleteDijkstraReturnValue(dijkstraResult, true);
                 }
 
                 for (unsigned j = i; j >= MINIMAL_ROUTE_ID; j--) {
@@ -392,7 +332,7 @@ bool removeRoad(Map *map, const char *city1, const char *city2) {
                 return false;
             }
 
-            routesToInsert[i] = newRoute->path;
+            routesToInsert[i] = dijkstraResult->path;
             //TODO ustawić reversed routes i posprawdza
         }
     }
@@ -410,24 +350,8 @@ bool removeRoad(Map *map, const char *city1, const char *city2) {
     free(routesToInsert);
 
     return true;
-    //TODO dokończyć!!! Przejrzeć wszystkie drogi krajowe i powkładać tam rzeczy
 }
 
-/** @brief Udostępnia informacje o drodze krajowej.
- * Zwraca wskaźnik na napis, który zawiera informacje o drodze krajowej. Alokuje
- * pamięć na ten napis. Zwraca pusty napis, jeśli nie istnieje droga krajowa
- * o podanym numerze. Zaalokowaną pamięć trzeba zwolnić za pomocą funkcji free.
- * Informacje wypisywane są w formacie:
- * numer drogi krajowej;nazwa miasta;długość odcinka drogi;rok budowy lub
- * ostatniego remontu;nazwa miasta;długość odcinka drogi;rok budowy lub
- * ostatniego remontu;nazwa miasta;…;nazwa miasta.
- * Kolejność miast na liście jest taka, aby miasta @p city1 i @p city2, podane
- * w wywołaniu funkcji @ref newRoute, które utworzyło tę drogę krajową, zostały
- * wypisane w tej kolejności.
- * @param[in,out] map    – wskaźnik na strukturę przechowującą mapę dróg;
- * @param[in] routeId    – numer drogi krajowej.
- * @return Wskaźnik na napis lub NULL, gdy nie udało się zaalokować pamięci.
- */
 char const *getRouteDescription(Map *map, unsigned routeId) {
     if (map == NULL) {
         return NULL;
@@ -445,7 +369,7 @@ char const *getRouteDescription(Map *map, unsigned routeId) {
     const char *length = NULL, *year = NULL;
 
     ListNode *position = map->routes[routeId]->path->beginning;
-    Path *pathNode = position->data;
+    PathNode *pathNode = position->data;
     char *routeIdString = unsignedToString(routeId);
 
     FAIL_IF(!concatenateString(string, routeIdString));

@@ -164,47 +164,6 @@ Road *getNewRoad(int year, int length, City *city1, City *city2) {
     return newRoad;
 }
 
-bool addNewRoad(Map *map, const char *city1, const char *city2, int year, int length) {
-    FAIL_IF_NAMED(map == NULL, 4);
-    FAIL_IF_NAMED(city1 == NULL || city2 == NULL, 4);
-
-    City *newCity1 = searchCity(map, city1);
-    City *newCity2 = searchCity(map, city2);
-
-    if (newCity1 == NULL) {
-        newCity1 = getNewCity(map, city1);
-        FAIL_IF_NAMED(newCity1 == NULL, 4);
-    }
-
-    if (newCity2 == NULL) {
-        newCity2 = getNewCity(map, city2);
-        FAIL_IF_NAMED(newCity2 == NULL, 4);
-    }
-
-    FAIL_IF_NAMED(searchRoad(map, newCity1, newCity2), 4);
-
-    Road *newRoad = getNewRoad(year, length, newCity1, newCity2);
-    FAIL_IF_NAMED(newRoad == NULL, 4);
-
-    FAIL_IF_NAMED(!pushToVector(map->roads, newRoad), 3);
-    FAIL_IF_NAMED(!insertSet(newCity2->roads, newRoad), 2);
-    FAIL_IF_NAMED(!insertSet(newCity1->roads, newRoad), 1);
-
-    return true;
-
-    failure1:;
-    deleteFromSet(newCity2->roads, NULL, newRoad);
-
-    failure2:;
-    popFromVector(map->roads, NULL);
-
-    failure3:;
-    deleteRoad(newRoad);
-
-    failure4:;
-    return false;
-}
-
 void blockRoad(Road *road) {
     if (road == NULL) {
         return;
@@ -258,8 +217,6 @@ Road *searchRoad(Map *map, City *city1, City *city2) {
     tmpRoad2.year = 0;
     tmpRoad2.city1 = city1;
     tmpRoad2.city2 = city2;
-   // setRoad(tmpRoad1, 0, 0, city1, city2); TODO czemu nie działa? :'(
-   // setRoad(tmpRoad2, 0, 0, city2, city1);
 
     Road *searchResult1, *searchResult2; //TODO wystarczy jednego z tych wyszukać, bo komparator jest miły
 
@@ -278,7 +235,6 @@ Road *searchRoad(Map *map, City *city1, City *city2) {
 //zobaczyć, czy to jest ok. Tylko tutaj raczej, więc nie aż tak tragicznie. Też trochę przypał z tym zerowaniem
 //odwiedzonych - lepiej by było robić to w Dijkstrze - cykliczne odwołania? Nie brzmi dobrze. Przecież nie bardzo
 //potem dodać repair road.
-//TODO do map.c
 bool updateYearRoad(Map *map, const char *city1, const char *city2, int year) {
     if (map == NULL) {
         return false;
