@@ -344,7 +344,7 @@ bool removeRoad(Map *map, const char *city1, const char *city2) {
         }
     }
 
-    removeSomeRoad(map, tmpCity1, tmpCity2);
+    deleteRoadFromMap(map, tmpCity1, tmpCity2);
 
     deletePathNode(pathNode);
     free(routesToInsert);

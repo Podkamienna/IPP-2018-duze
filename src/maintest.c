@@ -3,6 +3,7 @@
 #endif
 
 #include <assert.h>
+#include <stdio.h>
 
 /* Ten plik włączamy na początku i dwa razy, aby sprawdzić, czy zawiera
  * wszystko, co jest potrzebne. */
@@ -1674,6 +1675,8 @@ static int long1(void) {
         memcpy(rd + 4, city[i], 3);
         memcpy(rd + sizeof (rd) - 4, city[i + 1], 3);
         DK(m, i, rd + j);
+        printf("%d\n", i);
+        fflush(stdout);
     }
 
     deleteMap(m);

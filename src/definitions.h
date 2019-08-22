@@ -19,12 +19,28 @@ typedef struct Dictionary Dictionary;
 typedef struct Set Set;
 typedef struct Vector Vector;
 
-#define FAIL_IF(condition) do { if (condition) goto failure; } while(0)
-#define FAIL_IF_LABELED(condition, label) do { if (condition) goto failure##label; } while(0)
+/**
+ * Jeżeli warunek jest spełniony, kończy wykonywanie funkcji,
+ * wykonyjąc wcześniej polecenia pod etykietą failure.
+ */
+#define FAIL_IF(condition)              \
+    do {                                \
+        if (condition) goto failure;    \
+    } while(0)                          \
 
-/** Stała z ilością dróg krajowych */
+/**
+* Jeżeli warunek jest spełniony, kończy wykonywanie funkcji,
+* wykonyjąc wcześniej polecenia pod etykietą failure##label.
+*/
+#define FAIL_IF_LABELED(condition, label)    \
+    do {                                     \
+        if (condition) goto failure##label;  \
+    } while(0)                               \
+
+/** Liczba dróg krajowych */
 #define ROUTE_COUNT 1000
 
+        //TODO usunąć jedną z rzeczy w hashtablicy
 extern const char *SEMICOLON;
 
 struct Map {
@@ -60,7 +76,7 @@ struct Route {
 };
 
 struct PathNode {
-    City *city; //jeżeli path nie jest NULLem, to path->city też
+    City *city;
     Road *road;
 };
 

@@ -1,6 +1,6 @@
-//
-// Created by alicja on 04.07.19.
-//
+/**
+ * @file Interfejs klasy przechowującej miasta i drogi.
+ */
 
 #ifndef DROGI_CITIES_AND_ROADS_H
 #define DROGI_CITIES_AND_ROADS_H
@@ -9,8 +9,22 @@
 
 #include <stdbool.h>
 
+/**
+ * @brief Alokuje pamięc pod i zwraca wskaźnik na
+ * nowe miasto.
+ * @param name — nazwa nowego miasta
+ * @return Wartość @p true jeżeli udało się dodać miasto.
+ * Wartość @p false jeżeli nie udało się zaalokować pamięci,
+ * lub jeżeli zadany napis nie jest poprawną nazwą miasta.
+ */
+City *getNewCity(Map *map, const char *name);
 
-void seeRoads(City *city); // TODO usunac
+/**
+ * @brief Usuwa zadane miasto.
+ * @param city — miasto do usunięcia
+ */
+void deleteCity(City *city);
+
 /**
  * @brief Sprawdza, czy zadany napis jest poprawną nazwą miasta.
  * @param city — wskaźnik na napis do sprawdzenia
@@ -21,36 +35,37 @@ void seeRoads(City *city); // TODO usunac
 bool isCityName(const char *city);
 
 /**
- * @brief Alokuje pamięc pod i zwraca nowe miasto.
- * @param name — nazwa nowego miasta
- * @return Wartość @p true jeżeli udało się dodać miasto.
- * Wartość @p false jeżeli nie udało się zaalokować pamięci,
- * lub jeżeli zadany napis nie jest poprawną nazwą miasta.
+ * @brief Porównuje miasta, sortując je po momencie
+ * dodania ich do mapy.
+ * @param city1 — pierwsze z miast do porównania
+ * @param city2 — drugie z miast do porówania
+ * @return Wartość @p 1 jeżeli pierwsze miasto jest
+ * większe, wartość @p 0 jeżeli miasta są równe,
+ * wartość @p -1 jeżeli drugie miasto jest większe.
  */
-City *getNewCity(Map *map, const char *name);
-
-/**
- * @brief Wyszukuje miasta zadanego danym napisem w danej mapie.
- * @param map — mapa w której ma być wyszukiwane
- * @param city — napis zadający miasto, które ma być wyszukane
- * @return Wyszukiwane miasto jeżeli wszystko się powiodło,
- * NULL, jeżeli coś się nie powiodło - miasto nie istnieje
- * w mapie lub parametry wejściowe są nieprawidłowe.
- */
-
-bool removeSomeRoad(Map *map, City *city1, City *city2);
-//TODO
 int compareCities(City *city1, City *city2);
 
+/**
+ * @brief Wyszukuje w zadanej mapie miasta powiązanego z
+ * zadaną nazwą.
+ * @param map — mapa w której ma być wyszukiwane
+ * @param city — nazwa miasta do odnalezienia
+ * @return Znalezione miasto lub wartość @p NULL, jeżeli
+ * nie udało się go odnaleźć lub któryś z parametrów miał
+ * wartość NULL.
+ */
 City *searchCity(Map *map, const char *city);
 
-//TODO komentarz
-City *getNeighbour(Road *road, City *city);
 /**
- * @brief Usuwa zadane miasto.
- * @param city — miasto do usunięcia
+ * @brief Mając drogę z zadanego miasta do innego,
+ * zwraca ten jej koniec, który nie jest zadanym miastem.
+ * @param road — droga z zadanego miasta
+ * @param city — miasto, którego sąsiada szukamy
+ * @return Wartość @p NULL jeżeli któryś z parametrów jest
+ * NULLem, zadana droga jest zablokowana, zadane miasto nie
+ * jest równe żadnemu z końców zadanej drogi.
  */
-void deleteCity(City *city);
+City *getNeighbour(Road *road, City *city);
 
 /**
  * @brief Alokuje pamieć pod i zwraca wskaźnik na nową drogę.
@@ -64,51 +79,54 @@ void deleteCity(City *city);
 Road *getNewRoad(int year, int length, City *city1, City *city2);
 
 /**
- * @brief Dodaje nową drogę do mapy.
- * @param map — mapa do której będzie dodawane
- * @param city1 — jeden koniec dodawanej drogi
- * @param city2 — drugi koniec dodawanej drogi
- * @param year — rok budowy dodawanej drogi
- * @param length — długość dodawanej drogi
- * @return Wartość @p true, jeżeli udało się dodać drogę.
- * Wartość @p false, jeżeli nie udało się zaalokować pamięci
- * lub któryś z parametrów ma nieprawidłową wartość.
+ * @brief Usuwa zadaną drogę
+ * @param road — droga do usunięcia
  */
-bool addNewRoad(Map *map, const char *city1, const char *city2, int year, int length);
+void deleteRoad(Road *road);
 
 /**
- * @brief Sprawdza, czy droga pomiędzy dwoma zadanymi miastami istnieje
+ * @brief Porównuje 2 drogi. 2 drogi są równe, jeżeli
+ * obie mają wartość NULL lub łączą te same miasta.
+ * W innych wypadkach pierwsza droga jest większa
+ * od drugiej.
+ * @param road1 — pierwsza z dróg do porównanie
+ * @param road2 — druga z dróg do porównania
+ * @return Wartość @p 0 jeżeli drogi są równe,
+ * wartość @p 1, jeżeli nie są równe.
+ */
+int compareRoads(Road *road1, Road *road2);
+
+/**
+ * @brief Ustawia drogę na niemożliwą do przejścia
+ * @param road — droga do ustawienia na niemożliwą do przejścia
+ */
+void blockRoad(Road *road);
+
+/**
+ * @brief Ustawia drogę na możliwą do przejścia
+ * @param road — droga do ustawienia na możliwą do przejścia
+ */
+void unblockRoad(Road *road);
+
+/**
+ * @brief Wyszukuje drogi między dwoma zadanymi miastami w zadanej mapie.
  * @param map — mapa w której jest szukane
  * @param city1 — jeden z końców drogi
  * @param city2 — drugi z końców drogi
  * @return Znaleziona droga lub NULL, gdy nie ma drogi lub któryś
  * z argumentów ma niepoprawną wartość
  */
-
-void blockRoad(Road *road);
-
-void unblockRoad(Road *road);
-
-int compareRoads(Road *road1, Road *road2);
-
 Road *searchRoad(Map *map, City *city1, City *city2);
 
 /**
- * @brief Aktualizuje rok budowy drogi zadanej przez swoje dwa końce.
- * @param map — mapa w której jest droga
- * @param city1 — napis wyznaczający jeden koniec drogi
- * @param city2 — napis wyznaczający drugi koniec drogi
- * @param year — nowy rok który ma być przypisany do drogi
- * @return Wartość @p true, jeżeli udało się zmienić rok.
- * Wartość @p false, jeżeli coś się nie powiodło - któryś
- * z parametrów ma niepoprawną wartość, lub zadana droga nieistnieje.
+ * @brief Wyszukuje miasta zadanego danym napisem w danej mapie.
+ * @param map — mapa w której ma być wyszukiwane
+ * @param city — napis zadający miasto, które ma być wyszukane
+ * @return Wyszukiwane miasto jeżeli wszystko się powiodło,
+ * NULL, jeżeli coś się nie powiodło - miasto nie istnieje
+ * w mapie lub parametry wejściowe są nieprawidłowe.
  */
-bool updateYearRoad(Map *map, const char *city1, const char *city2, int year);
 
-/**
- * @brief usuwa zadaną drogę
- * @param road — droga do usunięcia
- */
-void deleteRoad(Road *road);
+bool deleteRoadFromMap(Map *map, City *city1, City *city2);
 
 #endif //DROGI_CITIES_AND_ROADS_H

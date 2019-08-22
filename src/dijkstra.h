@@ -11,13 +11,13 @@
 
 DijkstraReturnValue *getNewDijkstraReturnValue();
 
+void deleteDijkstraReturnValue(DijkstraReturnValue *dijkstraReturnValue, bool deletePath);
+
 bool isCorrectDijkstraReturnValue(DijkstraReturnValue *dijkstraReturnValue);
 
 Route *dijkstraReturnValueToRoute(DijkstraReturnValue *dijkstraReturnValue);
 
 int compareDijkstraReturnValues(DijkstraReturnValue *a, DijkstraReturnValue *b);
-
-void deleteDijkstraReturnValue(DijkstraReturnValue *dijkstraReturnValue, bool deletePath);
 
 DijkstraReturnValue *dijkstra(Map *map, City *source, City *destination, List *restrictedCities);
 

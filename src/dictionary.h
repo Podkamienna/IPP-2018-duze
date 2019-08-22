@@ -1,6 +1,6 @@
-//
-// Created by alicja on 03.07.19.
-//
+/**
+ * @file Interfejs klasy będącej słownikiem.
+ */
 
 #ifndef DROGI_DICTIONARY_H
 #define DROGI_DICTIONARY_H
@@ -17,6 +17,13 @@ typedef struct Dictionary Dictionary;
  * NULL jeżeli się nie udało zaalokować pamięci
  */
 Dictionary *initializeDictionary();
+
+/**
+ * @brief Funkcja usuwająca słownik.
+ * @param dictionary — słownik który ma być usunięty
+ * @param deleteValue — funkcja usuwająca element ze słownika
+ */
+void deleteDictionary(Dictionary *dictionary, void deleteValue(void *));
 
 /**
  * @brief Funkcja wyszukująca w słowniku zadanej wartości
@@ -39,22 +46,13 @@ void *searchDictionary(Dictionary *dictionary, const char *name);
  */
 bool insertDictionary(Dictionary *dictionary, const char *name, void *value);
 
-//TODO opis
+/**
+ * @brief Zwraca liczbę oznaczającą ilość elementów w słowniku.
+ * @param dictionary — słownik z którego informacje będą uzyskane
+ * @return Wartość @p 0 gdy słownik jest NULLem lub ilość elementów
+ * zawartych w słowniku.
+ */
 size_t getId(Dictionary *dictionary);
 
-/**
- * @brief Usuwa wartość przypisaną do zadanego tekstu z zadanego słownika
- * @param dictionary — słownik z którego ma być usuwane
- * @param name — tekst do którego przypisana wartość ma byś usuwana
- * @param deleteValue — funkcja usuwająca wartość
- */
-void deleteFromDictionary(Dictionary *dictionary, const char *name, void deleteValue(void *));
-
-/**
- * @brief Funkcja usuwająca słownik.
- * @param dictionary — słownik który ma być usunięty
- * @param deleteValue — funkcja usuwająca element ze słownika
- */
-void deleteDictionary(Dictionary *dictionary, void deleteValue(void *));
 
 #endif //DROGI_DICTIONARY_H

@@ -1,6 +1,6 @@
-//
-// Created by alicja on 03.07.19.
-//
+/**
+ * @file Implementacja klasy będącej słownikiem.
+ */
 
 #include "dictionary.h"
 #include "hashTable.h"
@@ -10,7 +10,12 @@
 #include <string.h>
 #include <stdlib.h>
 
+/*Stała oznaczająca początkowy rozmiar hash tablicy*/
 static const size_t INITIAL_HASH_TABLE_SIZE = 128;
+
+/*Stałe oznaczające, że jeżeli liczba elementów w hash tablicy
+ * przekroczy LOAD_FACTOR_MULTIPLIER/LOAD_FACTOR_DIVIDER jej
+ * rozmiaru, to należy ją zwiększyć (aby uniknąć zbyt częstych kolizji)*/
 static const size_t LOAD_FACTOR_MULTIPLIER = 3;
 static const size_t LOAD_FACTOR_DIVIDER = 4;
 
@@ -20,11 +25,18 @@ typedef struct HashTable HashTable;
 typedef struct Entry Entry;
 
 struct Dictionary {
-    size_t id;
     size_t size;
     size_t numberOfElements;
     HashTable *hashTable;
 };
+
+/**
+ * @brief Sprawdza, czy już należy powiększyć słownik.
+ * @param dictionary — słownik do sprawdzenia
+ * @return Wartość @p true, jeżeli należy zwiększyć słownik,
+ * wartość @p false, jeżeli jeszcze nie.
+ */
+static bool isFull(Dictionary *dictionary);
 
 static bool isFull(Dictionary *dictionary) {
     return LOAD_FACTOR_DIVIDER * dictionary->numberOfElements >= LOAD_FACTOR_MULTIPLIER * dictionary->size;
@@ -37,7 +49,6 @@ Dictionary *initializeDictionary() {
         return NULL;
     }
 
-    newDictionary->id = 0;
     newDictionary->numberOfElements = 0;
     newDictionary->size = INITIAL_HASH_TABLE_SIZE;
     newDictionary->hashTable = initializeHashTable(newDictionary->size);
@@ -59,7 +70,11 @@ void *searchDictionary(Dictionary *dictionary, const char *name) {
 }
 
 size_t getId(Dictionary *dictionary) {
-    return dictionary->id;
+    if (dictionary == NULL) {
+        return 0;
+    }
+
+    return dictionary->numberOfElements;
 }
 
 bool insertDictionary(Dictionary *dictionary, const char *name, void *value) {
@@ -71,12 +86,14 @@ bool insertDictionary(Dictionary *dictionary, const char *name, void *value) {
         HashTable *newHashTable = resizeHashTable(dictionary->hashTable, 2 * dictionary->size);
         FAIL_IF(newHashTable == NULL);
 
+        dictionary->size = 2*dictionary->size;
+
         dictionary->hashTable = newHashTable;
     }
 
     FAIL_IF(!insertHashTable(dictionary->hashTable, name, value));
 
-    dictionary->id++;
+    dictionary->numberOfElements++;
 
     return true;
 
