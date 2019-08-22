@@ -35,7 +35,7 @@ typedef struct FindPathResult FindPathResult;
 
 FindPathResult *getNewFindPathResult();
 
-void deleteFindPathResult(FindPathResult *findPathResult, bool deletePath);
+void deleteFindPathResult(FindPathResult *findPathResult);
 
 bool isCorrectPathResult(FindPathResult *findPathResult);
 
@@ -48,12 +48,12 @@ int compareFindPathResults(FindPathResult *findPathResult1, FindPathResult *find
  * @param map
  * @param source
  * @param destination
- * @param restrictedPaths
+ * @param restrictedPath
  * @return Wartość @p NULL jeżeli nie udało się zaalokować pamięci,
  * strukturę z polem path ustawionym na NULL, jeżeli nie udało się jednoznacznie
  * wyznaczyć ścieżki, z polem isUnique ustawionym na false jeżeli ścieżka jest niejednoznaczna,
  * a z polem isUnique ustawionym na true jeżeli nie udało się znaleźć żadnej.
  */
-FindPathResult *findPath(Map *map, City *source, City *destination, List *restrictedPaths);
+FindPathResult *findPath(Map *map, City *source, City *destination, List *restrictedPath);
 
 #endif //DROGI_FINDPATH_H

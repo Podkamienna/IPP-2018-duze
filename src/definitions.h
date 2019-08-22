@@ -18,6 +18,11 @@ typedef struct Dictionary Dictionary;
 typedef struct Set Set;
 typedef struct Vector Vector;
 
+#define FAIL           \
+    do {               \
+        goto failure;  \
+    } while(0)
+
 /**
  * Jeżeli warunek jest spełniony, kończy wykonywanie funkcji,
  * wykonyjąc wcześniej polecenia pod etykietą failure.

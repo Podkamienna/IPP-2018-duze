@@ -245,6 +245,7 @@ static Distance *calculateDistances(Map *map, City *source, City *destination, b
         heapEntry = popHeap(heap);
 
         if (isVisited[heapEntry->city->id]) {
+            deleteHeapEntry(heapEntry);
             continue;
         }
 
@@ -346,14 +347,12 @@ FindPathResult *getNewFindPathResult() {
     return newFindPathResult;
 }
 
-void deleteFindPathResult(FindPathResult *findPathResult, bool deletePath) {
+void deleteFindPathResult(FindPathResult *findPathResult) {
     if (findPathResult == NULL) {
         return;
     }
 
-    if (deletePath) {
-        deleteList(findPathResult->path, (void (*)(void *)) deletePathNode);
-    }
+    deleteList(findPathResult->path, (void (*)(void *)) deletePathNode);
 
     free(findPathResult);
 }
@@ -388,7 +387,7 @@ int compareFindPathResults(FindPathResult *findPathResult1, FindPathResult *find
     if (!isCorrectPathResult(findPathResult1) && !isCorrectPathResult(findPathResult2)) {
         return 0;
     }
-
+    // TODO poprawić warunki przy niejezdnozanczym resulcie
     if (!isCorrectPathResult(findPathResult1)) {
         return -1;
     }
@@ -400,10 +399,10 @@ int compareFindPathResults(FindPathResult *findPathResult1, FindPathResult *find
     return compareDistances(findPathResult1->distance, findPathResult2->distance);
 }
 
-FindPathResult *findPath(Map *map, City *source, City *destination, List *restrictedPaths) {
-    ListIterator *listIterator = getNewListIterator(restrictedPaths);
+FindPathResult *findPath(Map *map, City *source, City *destination, List *restrictedPath) {
+    ListIterator *listIterator = getNewListIterator(restrictedPath);
 
-    if (listIterator == NULL && restrictedPaths != NULL) {
+    if (listIterator == NULL && restrictedPath != NULL) {
         return NULL;
     }
 

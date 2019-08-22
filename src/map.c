@@ -143,14 +143,17 @@ bool newRoute(Map *map, unsigned routeId,
     FAIL_IF(!isCorrectPathResult(findPathResult)); //sprawdzam, czy udalo sie wyznaczyc droge i czy jednznacznie
 
     Route *newRoute = findPathResultToRoute(findPathResult);
+    FAIL_IF(newRoute == NULL);
+    findPathResult->path = NULL;
+
     map->routes[routeId] = newRoute;
 
-    deleteFindPathResult(findPathResult, false);
+    deleteFindPathResult(findPathResult);
 
     return true;
 
     failure:;
-    deleteFindPathResult(findPathResult, true);
+    deleteFindPathResult(findPathResult);
 
     return false;
 }
@@ -158,96 +161,69 @@ bool newRoute(Map *map, unsigned routeId,
 bool extendRoute(Map *map, unsigned routeId, const char *cityName) {
     FindPathResult *findPathResult1 = NULL;
     FindPathResult *findPathResult2 = NULL;
+    PathNode *path = NULL;
 
-    FAIL_IF_LABELED(map == NULL, 1);
-    FAIL_IF_LABELED(cityName == NULL, 1);
-    FAIL_IF_LABELED(!isCityName(cityName), 1);
-    FAIL_IF_LABELED(routeId < MINIMAL_ROUTE_ID || routeId > MAXIMAL_ROUTE_ID, 1);
-    FAIL_IF_LABELED(map->routes[routeId] == NULL, 1);
+    FAIL_IF(map == NULL);
+    FAIL_IF(cityName == NULL);
+    FAIL_IF(!isCityName(cityName));
+    FAIL_IF(routeId < MINIMAL_ROUTE_ID || routeId > MAXIMAL_ROUTE_ID);
+    FAIL_IF(map->routes[routeId] == NULL);
 
     City *city = searchCity(map, cityName);
+    FAIL_IF(city == NULL);
 
-    if (city == NULL) {
-        return false;
-    }
+    path = getNewPathNode(city, NULL);
+    FAIL_IF(path == NULL);
 
-    PathNode *path = getNewPathNode(city, NULL);
-
-    if (path == NULL) {
-        deleteCity(city);
-
-        return false;
-    }
-
-    if (searchList(map->routes[routeId]->path, path, (int (*)(void *, void *)) comparePathNodes)) {
-        deletePathNode(path);
-
-        return false;
-    }
+    FAIL_IF(searchList(map->routes[routeId]->path, path, (int (*)(void *, void *)) comparePathNodes));
 
     deletePathNode(path);
+    path = NULL;
 
-    findPathResult1 = findPath(map, city, map->routes[routeId]->source,
-                               map->routes[routeId]->path);
-
-    if (findPathResult1 == NULL) {
-        return false;
-    }
+    findPathResult1 = findPath(map, city, map->routes[routeId]->source, map->routes[routeId]->path);
+    FAIL_IF(findPathResult1 == NULL);
 
     findPathResult2 = findPath(map, map->routes[routeId]->destination, city, map->routes[routeId]->path);
-
-    if (findPathResult2 == NULL) {
-        deleteFindPathResult(findPathResult1, false);
-
-        return false;
-    }
+    FAIL_IF(findPathResult2 == NULL);
 
     int compareResult = compareFindPathResults(findPathResult1, findPathResult2);
 
-    if (compareResult == 0) {
-        deleteFindPathResult(findPathResult1, true);
-        deleteFindPathResult(findPathResult2, true);
-
-        return false;
-    }
+    FAIL_IF(compareResult == 0);
 
     if (compareResult == 1) {
-        deleteFindPathResult(findPathResult2, true);
+        deleteFindPathResult(findPathResult2);
+        findPathResult2 = NULL;
 
-        if (!isCorrectPathResult(findPathResult1)) {
-            deleteFindPathResult(findPathResult1, true);
-
-            return false;
-        }
+        FAIL_IF(!isCorrectPathResult(findPathResult1));
 
         insertAtTheBeginningList(map->routes[routeId]->path, findPathResult1->path, (void (*)(void *)) deletePathNode,
                                  (int (*)(void *, void *)) comparePathNodes);
+        findPathResult1->path = NULL;
         map->routes[routeId]->source = findPathResult1->source;
 
-        free(findPathResult1->path);
-        deleteFindPathResult(findPathResult1, false);
+        deleteFindPathResult(findPathResult1);
     }
 
     if (compareResult == -1) {
-        deleteFindPathResult(findPathResult1, true);
+        deleteFindPathResult(findPathResult1);
+        findPathResult1 = NULL;
 
-        if (!isCorrectPathResult(findPathResult2)) {
-            deleteFindPathResult(findPathResult2, true);
-
-            return false;
-        }
+        FAIL_IF(!isCorrectPathResult(findPathResult2));
 
         insertAtTheEndList(map->routes[routeId]->path, findPathResult2->path, (void (*)(void *)) deletePathNode,
                            (int (*)(void *, void *)) comparePathNodes);
+        findPathResult2->path = NULL;
         map->routes[routeId]->destination = findPathResult2->destination;
 
-        free(findPathResult2->path);
-        deleteFindPathResult(findPathResult2, false);
+        deleteFindPathResult(findPathResult2);
     }
 
     return true;
 
-    failure1:;
+    failure:;
+    deletePathNode(path);
+    deleteFindPathResult(findPathResult1);
+    deleteFindPathResult(findPathResult2);
     return false;
 }
 
@@ -271,78 +247,54 @@ bool extendRoute(Map *map, unsigned routeId, const char *cityName) {
 bool removeRoad(Map *map, const char *city1, const char *city2) {
     City *tmpCity1 = searchCity(map, city1);
     City *tmpCity2 = searchCity(map, city2);
+    List **routesToInsert = NULL;
+    PathNode *pathNode = NULL;
 
-    if (tmpCity1 == NULL || tmpCity2 == NULL) {
-        return false;
-    }
+    FAIL_IF(tmpCity1 == NULL || tmpCity2 == NULL);
 
     Road *toRemove = searchRoad(map, tmpCity1, tmpCity2);
-
-    if (toRemove == NULL) {
-        return false;
-    }
+    FAIL_IF(toRemove == NULL);
 
     blockRoad(toRemove);
 
-    PathNode *pathNode = getNewPathNode(NULL, toRemove);
+    pathNode = getNewPathNode(NULL, toRemove);
+    FAIL_IF(pathNode == NULL);
 
-    if (pathNode == NULL) {
-        unblockRoad(toRemove);
-
-        return false;
-    }
-
-    List **routesToInsert = calloc(ROUTE_COUNT, sizeof(List));
-
-    if (routesToInsert == NULL) {
-        deletePathNode(pathNode);
-        unblockRoad(toRemove);
-
-        return false;
-    }
+    routesToInsert = calloc(ROUTE_COUNT, sizeof(List));
+    FAIL_IF(routesToInsert == NULL);
 
     for (unsigned i = MINIMAL_ROUTE_ID; i <= MAXIMAL_ROUTE_ID; i++) {
         if (map->routes[i] == NULL) {
             continue;
         }
 
-        List *restrictedPaths = map->routes[i]->path;
-        PathNode *searchResult = searchList(restrictedPaths, pathNode, (int (*)(void *, void *)) comparePathNodes);
+        List *restrictedPath = map->routes[i]->path;
+        PathNode *searchResult = searchList(restrictedPath, pathNode, (int (*)(void *, void *)) comparePathNodes);
         FindPathResult *findPathResult;
 
         if (searchResult != NULL) {
             if (compareCities(tmpCity1, searchResult->city) == 0) {
-                findPathResult = findPath(map, tmpCity1, tmpCity2, restrictedPaths);
+                findPathResult = findPath(map, tmpCity1, tmpCity2, restrictedPath);
             } else {
-                findPathResult = findPath(map, tmpCity2, tmpCity1, restrictedPaths);
+                findPathResult = findPath(map, tmpCity2, tmpCity1, restrictedPath);
             }
 
             if (!isCorrectPathResult(findPathResult)) {
                 if (findPathResult != NULL) {
-                    deleteFindPathResult(findPathResult, true); //TODO wywalić
+                    deleteFindPathResult(findPathResult);
                 }
 
-                for (unsigned j = i; j >= MINIMAL_ROUTE_ID; j--) {
-                    deleteList(routesToInsert[j], (void (*)(void *)) deletePathNode);
-                }
-
-                deletePathNode(pathNode);
-                free(routesToInsert);
-                unblockRoad(toRemove);
-
-                return false;
+                FAIL;
             }
 
             routesToInsert[i] = findPathResult->path;
-            deleteFindPathResult(findPathResult, false);
-            //TODO ustawić reversed routes i posprawdza
+            findPathResult->path = NULL;
+            deleteFindPathResult(findPathResult);
         }
     }
 
     for (unsigned i = MINIMAL_ROUTE_ID; i <= MAXIMAL_ROUTE_ID; i++) {
         if (map->routes[i] != NULL) {
-            insertToList(map->routes[i]->path, routesToInsert[i], (void (*)(void *)) deletePathNode,
-                         (int (*)(void *, void *)) comparePathNodes2);
             insertToList(map->routes[i]->path, routesToInsert[i], (void (*)(void *)) deletePathNode,
                          (int (*)(void *, void *)) comparePathNodes2);
         }
@@ -354,6 +306,19 @@ bool removeRoad(Map *map, const char *city1, const char *city2) {
     free(routesToInsert);
 
     return true;
+
+    failure:;
+    if (routesToInsert != NULL) {
+        for (unsigned i = MINIMAL_ROUTE_ID; i <= MAXIMAL_ROUTE_ID; i++) {
+            deleteList(routesToInsert[i], (void (*)(void *)) deletePathNode);
+        }
+    }
+
+    free(routesToInsert);
+
+    deletePathNode(pathNode);
+    unblockRoad(toRemove);
+    return false;
 }
 
 char const *getRouteDescription(Map *map, unsigned routeId) {
@@ -370,7 +335,7 @@ char const *getRouteDescription(Map *map, unsigned routeId) {
     }
 
     String *string = initializeString();
-    const char *length = NULL, *year = NULL;
+    char *length = NULL, *year = NULL;
 
     ListNode *position = map->routes[routeId]->path->beginning;
     PathNode *pathNode = position->data;
@@ -401,25 +366,25 @@ char const *getRouteDescription(Map *map, unsigned routeId) {
             FAIL_IF(!concatenateString(string, year));
             FAIL_IF(!concatenateString(string, SEMICOLON));
 
-            free((void *) length);
-            free((void *) year);
+            free(length);
+            free(year);
         }
         position = position->next;
     }
 
     char *returnValue = getData(string);
     deleteString(string, false);
-    free((void *) length);
-    free((void *) year);
-    free((void *) routeIdString);
+    free(length);
+    free(year);
+    free(routeIdString);
 
     return returnValue;
 
     failure:;
     deleteString(string, true);
-    free((void *) length);
-    free((void *) year);
-    free((void *) routeIdString);
+    free(length);
+    free(year);
+    free(routeIdString);
 
     return NULL;
 }

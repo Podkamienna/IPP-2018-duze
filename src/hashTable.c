@@ -100,26 +100,6 @@ static bool insertEntryHashTable(HashTable *hashTable, Entry *entry) {
     return false;
 }
 
-//TODO Hmm...
-static Entry *searchEntryHashTable(HashTable *hashTable, const char *name) {
-    size_t hash = getHash(name);
-    size_t position = getPosition(hashTable, hash);
-    size_t i = 0;
-
-    while (hashTable->table[(position + i) % (hashTable->size + 1)] != NULL || i < hashTable->size) {
-        if (hashTable->table[(position + i) % (hashTable->size + 1)]->hash !=
-            hash) { // TODO skrócić (zrobić getNextPosition)
-            return NULL;
-        }
-
-        if (isEqual(hash, name, hashTable->table[(position + i) % (hashTable->size + 1)])) {
-            return hashTable->table[(position + i) % (hashTable->size + 1)];
-        }
-    }
-
-    return NULL;
-}
-
 //usuwa wejście hash tablicy
 static void deleteEntry(Entry *entry, void deleteValue(void *)) {
     if (entry == NULL) {

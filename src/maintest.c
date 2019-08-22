@@ -1672,8 +1672,8 @@ static int long1(void) {
         memcpy(rd + 4, city[i], 3);
         memcpy(rd + sizeof(rd) - 4, city[i + 1], 3);
         DK(m, i, rd + j);
-        printf("%d\n", i);
-        fflush(stdout);
+        //printf("%d\n", i);
+        //fflush(stdout);
     }
 
     deleteMap(m);

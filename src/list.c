@@ -90,7 +90,7 @@ bool addToList(List *list, void *value) {
     return true;
 }
 
-void *searchList(List *list, void *value, int compare (void *, void *)) {
+void *searchList(List *list, void *value, int compare(void *, void *)) {
     if (list == NULL) {
         return NULL;
     }
@@ -123,14 +123,15 @@ bool insertAtTheBeginningList(List *list, List *toInsert, void deleteValue(void 
     toInsert->end->prev->next = list->beginning;
     list->beginning->prev = toInsert->end->prev;
 
-    deleteListNode(list->beginning, deleteValue);
+    deleteListNode(toInsert->end, deleteValue);
 
     list->beginning = toInsert->beginning;
 
+    free(toInsert);
     return true;
 }
 
-bool insertAtTheEndList(List *list, List *toInsert, void deleteValue(void *), int compare (void *, void *)) {
+bool insertAtTheEndList(List *list, List *toInsert, void deleteValue(void *), int compare(void *, void *)) {
     if (list == NULL || toInsert == NULL) {
         return false;
     }
@@ -146,10 +147,11 @@ bool insertAtTheEndList(List *list, List *toInsert, void deleteValue(void *), in
 
     list->end = toInsert->end;
 
+    free(toInsert);
     return true;
 }
 
-bool insertToList(List *list, List *toInsert, void deleteValue(void *), int compare (void *, void *)) {
+bool insertToList(List *list, List *toInsert, void deleteValue(void *), int compare(void *, void *)) {
     if (list == NULL || toInsert == NULL) {
         return false;
     }
@@ -168,11 +170,13 @@ bool insertToList(List *list, List *toInsert, void deleteValue(void *), int comp
                     ListNode *toDelete2 = list->beginning;
 
                     toInsert->end->prev->next = list->beginning->next;
+                    list->beginning->next->prev = toInsert->end->prev;
                     list->beginning = toInsert->beginning;
 
                     deleteListNode(toDelete1, deleteValue);
                     deleteListNode(toDelete2, deleteValue);
 
+                    free(toInsert);
                     return true;
                 }
 
@@ -180,11 +184,14 @@ bool insertToList(List *list, List *toInsert, void deleteValue(void *), int comp
                 ListNode *toDelete2 = position;
 
                 position->prev->next = toInsert->beginning;
+                toInsert->beginning->prev = position->prev;
+                position->next->prev = toInsert->end->prev;
                 toInsert->end->prev->next = position->next;
 
                 deleteListNode(toDelete1, deleteValue);
                 deleteListNode(toDelete2, deleteValue);
 
+                free(toInsert);
                 return true;
             }
         }
