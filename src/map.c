@@ -3,7 +3,7 @@
 #include "route.h"
 #include "citiesAndRoads.h"
 #include "list.h"
-#include "dijkstra.h"
+#include "findPath.h"
 #include "string.h"
 #include "vector.h"
 #include "set.h"
@@ -130,7 +130,7 @@ bool repairRoad(Map *map, const char *city1, const char *city2, int repairYear) 
 
 bool newRoute(Map *map, unsigned routeId,
               const char *city1, const char *city2) {
-    DijkstraReturnValue *dijkstraResult = NULL;
+    FindPathResult *findPathResult = NULL;
 
     FAIL_IF(map == NULL);
     FAIL_IF(city1 == NULL || city2 == NULL);
@@ -138,26 +138,26 @@ bool newRoute(Map *map, unsigned routeId,
     FAIL_IF(routeId < MINIMAL_ROUTE_ID || routeId > MAXIMAL_ROUTE_ID);
     FAIL_IF(map->routes[routeId] != NULL);
 
-    dijkstraResult = dijkstra(map, searchDictionary(map->cities, city1), searchDictionary(map->cities, city2), NULL);
+    findPathResult = findPath(map, searchDictionary(map->cities, city1), searchDictionary(map->cities, city2), NULL);
 
-    FAIL_IF(!isCorrectDijkstraReturnValue(dijkstraResult)); //sprawdzam, czy udalo sie wyznaczyc droge i czy jednznacznie
+    FAIL_IF(!isCorrectPathResult(findPathResult)); //sprawdzam, czy udalo sie wyznaczyc droge i czy jednznacznie
 
-    Route *newRoute = dijkstraReturnValueToRoute(dijkstraResult);
+    Route *newRoute = findPathResultToRoute(findPathResult);
     map->routes[routeId] = newRoute;
 
-    deleteDijkstraReturnValue(dijkstraResult, false);
+    deleteFindPathResult(findPathResult, false);
 
     return true;
 
     failure:;
-    deleteDijkstraReturnValue(dijkstraResult, true);
+    deleteFindPathResult(findPathResult, true);
 
     return false;
 }
 
 bool extendRoute(Map *map, unsigned routeId, const char *cityName) {
-    DijkstraReturnValue *dijkstraResult1 = NULL;
-    DijkstraReturnValue *dijkstraResult2 = NULL;
+    FindPathResult *findPathResult1 = NULL;
+    FindPathResult *findPathResult2 = NULL;
 
     FAIL_IF_LABELED(map == NULL, 1);
     FAIL_IF_LABELED(cityName == NULL, 1);
@@ -187,62 +187,62 @@ bool extendRoute(Map *map, unsigned routeId, const char *cityName) {
 
     deletePathNode(path);
 
-    dijkstraResult1 = dijkstra(map, city, map->routes[routeId]->source,
-                                                    map->routes[routeId]->path);
+    findPathResult1 = findPath(map, city, map->routes[routeId]->source,
+                               map->routes[routeId]->path);
 
-    if (dijkstraResult1 == NULL) {
+    if (findPathResult1 == NULL) {
         return false;
     }
 
-    dijkstraResult2 = dijkstra(map, map->routes[routeId]->destination, city, map->routes[routeId]->path);
+    findPathResult2 = findPath(map, map->routes[routeId]->destination, city, map->routes[routeId]->path);
 
-    if (dijkstraResult2 == NULL) {
-        deleteDijkstraReturnValue(dijkstraResult1, false);
+    if (findPathResult2 == NULL) {
+        deleteFindPathResult(findPathResult1, false);
 
         return false;
     }
 
-    int compareResult = compareDijkstraReturnValues(dijkstraResult1, dijkstraResult2);
+    int compareResult = compareFindPathResults(findPathResult1, findPathResult2);
 
     if (compareResult == 0) {
-        deleteDijkstraReturnValue(dijkstraResult1, true);
-        deleteDijkstraReturnValue(dijkstraResult2, true);
+        deleteFindPathResult(findPathResult1, true);
+        deleteFindPathResult(findPathResult2, true);
 
         return false;
     }
 
     if (compareResult == 1) {
-        deleteDijkstraReturnValue(dijkstraResult2, true);
+        deleteFindPathResult(findPathResult2, true);
 
-        if (!isCorrectDijkstraReturnValue(dijkstraResult1)) {
-            deleteDijkstraReturnValue(dijkstraResult1, true);
+        if (!isCorrectPathResult(findPathResult1)) {
+            deleteFindPathResult(findPathResult1, true);
 
             return false;
         }
 
-        insertAtTheBeginningList(map->routes[routeId]->path, dijkstraResult1->path, (void (*)(void *)) deletePathNode,
+        insertAtTheBeginningList(map->routes[routeId]->path, findPathResult1->path, (void (*)(void *)) deletePathNode,
                                  (int (*)(void *, void *)) comparePathNodes);
-        map->routes[routeId]->source = dijkstraResult1->source;
+        map->routes[routeId]->source = findPathResult1->source;
 
-        free(dijkstraResult1->path);
-        deleteDijkstraReturnValue(dijkstraResult1, false);
+        free(findPathResult1->path);
+        deleteFindPathResult(findPathResult1, false);
     }
 
     if (compareResult == -1) {
-        deleteDijkstraReturnValue(dijkstraResult1, true);
+        deleteFindPathResult(findPathResult1, true);
 
-        if (!isCorrectDijkstraReturnValue(dijkstraResult2)) {
-            deleteDijkstraReturnValue(dijkstraResult2, true);
+        if (!isCorrectPathResult(findPathResult2)) {
+            deleteFindPathResult(findPathResult2, true);
 
             return false;
         }
 
-        insertAtTheEndList(map->routes[routeId]->path, dijkstraResult2->path, (void (*)(void *)) deletePathNode,
+        insertAtTheEndList(map->routes[routeId]->path, findPathResult2->path, (void (*)(void *)) deletePathNode,
                            (int (*)(void *, void *)) comparePathNodes);
-        map->routes[routeId]->destination = dijkstraResult2->destination;
+        map->routes[routeId]->destination = findPathResult2->destination;
 
-        free(dijkstraResult2->path);
-        deleteDijkstraReturnValue(dijkstraResult2, false);
+        free(findPathResult2->path);
+        deleteFindPathResult(findPathResult2, false);
     }
 
     return true;
@@ -308,23 +308,22 @@ bool removeRoad(Map *map, const char *city1, const char *city2) {
 
         List *restrictedPaths = map->routes[i]->path;
         PathNode *searchResult = searchList(restrictedPaths, pathNode, (int (*)(void *, void *)) comparePathNodes);
-        DijkstraReturnValue *dijkstraResult;
+        FindPathResult *findPathResult;
 
         if (searchResult != NULL) {
             if (compareCities(tmpCity1, searchResult->city) == 0) {
-                dijkstraResult = dijkstra(map, tmpCity1, tmpCity2, restrictedPaths);
-            }
-            else {
-                dijkstraResult = dijkstra(map, tmpCity2, tmpCity1, restrictedPaths);
+                findPathResult = findPath(map, tmpCity1, tmpCity2, restrictedPaths);
+            } else {
+                findPathResult = findPath(map, tmpCity2, tmpCity1, restrictedPaths);
             }
 
-            if (!isCorrectDijkstraReturnValue(dijkstraResult)) {
-                if (dijkstraResult != NULL) {
-                    deleteDijkstraReturnValue(dijkstraResult, true);
+            if (!isCorrectPathResult(findPathResult)) {
+                if (findPathResult != NULL) {
+                    deleteFindPathResult(findPathResult, true); //TODO wywalić
                 }
 
                 for (unsigned j = i; j >= MINIMAL_ROUTE_ID; j--) {
-                    deleteList(routesToInsert[j], (void(*)(void*))deletePathNode);
+                    deleteList(routesToInsert[j], (void (*)(void *)) deletePathNode);
                 }
 
                 deletePathNode(pathNode);
@@ -334,15 +333,18 @@ bool removeRoad(Map *map, const char *city1, const char *city2) {
                 return false;
             }
 
-            routesToInsert[i] = dijkstraResult->path;
+            routesToInsert[i] = findPathResult->path;
+            deleteFindPathResult(findPathResult, false);
             //TODO ustawić reversed routes i posprawdza
         }
     }
 
     for (unsigned i = MINIMAL_ROUTE_ID; i <= MAXIMAL_ROUTE_ID; i++) {
         if (map->routes[i] != NULL) {
-            insertToList(map->routes[i]->path, routesToInsert[i], (void (*)(void *)) deletePathNode, (int(*)(void *, void *))comparePathNodes2);
-            insertToList(map->routes[i]->path, routesToInsert[i], (void (*)(void *)) deletePathNode, (int(*)(void *, void *))comparePathNodes2);
+            insertToList(map->routes[i]->path, routesToInsert[i], (void (*)(void *)) deletePathNode,
+                         (int (*)(void *, void *)) comparePathNodes2);
+            insertToList(map->routes[i]->path, routesToInsert[i], (void (*)(void *)) deletePathNode,
+                         (int (*)(void *, void *)) comparePathNodes2);
         }
     }
 

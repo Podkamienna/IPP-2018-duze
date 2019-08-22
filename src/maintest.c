@@ -55,7 +55,7 @@ static int empty(void) {
 
 /* Sprawdza opublikowany przykład użycia. */
 static int example(void) {
-    Map* m = newMap();
+    Map *m = newMap();
     assert(m);
 
     assert(addRoad(m, "Alinów", "Bór", 1, 2020));
@@ -96,69 +96,69 @@ static int params(void) {
     Map *m = newMap();
     assert(m);
 
-    assert(!addRoad(m, "",     "def",  1, 2019));
-    assert(!addRoad(m, "\x01", "def",  1, 2019));
-    assert(!addRoad(m, "\x1f", "def",  1, 2019));
-    assert(!addRoad(m, ";",    "def",  1, 2019));
-    assert(!addRoad(m, "abc",  "",     1, 2019));
-    assert(!addRoad(m, "abc",  "\x01", 1, 2019));
-    assert(!addRoad(m, "abc",  "\x1f", 1, 2019));
-    assert(!addRoad(m, "abc",  ";",    1, 2019));
-    assert(!addRoad(m, "abc",  "def",  0, 2019));
-    assert(!addRoad(m, "abc",  "abc",  0, 2019));
-    assert(!addRoad(m, "abc",  "def",  1, 0));
+    assert(!addRoad(m, "", "def", 1, 2019));
+    assert(!addRoad(m, "\x01", "def", 1, 2019));
+    assert(!addRoad(m, "\x1f", "def", 1, 2019));
+    assert(!addRoad(m, ";", "def", 1, 2019));
+    assert(!addRoad(m, "abc", "", 1, 2019));
+    assert(!addRoad(m, "abc", "\x01", 1, 2019));
+    assert(!addRoad(m, "abc", "\x1f", 1, 2019));
+    assert(!addRoad(m, "abc", ";", 1, 2019));
+    assert(!addRoad(m, "abc", "def", 0, 2019));
+    assert(!addRoad(m, "abc", "abc", 0, 2019));
+    assert(!addRoad(m, "abc", "def", 1, 0));
 
     assert(addRoad(m, "abc", "def", 1, -1));
-    assert(!repairRoad(m, "",     "def",  2));
-    assert(!repairRoad(m, "\x01", "def",  2));
-    assert(!repairRoad(m, "\x1f", "def",  2));
-    assert(!repairRoad(m, ";",    "def",  2));
-    assert(!repairRoad(m, "abc",  "",     2));
-    assert(!repairRoad(m, "abc",  "\x01", 2));
-    assert(!repairRoad(m, "abc",  "\xff", 2));
-    assert(!repairRoad(m, "abc",  ";",    2));
-    assert(!repairRoad(m, "abc",  "def",  0));
+    assert(!repairRoad(m, "", "def", 2));
+    assert(!repairRoad(m, "\x01", "def", 2));
+    assert(!repairRoad(m, "\x1f", "def", 2));
+    assert(!repairRoad(m, ";", "def", 2));
+    assert(!repairRoad(m, "abc", "", 2));
+    assert(!repairRoad(m, "abc", "\x01", 2));
+    assert(!repairRoad(m, "abc", "\xff", 2));
+    assert(!repairRoad(m, "abc", ";", 2));
+    assert(!repairRoad(m, "abc", "def", 0));
 
-    assert(!newRoute(m, 0,    "abc",  "def"));
-    assert(!newRoute(m, 1000, "abc",  "def"));
-    assert(!newRoute(m, 1,    "",     "def"));
-    assert(!newRoute(m, 1,    "\x01", "def"));
-    assert(!newRoute(m, 1,    "\x1f", "def"));
-    assert(!newRoute(m, 1,    "abc",  ""));
-    assert(!newRoute(m, 1,    "abc",  "\x01"));
-    assert(!newRoute(m, 1,    "abc",  "\x1f"));
-    assert(!newRoute(m, 1,    "abc",  ";"));
-    assert(!newRoute(m, 1,    "abc",  "abc"));
+    assert(!newRoute(m, 0, "abc", "def"));
+    assert(!newRoute(m, 1000, "abc", "def"));
+    assert(!newRoute(m, 1, "", "def"));
+    assert(!newRoute(m, 1, "\x01", "def"));
+    assert(!newRoute(m, 1, "\x1f", "def"));
+    assert(!newRoute(m, 1, "abc", ""));
+    assert(!newRoute(m, 1, "abc", "\x01"));
+    assert(!newRoute(m, 1, "abc", "\x1f"));
+    assert(!newRoute(m, 1, "abc", ";"));
+    assert(!newRoute(m, 1, "abc", "abc"));
 
-    assert(newRoute(m, 999, "abc",  "def"));
+    assert(newRoute(m, 999, "abc", "def"));
     assert(addRoad(m, "def", "ghi", 1, 1));
-    assert(!extendRoute(m,    0, "ghi"));
+    assert(!extendRoute(m, 0, "ghi"));
     assert(!extendRoute(m, 1000, "ghi"));
-    assert(!extendRoute(m,  999, ""));
-    assert(!extendRoute(m,  999, "\x01"));
-    assert(!extendRoute(m,  999, "\x1f"));
-    assert(!extendRoute(m,  999, ";"));
-    assert(!extendRoute(m,  999, "abc"));
-    assert(!extendRoute(m,  999, "def"));
+    assert(!extendRoute(m, 999, ""));
+    assert(!extendRoute(m, 999, "\x01"));
+    assert(!extendRoute(m, 999, "\x1f"));
+    assert(!extendRoute(m, 999, ";"));
+    assert(!extendRoute(m, 999, "abc"));
+    assert(!extendRoute(m, 999, "def"));
 
-    assert(!removeRoad(m, "",     "def"));
+    assert(!removeRoad(m, "", "def"));
     assert(!removeRoad(m, "\x01", "def"));
     assert(!removeRoad(m, "\x1f", "def"));
-    assert(!removeRoad(m, ";",    "def"));
-    assert(!removeRoad(m, "abc",  ""));
-    assert(!removeRoad(m, "abc",  "\x01"));
-    assert(!removeRoad(m, "abc",  "\x1f"));
-    assert(!removeRoad(m, "abc",  ";"));
+    assert(!removeRoad(m, ";", "def"));
+    assert(!removeRoad(m, "abc", ""));
+    assert(!removeRoad(m, "abc", "\x01"));
+    assert(!removeRoad(m, "abc", "\x1f"));
+    assert(!removeRoad(m, "abc", ";"));
 
-    char const* d;
+    char const *d;
 
     d = getRouteDescription(m, 0);
     assert(d == NULL || strcmp(d, "") == 0);
-    free((void *)d);
+    free((void *) d);
 
     d = getRouteDescription(m, 1000);
     assert(d == NULL || strcmp(d, "") == 0);
-    free((void *)d);
+    free((void *) d);
 
     deleteMap(m);
     return PASS;
@@ -193,8 +193,7 @@ static int memory(void) {
                 int i = dk2str(dk, rd);
                 assert(strcmp(str, rd + i) == 0);
             }
-        }
-        else {
+        } else {
             char const *str = getRouteDescription(m, dk);
             if (str) {
                 assert(strcmp(str, "") == 0);
@@ -234,8 +233,6 @@ static int forum1(void) {
 
     assert(removeRoad(m, "a", "c"));
 
-    char *str = getRouteDescription(m, 1);
-
     DK(m, 1, "1;poczatek;10;2019;a;100;2019;b;100;2019;c;10;2019;koniec");
 
     deleteMap(m);
@@ -261,7 +258,7 @@ static int forum2(void) {
 /* Test utworzony na podstawie pytania z forum z dodaną dodatkową drogą krajową
  * na skróty */
 static int forum3(void) {
-    Map* m = newMap();
+    Map *m = newMap();
     assert(m);
 
     assert(addRoad(m, "A", "B", 1, 2000));
@@ -286,7 +283,7 @@ static int forum3(void) {
 
 /* Funkcja getRouteDescription musi przy każdym wywołaniu zaalokować pamięć. */
 static int description1(void) {
-    Map* m = newMap();
+    Map *m = newMap();
     assert(m);
 
     assert(addRoad(m, "Aaa", "Bbb", 48, 1998));
@@ -300,8 +297,8 @@ static int description1(void) {
     assert(d4);
     assert(strcmp(d8, "8;Aaa;48;1998;Bbb") == 0);
     assert(strcmp(d4, "4;Ccc;84;1994;Ddd") == 0);
-    free((void *)d8);
-    free((void *)d4);
+    free((void *) d8);
+    free((void *) d4);
 
     deleteMap(m);
     return PASS;
@@ -310,7 +307,7 @@ static int description1(void) {
 /* Wynikiem funkcji getRouteDescription przy braku
  * drogi krajowej ma być pusty napis. */
 static int description2(void) {
-    Map* m = newMap();
+    Map *m = newMap();
     assert(m);
 
     for (unsigned dk = 1; dk <= 999; ++dk)
@@ -322,7 +319,7 @@ static int description2(void) {
 
 /* Odcinki dróg nie będące fragmentami dróg krajowych można zawsze usunąć. */
 static int remove1(void) {
-    Map* m = newMap();
+    Map *m = newMap();
     assert(m);
 
     assert(addRoad(m, "a", "b", 1, 1));
@@ -353,7 +350,7 @@ static int remove1(void) {
 
 /* Nie można utworzyć dwa razy drogi krajowej o tym samym numerze. */
 static int route1(void) {
-    Map* m = newMap();
+    Map *m = newMap();
     assert(m);
 
     assert(addRoad(m, "Ćmielów", "Żagań", 1, 1));
@@ -366,7 +363,7 @@ static int route1(void) {
 
 /* Tworzy 999 dróg krajowych. */
 static int route2(void) {
-    Map* m = newMap();
+    Map *m = newMap();
     assert(m);
 
     assert(addRoad(m, "a", "b", 1, 1));
@@ -379,7 +376,7 @@ static int route2(void) {
         static char rd[] = "000;a;1;1;b;1;1;c";
         int i = dk2str(dk, rd);
         assert(strcmp(str, rd + i) == 0);
-        free((void *)str);
+        free((void *) str);
     }
 
     deleteMap(m);
@@ -1673,7 +1670,7 @@ static int long1(void) {
         static char rd[] = "000;___;11;996;Aaa;11;996;Caa;2;996;Daa;11;996;Baa;11;996;___";
         int j = dk2str(i, rd);
         memcpy(rd + 4, city[i], 3);
-        memcpy(rd + sizeof (rd) - 4, city[i + 1], 3);
+        memcpy(rd + sizeof(rd) - 4, city[i + 1], 3);
         DK(m, i, rd + j);
         printf("%d\n", i);
         fflush(stdout);
@@ -1685,7 +1682,7 @@ static int long1(void) {
 
 /* TODO */
 static int long2(void) {
-    Map* m = newMap();
+    Map *m = newMap();
     assert(m);
 
     /* TODO */
@@ -1698,6 +1695,7 @@ static int long2(void) {
 
 typedef struct {
     char const *name;
+
     int (*function)(void);
 } test_list_t;
 
@@ -1732,7 +1730,8 @@ int main(int argc, char *argv[]) {
     if (argc != 2)
         return WRONG_TEST;
 
-    for (size_t i = 0; i < SIZE(test_list); ++i)
+    for (size_t i = 0; i < SIZE(test_list);
+    ++i)
     if (strcmp(argv[1], test_list[i].name) == 0)
         return test_list[i].function();
 

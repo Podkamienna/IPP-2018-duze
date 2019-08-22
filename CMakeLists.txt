@@ -38,8 +38,8 @@ set(SOURCE_FILES
         src/hashTable.h
         src/heap.c
         src/heap.h
-        src/dijkstra.c
-        src/dijkstra.h
+        src/findPath.c
+        src/findPath.h
         src/route.c
         src/route.h
         src/list.c

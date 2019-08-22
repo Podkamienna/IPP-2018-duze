@@ -1,7 +1,7 @@
 //
 // Created by alicja on 13.07.19.
 //
-#include "dijkstra.h"
+#include "findPath.h"
 #include "heap.h"
 #include "citiesAndRoads.h"
 #include "list.h"
@@ -12,17 +12,6 @@
 #include <stdlib.h>
 #include <inttypes.h>
 #include <limits.h>
-
-typedef struct Distance Distance;
-typedef struct HeapEntry HeapEntry;
-
-const Distance BASE_DISTANCE;
-const Distance WORST_DISTANCE;
-
-struct Distance {
-    uint64_t length;
-    int minYear;
-};
 
 struct HeapEntry {
     City *city;
@@ -95,7 +84,7 @@ static void deleteHeapEntry(HeapEntry *heapEntry);
 static int compareHeapEntries(HeapEntry *heapEntry1, HeapEntry *heapEntry2);
 
 /**
- * @brief Wkłada odwiedzalnych (nie odwiedzonych, i takich do których wejście nie jest zabronione)
+ * @brief Wkłada odwiedzalnych (nieodwiedzonych i takich do których wejście nie jest zabronione)
  * sąsiadów zadanego przez pole wkładane na kopiec miasta na zadany kopiec.
  * @param entry — pole zadające miasto
  * @param heap — kopiec na który będą wkładani sąsiedzi
@@ -107,7 +96,7 @@ static int compareHeapEntries(HeapEntry *heapEntry1, HeapEntry *heapEntry2);
 static bool pushNeighbours(HeapEntry *entry, Heap *heap, bool *isVisited, bool *isRestricted);
 
 /**
- * @brief Przy użyciu algorytu Dijkstry oblicza odległość od źródła do celu, zapisuje uzyskane
+ * @brief Przy użyciu algorytmu Dijkstry oblicza odległość od źródła do celu, zapisuje uzyskane
  * przy tej okazji dystanse do poszczególnych miast i zwraca tablicę tak uzyskanych wyników.
  * @param map — mapa w której zawarte są miasta i drogi
  * @param source — miasto z którego szukana jest ścieżka
@@ -197,7 +186,7 @@ static bool pushNeighbours(HeapEntry *entry, Heap *heap, bool *isVisited, bool *
 
     FAIL_IF(setIterator == NULL);
 
-    for(Road *road = getNextSetIterator(setIterator); road != NULL; road = getNextSetIterator(setIterator)) {
+    for (Road *road = getNextSetIterator(setIterator); road != NULL; road = getNextSetIterator(setIterator)) {
         City *neighbour = getNeighbour(road, entry->city);
 
         if (neighbour == NULL) {
@@ -273,13 +262,13 @@ static Distance *calculateDistances(Map *map, City *source, City *destination, b
         deleteHeapEntry(heapEntry);
     }
 
-    deleteHeap(heap, (void(*)(void *))deleteHeapEntry);
+    deleteHeap(heap, (void (*)(void *)) deleteHeapEntry);
     free(isVisited);
 
     return distances;
 
     failure:;
-    deleteHeap(heap, (void(*)(void *))deleteHeapEntry);
+    deleteHeap(heap, (void (*)(void *)) deleteHeapEntry);
     deleteHeapEntry(heapEntry);
     free(isVisited);
     free(distances);
@@ -339,95 +328,79 @@ static List *reconstructPath(City *source, City *destination, Distance *distance
     return path;
 
     failure:;
-    deleteList(path, (void(*)(void *))deletePathNode);
+    deleteList(path, (void (*)(void *)) deletePathNode);
 
     return NULL;
 }
 
-DijkstraReturnValue *getNewDijkstraReturnValue() {
-    DijkstraReturnValue *newDijkstraReturnValue = malloc(sizeof(DijkstraReturnValue));
+FindPathResult *getNewFindPathResult() {
+    FindPathResult *newFindPathResult = malloc(sizeof(FindPathResult));
 
-    if (newDijkstraReturnValue == NULL) {
+    if (newFindPathResult == NULL) {
         return NULL;
     }
 
-    newDijkstraReturnValue->path = NULL;
-    newDijkstraReturnValue->isUnique = true;
+    newFindPathResult->path = NULL;
+    newFindPathResult->isUnique = true;
 
-    return newDijkstraReturnValue;
+    return newFindPathResult;
 }
 
-void deleteDijkstraReturnValue(DijkstraReturnValue *dijkstraReturnValue, bool deletePath) {
-    if (dijkstraReturnValue == NULL) {
+void deleteFindPathResult(FindPathResult *findPathResult, bool deletePath) {
+    if (findPathResult == NULL) {
         return;
     }
 
     if (deletePath) {
-        deleteList(dijkstraReturnValue->path, (void (*)(void *))deletePathNode);
+        deleteList(findPathResult->path, (void (*)(void *)) deletePathNode);
     }
 
-    free(dijkstraReturnValue);
+    free(findPathResult);
 }
 
-bool isCorrectDijkstraReturnValue(DijkstraReturnValue *dijkstraReturnValue) {
-    if (dijkstraReturnValue == NULL) {
+bool isCorrectPathResult(FindPathResult *findPathResult) {
+    if (findPathResult == NULL) {
         return false;
     }
 
-    if (dijkstraReturnValue->path == NULL) {
+    if (findPathResult->path == NULL) {
         return false;
     }
 
-    return dijkstraReturnValue->isUnique;
+    return findPathResult->isUnique;
 }
 
-Route *dijkstraReturnValueToRoute(DijkstraReturnValue *dijkstraReturnValue) {
+Route *findPathResultToRoute(FindPathResult *findPathResult) {
     Route *newRoute = getNewRoute();
 
-    if (newRoute == NULL || dijkstraReturnValue == NULL) {
+    if (newRoute == NULL || findPathResult == NULL) {
         return NULL;
     }
 
-    newRoute->path = dijkstraReturnValue->path;
-    newRoute->destination = dijkstraReturnValue->destination;
-    newRoute->source = dijkstraReturnValue->source;
+    newRoute->path = findPathResult->path;
+    newRoute->destination = findPathResult->destination;
+    newRoute->source = findPathResult->source;
 
     return newRoute;
 }
 
-int compareDijkstraReturnValues(DijkstraReturnValue *a, DijkstraReturnValue *b) {
-    if (!isCorrectDijkstraReturnValue(a) && !isCorrectDijkstraReturnValue(b)) {
+int compareFindPathResults(FindPathResult *findPathResult1, FindPathResult *findPathResult2) {
+    if (!isCorrectPathResult(findPathResult1) && !isCorrectPathResult(findPathResult2)) {
         return 0;
     }
 
-    if (!isCorrectDijkstraReturnValue(a)) {
+    if (!isCorrectPathResult(findPathResult1)) {
         return -1;
     }
 
-    if (!isCorrectDijkstraReturnValue(b)) {
+    if (!isCorrectPathResult(findPathResult2)) {
         return 1;
     }
 
-    if (a->length > b->length) {
-        return -1;
-    }
-
-    if (b->length > a->length) {
-        return 1;
-    }
-
-    if (a->minimalYear > b->minimalYear) {
-        return 1;
-    }
-
-    if (b->minimalYear > a->minimalYear) {
-        return -1;
-    }
-
-    return 0;
+    return compareDistances(findPathResult1->distance, findPathResult2->distance);
 }
 
-DijkstraReturnValue *dijkstra(Map *map, City *source, City *destination, List *restrictedPaths) {
+FindPathResult *findPath(Map *map, City *source, City *destination, List *restrictedPaths) {
     ListIterator *listIterator = getNewListIterator(restrictedPaths);
 
     if (listIterator == NULL && restrictedPaths != NULL) {
@@ -443,23 +416,22 @@ DijkstraReturnValue *dijkstra(Map *map, City *source, City *destination, List *r
         return NULL;
     }
 
-    while (true) {
+    while (true) { // TODO unikać while (true), dać fora
         PathNode *path = getNextListIterator(listIterator);
 
         if (path == NULL) {
             break;
         }
 
-        if (compareCities(path->city, source) == 0 || compareCities(path->city, destination) == 0) {
-            continue;
-        }
-
         isRestricted[path->city->id] = true;
     }
 
+    isRestricted[source->id] = false;
+    isRestricted[destination->id] = false;
+
     Distance *distances = calculateDistances(map, source, destination, isRestricted);
 
-    DijkstraReturnValue *result = getNewDijkstraReturnValue();
+    FindPathResult *result = getNewFindPathResult();
     if (result == NULL) {
         free(distances);
         free(isRestricted);
@@ -469,7 +441,7 @@ DijkstraReturnValue *dijkstra(Map *map, City *source, City *destination, List *r
     }
 
     if (compareDistances(distances[destination->id], WORST_DISTANCE) == 0) { //Jeżeli nie ma ścieżki
-        free(distances);
+        free(distances); // TODO przerzucić to reconstructPath
         free(isRestricted);
         deleteListIterator(listIterator);
 
@@ -483,8 +455,7 @@ DijkstraReturnValue *dijkstra(Map *map, City *source, City *destination, List *r
 
     result->source = source;
     result->destination = destination;
-    result->minimalYear = distances[destination->id].minYear;
-    result->length = distances[destination->id].length;
+    result->distance = distances[destination->id];
 
     if (compareCities(endOfReconstructedPath->city, source) != 0) {  //Sprawdzenie czy ścieżka jest jednoznaczna
         free(distances);

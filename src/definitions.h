@@ -11,7 +11,6 @@
 
 typedef struct City City;
 typedef struct Road Road;
-typedef struct DijkstraReturnValue DijkstraReturnValue;
 typedef struct Route Route;
 typedef struct List List;
 typedef struct Map Map;
@@ -59,14 +58,6 @@ struct Road {
     int length;
     int year;
     City *city1, *city2;
-};
-
-struct DijkstraReturnValue {
-    List *path;
-    City *source, *destination;
-    uint64_t length;
-    int minimalYear;
-    bool isUnique;
 };
 
 struct Route {
