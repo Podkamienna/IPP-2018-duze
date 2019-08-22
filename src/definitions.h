@@ -40,7 +40,6 @@ typedef struct Vector Vector;
 /** Liczba dróg krajowych */
 #define ROUTE_COUNT 1000
 
-        //TODO usunąć jedną z rzeczy w hashtablicy
 extern const char *SEMICOLON;
 
 struct Map {

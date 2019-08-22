@@ -9,7 +9,6 @@
 #include "route.h"
 #include "dictionary.h"
 
-#include <stdio.h>
 #include <stdlib.h>
 #include <inttypes.h>
 #include <limits.h>
@@ -33,11 +32,109 @@ struct HeapEntry {
 const Distance BASE_DISTANCE = (Distance) {0, INT_MAX};
 const Distance WORST_DISTANCE = (Distance) {UINT64_MAX, INT_MIN};
 
+/**
+ * @brief Zwraca zmienną typu dystans, zawierającą informacje
+ * o zadanej długości i roku minimalnym.
+ * @param length — długość
+ * @param minYear — minimalny rok
+ * @return Utworzona zmienna
+ */
+static Distance getDistance(uint64_t length, int minYear);
+
+/**
+ * @brief Porównuje dystanse (po wspołrzędnych).
+ * @param distance1 — pierwszy dystans do porównania
+ * @param distance2 — drugi dystans do porównania
+ * @return Wartość @p 1, jeżeli pierwszy dystans jest większy.
+ * Wartość @p 0, jeżeli dystanse są równe.
+ * Wartość @p -1 jeżeli drugi dystans jest mniejszy.
+ */
+static int compareDistances(Distance distance1, Distance distance2);
+
+/**
+ * @brief Dodaje do siebie dwa dystanse.
+ * @param distance1 — pierwszy dystans do dodania
+ * @param distance2 — drugi dystans do dodania
+ * @return Wynik dodawania dystansów
+ */
+static Distance addDistances(Distance distance1, Distance distance2);
+
+/**
+ * @brief Dodaje drogę do dystansu.
+ * @param distance — dystans do dodania
+ * @param road — droga do dodania (nie równa NULL)
+ * @return Wynik dodawania
+ */
+static Distance addRoadToDistance(Distance distance, Road *road);
+
+/**
+ * @brief Alokuje pamięć pod i zwraca nowe pole,
+ * które jest wkładane na kopiec
+ * przy wykonywaniu wariantu algorytmu Dijkstry
+ * @param city — miasto od którego zależy zwracane pole (nie równe NULL)
+ * @param distance — dystans od którego zależy zwracane pole (nie równe NULL)
+ * @return Wskaźnik na nowo utworzoną strukturę lub NULL, jeżeli
+ * nie udało się zaalokować pamięci
+ */
+static HeapEntry *getNewHeapEntry(City *city, Distance distance);
+
+/**
+ * @brief Usuwa pole wkładane na kopiec.
+ * @param heapEntry — pole do usunięcia
+ */
+static void deleteHeapEntry(HeapEntry *heapEntry);
+
+/**
+ * @brief Porównuje 2 pola wkładane na kopiec.
+ * @param heapEntry1 — pierwsze pole do porównania (nie NULL)
+ * @param heapEntry2 — drugie pole do porównania (nie NULL)
+ * @return Wartość @p 1 jeżeli pierwsze pole jest większe,
+ * wartość @p 0 jeżeli pola są równe, wartość @p -1, jeżeli
+ * drugie pole jest większe.
+ */
+static int compareHeapEntries(HeapEntry *heapEntry1, HeapEntry *heapEntry2);
+
+/**
+ * @brief Wkłada odwiedzalnych (nie odwiedzonych, i takich do których wejście nie jest zabronione)
+ * sąsiadów zadanego przez pole wkładane na kopiec miasta na zadany kopiec.
+ * @param entry — pole zadające miasto
+ * @param heap — kopiec na który będą wkładani sąsiedzi
+ * @param isVisited — tablica pozwalająca na sprawdzenie, czy miasto było odwiedzone
+ * @param isRestricted — tablica pozwalająca na sprawdzanie, czy można wejść do danego miasta
+ * @return Wartość @p false, jeżeli nie udało się zaalokować pamięci, wartość @p true, jeżeli wszystko
+ * się powiodło.
+ */
+static bool pushNeighbours(HeapEntry *entry, Heap *heap, bool *isVisited, bool *isRestricted);
+
+/**
+ * @brief Przy użyciu algorytu Dijkstry oblicza odległość od źródła do celu, zapisuje uzyskane
+ * przy tej okazji dystanse do poszczególnych miast i zwraca tablicę tak uzyskanych wyników.
+ * @param map — mapa w której zawarte są miasta i drogi
+ * @param source — miasto z którego szukana jest ścieżka
+ * @param destination — miasto do którego szukana jest ścieżka
+ * @param isRestricted — tablica pozwalająca na sprawdzenie, czy można wejść do danego miasta
+ * @return Wartość @p NULL, jeżeli nie uda się zaalokować pamięci, obliczoną tablicę odległości
+ * w przeciwnym razie. Jeżeli ścieżka nie istnieje, to na polu odpowiadającemu celowi będzie dystans
+ * równy stałej WORST_DISTANCE.
+ */
+static Distance *calculateDistances(Map *map, City *source, City *destination, bool *isRestricted);
+
+/**
+ * @brief Na podstawie tablicy obliczonej przez funkcję calculateDistances odtwarza najkrótszą
+ * ścieżkę. Zakłada, że jakaś ścieżka istnieje.
+ * @param source — miasto z którego szukana jest ścieżka
+ * @param destination — miasto do którego szukana jest ścieżka
+ * @param distances — obliczona tablica dystansów
+ * @return Wartość @p NULL, jeżeli nie udało się zaalokować pamięci, obliczoną ścieżkę w innnym razie.
+ * Jeżeli ścieżka nie jest wyznaczona jednoznacznie, zwraca sufiks ścieżki, który jest wyznaczony jednoznacznie.
+ */
+static List *reconstructPath(City *source, City *destination, Distance *distances);
+
 static Distance getDistance(uint64_t length, int minYear) {
     return (Distance) {length, minYear};
 }
 
-static int compareDistance(Distance distance1, Distance distance2) {
+static int compareDistances(Distance distance1, Distance distance2) {
     if (distance1.length > distance2.length) {
         return 1;
     }
@@ -57,7 +154,7 @@ static int compareDistance(Distance distance1, Distance distance2) {
     return 0;
 }
 
-static Distance addDistance(Distance distance1, Distance distance2) {
+static Distance addDistances(Distance distance1, Distance distance2) {
     Distance result = distance1;
 
     result.length += distance2.length;
@@ -70,7 +167,7 @@ static Distance addDistance(Distance distance1, Distance distance2) {
 }
 
 static Distance addRoadToDistance(Distance distance, Road *road) {
-    return addDistance(distance, getDistance(road->length, road->year));
+    return addDistances(distance, getDistance(road->length, road->year));
 }
 
 static HeapEntry *getNewHeapEntry(City *city, Distance distance) {
@@ -90,8 +187,8 @@ static void deleteHeapEntry(HeapEntry *heapEntry) {
     free(heapEntry);
 }
 
-static int compareHeapEntry(HeapEntry *heapEntry1, HeapEntry *heapEntry2) {
-    return compareDistance(heapEntry1->distance, heapEntry2->distance);
+static int compareHeapEntries(HeapEntry *heapEntry1, HeapEntry *heapEntry2) {
+    return compareDistances(heapEntry1->distance, heapEntry2->distance);
 }
 
 static bool pushNeighbours(HeapEntry *entry, Heap *heap, bool *isVisited, bool *isRestricted) {
@@ -138,7 +235,7 @@ static Distance *calculateDistances(Map *map, City *source, City *destination, b
 
     FAIL_IF(source == NULL || destination == NULL);
 
-    heap = initializeHeap((int (*)(void *, void *))compareHeapEntry);
+    heap = initializeHeap((int (*)(void *, void *)) compareHeapEntries);
     FAIL_IF(heap == NULL);
 
     heapEntry = getNewHeapEntry(source, BASE_DISTANCE);
@@ -191,14 +288,9 @@ static Distance *calculateDistances(Map *map, City *source, City *destination, b
 
 }
 
-static List *reconstructRoute(Map *map, City *source, City *destination, Distance *distances) {
+static List *reconstructPath(City *source, City *destination, Distance *distances) {
     List *path = initializeList();
-
-    if (path == NULL) {
-        free(distances);
-
-        return NULL;
-    }
+    FAIL_IF(path == NULL);
 
     City *position = destination;
     City *potentialNextPosition;
@@ -209,13 +301,9 @@ static List *reconstructRoute(Map *map, City *source, City *destination, Distanc
 
     while (compareCities(position, source) != 0) {
         potentialNextPosition = NULL;
+
         SetIterator *setIterator = getNewSetIterator(position->roads);
-
-        if (setIterator == NULL) {
-            deleteList(path, (void(*)(void *))deletePathNode);
-
-            return NULL;
-        }
+        FAIL_IF(setIterator == NULL);
 
         for (Road *road = getNextSetIterator(setIterator); road != NULL; road = getNextSetIterator(setIterator)) {
             City *neighbour = getNeighbour(road, position);
@@ -224,9 +312,10 @@ static List *reconstructRoute(Map *map, City *source, City *destination, Distanc
                 continue;
             }
 
-            Distance distanceThroughNeighbour = addDistance(currentDistance, addRoadToDistance(distances[neighbour->id], road));
+            Distance distanceThroughNeighbour = addDistances(currentDistance,
+                                                             addRoadToDistance(distances[neighbour->id], road));
 
-            if (compareDistance(distances[destination->id], distanceThroughNeighbour) == 0) {
+            if (compareDistances(distances[destination->id], distanceThroughNeighbour) == 0) {
                 if (potentialNextPosition != NULL) {
                     deleteSetIterator(setIterator);
 
@@ -248,6 +337,11 @@ static List *reconstructRoute(Map *map, City *source, City *destination, Distanc
     }
 
     return path;
+
+    failure:;
+    deleteList(path, (void(*)(void *))deletePathNode);
+
+    return NULL;
 }
 
 DijkstraReturnValue *getNewDijkstraReturnValue() {
@@ -281,10 +375,6 @@ bool isCorrectDijkstraReturnValue(DijkstraReturnValue *dijkstraReturnValue) {
     }
 
     if (dijkstraReturnValue->path == NULL) {
-        return false;
-    }
-
-    if (dijkstraReturnValue->minimalYear == 0) {
         return false;
     }
 
@@ -345,7 +435,13 @@ DijkstraReturnValue *dijkstra(Map *map, City *source, City *destination, List *r
     }
 
     size_t cityCount = getId(map->cities);
+
     bool *isRestricted = calloc(cityCount, sizeof(bool));
+    if (isRestricted == NULL) {
+        deleteListIterator(listIterator);
+
+        return NULL;
+    }
 
     while (true) {
         PathNode *path = getNextListIterator(listIterator);
@@ -362,44 +458,49 @@ DijkstraReturnValue *dijkstra(Map *map, City *source, City *destination, List *r
     }
 
     Distance *distances = calculateDistances(map, source, destination, isRestricted);
-    DijkstraReturnValue *route = getNewDijkstraReturnValue();
 
-    if (route == NULL) {
+    DijkstraReturnValue *result = getNewDijkstraReturnValue();
+    if (result == NULL) {
+        free(distances);
+        free(isRestricted);
+        deleteListIterator(listIterator);
+
         return NULL;
     }
 
-    if (compareDistance(distances[destination->id], WORST_DISTANCE) == 0) { //Jeżeli nie ma ścieżki
+    if (compareDistances(distances[destination->id], WORST_DISTANCE) == 0) { //Jeżeli nie ma ścieżki
         free(distances);
         free(isRestricted);
         deleteListIterator(listIterator);
-        route->minimalYear = 0;
 
-        return route;
+        result->path = NULL;
+
+        return result;
     }
 
-    List *list = reconstructRoute(map, source, destination, distances);
-    PathNode *endOfList = getLast(list);
+    List *reconstructedPath = reconstructPath(source, destination, distances);
+    PathNode *endOfReconstructedPath = getLastFromList(reconstructedPath);
 
-    route->source = source;
-    route->destination = destination;
-    route->minimalYear = distances[destination->id].minYear;
-    route->length = distances[destination->id].length;
+    result->source = source;
+    result->destination = destination;
+    result->minimalYear = distances[destination->id].minYear;
+    result->length = distances[destination->id].length;
 
-    if (compareCities(endOfList->city, source) != 0) {
+    if (compareCities(endOfReconstructedPath->city, source) != 0) {  //Sprawdzenie czy ścieżka jest jednoznaczna
         free(distances);
         free(isRestricted);
         deleteListIterator(listIterator);
 
-        route->path = NULL;
+        result->path = NULL;
 
-        return route; //!!!!!!!!!!!!!trzeba najpierw wyifować, czy jest UNIQUE po wywołaniu
+        return result;
     }
 
     free(distances);
     free(isRestricted);
     deleteListIterator(listIterator);
 
-    route->path = list;
+    result->path = reconstructedPath;
 
-    return route;
+    return result;
 }

@@ -37,6 +37,15 @@ struct ListIterator {
  */
 List *initializeList();
 
+
+/**
+ * @brief Usuwa zadaną listę. Jeżeli deleteValue to NULL,
+ * to nie usuwa elementów listy.
+ * @param list — lista, która ma zostać usunięta
+ * @param deleteValue — funkcja usuwająca elementy listy
+ */
+void deleteList(List *list, void deleteValue(void *));
+
 /**
  * @brief Alokuje pamięć pod i wstawia na początek listy nowy
  * element.
@@ -50,11 +59,6 @@ List *initializeList();
 bool addToList(List *list, void *value);
 
 /**
- * @brief Odwraca zadaną listę
- * @param list — lista do odwrócenia
- */
-void reverseList(List *list);
-/**
  * @brief Funkcja sprawdzająca, czy zadana
  * wartość jest obecna w liście.
  * @param list — lista, w której wartość
@@ -64,11 +68,11 @@ void reverseList(List *list);
  * Wartość @p false, jeżeli któryś z elementów wejściowych
  * ma wartość NULL lub wyszukiwany element nie istnieje.
  */
-void * searchList(List *list, void *value, int compare (void *, void *));
+void *searchList(List *list, void *value, int compare (void *, void *));
 
-bool insertAtTheBeginning(List *list, List *toInsert, void deleteValue(void *), int compare (void *, void *));
+bool insertAtTheBeginningList(List *list, List *toInsert, void deleteValue(void *), int compare (void *, void *));
 
-bool insertAtTheEnd(List *list, List *toInsert, void deleteValue(void *), int compare (void *, void *));
+bool insertAtTheEndList(List *list, List *toInsert, void deleteValue(void *), int compare (void *, void *));
 
 /**
  * @brief Ws
@@ -78,19 +82,9 @@ bool insertAtTheEnd(List *list, List *toInsert, void deleteValue(void *), int co
  */
 bool insertToList(List *list, List *toInsert, void deleteValue(void *), int compare (void *, void *));
 
-/**
- * @brief Usuwa zadaną listę. Jeżeli deleteValue to NULL,
- * to nie usuwa elementów listy.
- * @param list — lista, która ma zostać usunięta
- * @param deleteValue — funkcja usuwająca elementy listy
- */
-void deleteList(List *list, void deleteValue(void *));
-
-void *getLast(List *list);
+void *getLastFromList(List *list);
 
 ListIterator *getNewListIterator(List *list);
-
-bool incrementListIterator(ListIterator *listIterator);
 
 void *getNextListIterator(ListIterator *listIterator);
 

@@ -220,7 +220,8 @@ bool extendRoute(Map *map, unsigned routeId, const char *cityName) {
             return false;
         }
 
-        insertAtTheBeginning(map->routes[routeId]->path, dijkstraResult1->path, (void (*)(void *)) deletePathNode, (int(*)(void *, void *)) comparePathNodes);
+        insertAtTheBeginningList(map->routes[routeId]->path, dijkstraResult1->path, (void (*)(void *)) deletePathNode,
+                                 (int (*)(void *, void *)) comparePathNodes);
         map->routes[routeId]->source = dijkstraResult1->source;
 
         free(dijkstraResult1->path);
@@ -236,7 +237,8 @@ bool extendRoute(Map *map, unsigned routeId, const char *cityName) {
             return false;
         }
 
-        insertAtTheEnd(map->routes[routeId]->path, dijkstraResult2->path, (void (*)(void *)) deletePathNode, (int(*)(void *, void *)) comparePathNodes);
+        insertAtTheEndList(map->routes[routeId]->path, dijkstraResult2->path, (void (*)(void *)) deletePathNode,
+                           (int (*)(void *, void *)) comparePathNodes);
         map->routes[routeId]->destination = dijkstraResult2->destination;
 
         free(dijkstraResult2->path);
