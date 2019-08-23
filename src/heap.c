@@ -12,6 +12,47 @@ struct Heap {
     int (*compare)(void *, void *);
 };
 
+/**
+ * @brief Zwraca indeks rodzica elementu kopca z zadanym indeksem.
+ * @param i — ineks, którego rodzic jest poszukiwany
+ * @return Znaleziony indeks.
+ */
+static size_t getParent(size_t i);
+
+/**
+ * @brief Zwraca indeks lewego syna elementu kopca z zadanym indeksem.
+ * @param i — ineks, którego lewy syn jest poszukiwany
+ * @return Znaleziony indeks.
+ */
+static size_t getLeftChild(size_t i);
+
+/**
+ * @brief Zwraca indeks prawego syna elementu kopca z zadanym indeksem.
+ * @param i — ineks, którego prawy syn jest poszukiwany
+ * @return Znaleziony indeks.
+ */
+static size_t getRightChild(size_t i);
+
+/**
+ * @brief Mając zadane 2 indeksy i kopiec, zwraca ten z nich, któremu
+ * przypisana jest wartość niebędąca NULLem, i jeżeli oba takie są, to
+ * zwraca ten któremu przypisana jest wartość mniejsza. Jeżeli oba mają
+ * wartość NULL, to zwraca pierwszy z nich.
+ * @param heap — kopiec w którym sprawdzane są wartości
+ * @param i — indeks, któremu przypisana jest pierwsza wartość
+ * @param j — indeks, któremu przypisana jest druga wartość
+ * @return Wybrany wedle opisu indeks.
+ */
+static size_t minNotNull(Heap *heap, size_t i, size_t j);
+
+/**
+ * @brief Zamienia wartości będące w zadanej tablicy pod zadanymi indeksami.
+ * @param arr — tablica w której są wartości
+ * @param i — pierwszy indeks
+ * @param j — drugi indeks
+ */
+static void swap(void **arr, size_t i, size_t j);
+
 static size_t getParent(size_t i) {
     return (i - 1) / 2;
 }
@@ -24,7 +65,6 @@ static size_t getRightChild(size_t i) {
     return 2 * i + 2;
 }
 
-//returns smaller of the parents, that is not NULL
 static size_t minNotNull(Heap *heap, size_t i, size_t j) {
     if (j >= heap->vector->size) {
         return i;
@@ -37,7 +77,6 @@ static size_t minNotNull(Heap *heap, size_t i, size_t j) {
     return j;
 }
 
-//swaps two nodes in the heap
 static void swap(void **arr, size_t i, size_t j) {
     void *tmp = arr[i];
     arr[i] = arr[j];

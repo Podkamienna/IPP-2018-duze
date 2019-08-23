@@ -35,10 +35,13 @@ bool pushHeap(Heap *heap, void *value);
  */
 void *popHeap(Heap *heap);
 
-//TODO
+/**
+ * @brief Sprawdza, czy kopiec jest pusty.
+ * @param heap — kopiec do sprawdzenia pustości
+ * @return Wartość @p true, jeżeli kopiec jest pusty
+ * lub jest NULLem, wartość @p false w innym wypadku.
+ */
 bool isEmptyHeap(Heap *heap);
-
-void seeHeap(Heap *heap);
 
 /**
  * @brief Usuwa kopiec. Jeżeli deleteValue jest NULLem to

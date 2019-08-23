@@ -84,8 +84,7 @@ static size_t getPosition(HashTable *hashTable, size_t hash) {
 static bool insertEntryHashTable(HashTable *hashTable, Entry *entry) {
     size_t position = getPosition(hashTable, entry->hash);
 
-    for (size_t i = 0; i < hashTable->size; i++, position = (position + 1) % hashTable->size) { // TODO getPosition
-        // TODO może lepiej zamiast getPosition zrobić getNextPosition
+    for (size_t i = 0; i < hashTable->size; i++, position = (position + 1) % hashTable->size) {
         if (hashTable->table[i] == NULL) {
             hashTable->table[i] = entry;
 

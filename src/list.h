@@ -37,7 +37,6 @@ struct ListIterator {
  */
 List *initializeList();
 
-
 /**
  * @brief Usuwa zadaną listę. Jeżeli deleteValue to NULL,
  * to nie usuwa elementów listy.
@@ -70,24 +69,81 @@ bool addToList(List *list, void *value);
  */
 void *searchList(List *list, void *value, int compare (void *, void *));
 
+/**
+ * @brief Funkcja łącząca listę do wstawienia z zadaną listą tak, że
+ * jeżeli ostatni element list do wstawienia jest taki jak pierwszy
+ * element listy, to wstawia ten pierwszy element zamiast ostatniego i robi
+ * z nich jedną listę.
+ * @param list — lista do której będzie dołączane
+ * @param toInsert — lista, która będzie dołączana
+ * @param deleteValue — funkcja usuwająca ostatni element listy do wstawienia
+ * @param compare — funkcja porównująca zawartości listy
+ * @return Wartość @p true, jeżeli udało się połączyć listy.
+ * Wartość @p false, jeżeli zawartości końca drugiej listu i początku pierszej
+ * nie są równe lub któraś z list ma wartość NULL.
+ */
 bool insertAtTheBeginningList(List *list, List *toInsert, void deleteValue(void *), int compare (void *, void *));
 
+/**
+ * @brief Funkcja łącząca listę do wstawienia z zadaną listą tak, że
+ * jeżeli pierwszy element list do wstawienia jest taki jak ostatni
+ * element listy, to wstawia ten pierwszy element zamiast ostatniego i robi
+ * z nich jedną listę.
+ * @param list — lista do której będzie dołączane
+ * @param toInsert — lista, która będzie dołączana
+ * @param deleteValue — funkcja usuwająca ostatni element listy
+ * @param compare — funkcja porównująca zawartości listy
+ * @return Wartość @p true, jeżeli udało się połączyć listy.
+ * Wartość @p false, jeżeli zawartości początku drugiej listu i końca pierszej
+ * nie są równe lub któraś z list ma wartość NULL.
+ */
 bool insertAtTheEndList(List *list, List *toInsert, void deleteValue(void *), int compare (void *, void *));
 
 /**
- * @brief Ws
- * @param list
- * @param toInsert
- * @return
+ * @brief Mając dane dwie listy o długości conajmniej 2, sprawdza koniec i początek tej do wstawienia,
+ * a następnie sprawdza, czy w liście do której ma wstawiać istnieją 2 kolejne elementy, które
+ * jako ciąg są równe ciągowi początek, koniec z listy do wstawienia. Jeżeli znajdzie takie
+ * elementy to wstawia pomiędzy nie listę do wstawienia, przy czym usuwa ostatni element z listy
+ * do wstawienia i pierwszy przed nią.
+ * @param list — lista do której ma być wstawiane
+ * @param toInsert — lista, która ma być wstawiana
+ * @param deleteValue — funkcja usuwająca zawartość z list
+ * @param compare — funckja porównująca zawartości list
+ * @return Wartość @p true, jeżeli wstawianie się powiodło, wartość @p false, jeżeli parametry miały
+ * nieodpowiednią wartość lub nie udało się znaleźć szukanej pary w liście do której wykonywana była
+ * próba wstawienia.
  */
 bool insertToList(List *list, List *toInsert, void deleteValue(void *), int compare (void *, void *));
 
+/**
+ * @brief Zwraca element wstawiany jako ostatni do listy.
+ * @param list — lista z której element jest zwracany
+ * @return Element wstawiony jako ostatni do listy lub wartość @p NULL, gdy
+ * lista nie zawiera elementów.
+ */
 void *getLastFromList(List *list);
 
+/**
+ * @brief Alokuje pamięć na i zwraca nowy iteratory do zadanej listy.
+ * @param list — lista do której iterator będzie tworzony
+ * @return Wskaźnika na utworzoną strukturę, jeżeli lista była NULLem
+ * lub nie udało się zaalokować pamięci.
+ */
 ListIterator *getNewListIterator(List *list);
 
+/**
+ * @brief Zwraca kolejną wartość zawartą w liście.
+ * @param listIterator — iterator na listę z której ma być
+ * zwrócona wartość
+ * @return Kolejna wartość z listy lub NULL, jeżeli lista
+ * została już przejrzana.
+ */
 void *getNextListIterator(ListIterator *listIterator);
 
+/**
+ * @brief Usuwa iterator na listę.
+ * @param listIterator — iterator do usunięcia
+ */
 void deleteListIterator(ListIterator *listIterator);
 
 

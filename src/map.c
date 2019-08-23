@@ -18,12 +18,6 @@
  */
 typedef struct Map Map;
 
-/** @brief Tworzy nową strukturę.
- * Tworzy nową, pustą strukturę niezawierającą żadnych miast, odcinków dróg ani
- * dróg krajowych.
- * @return Wskaźnik na utworzoną strukturę lub NULL, gdy nie udało się
- * zaalokować pamięci.
- */
 Map *newMap() {
     Map *newMap = calloc(1, sizeof(Map));
     FAIL_IF(newMap == NULL);
@@ -42,11 +36,6 @@ Map *newMap() {
     return NULL;
 }
 
-/** @brief Usuwa strukturę.
- * Usuwa strukturę wskazywaną przez @p map.
- * Nic nie robi, jeśli wskaźnik ten ma wartość NULL.
- * @param[in] map        – wskaźnik na usuwaną strukturę.
- */
 void deleteMap(Map *map) {
     if (map == NULL) {
         return;

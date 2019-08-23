@@ -42,8 +42,6 @@ void *searchHashTable(HashTable *hashTable, const char *name);
  */
 bool insertHashTable(HashTable *hashTable, const char *name, void *value);
 
-void iterate(HashTable *hashTable, void fun(void *)); //TODO usunac
-
 /**
  * @brief Zwiększa rozmiar hash tablicy do żądanego rozmiaru.
  * @param hashTable — hash tablica, której rozmiar ma być zmieniony
@@ -53,14 +51,6 @@ void iterate(HashTable *hashTable, void fun(void *)); //TODO usunac
  * mają niepoprawną wartość
  */
 HashTable *resizeHashTable(HashTable *hashTable, size_t newSize);
-
-/**
- * @brief Usuwa wartość przypisaną do danego napisu z hash tablicy.
- * @param hashTable — tablica z której jest usuwane
- * @param name — napis do którego jest przypisana usuwana wartość
- * @param deleteValue — funkcja usuwająca wartość
- */
-void deleteFromHashTable(HashTable *hashTable, const char *name, void deleteValue(void *));
 
 /**
  * @brief Usuwa hash tablicę.

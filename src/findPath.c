@@ -415,7 +415,7 @@ FindPathResult *findPath(Map *map, City *source, City *destination, List *restri
         return NULL;
     }
 
-    while (true) { // TODO unikać while (true), dać fora
+    for (PathNode *path = getNextListIterator(listIterator); path != NULL; path = getNextListIterator(listIterator)) {
         PathNode *path = getNextListIterator(listIterator);
 
         if (path == NULL) {
