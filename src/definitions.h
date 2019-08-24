@@ -63,7 +63,7 @@ struct City {
 
 struct Road {
     bool isBlocked;
-    int length;
+    unsigned length;
     int year;
     City *city1, *city2;
 };

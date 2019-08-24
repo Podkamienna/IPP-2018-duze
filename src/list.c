@@ -193,14 +193,6 @@ bool insertToList(List *list, List *toInsert, void deleteValue(void *), bool are
     return false;
 }
 
-void *getLastFromList(List *list) {
-    if (list == NULL) {
-        return NULL;
-    }
-
-    return list->beginning->data;
-}
-
 ListIterator *getNewListIterator(List *list) {
     if (list == NULL) {
         return NULL;

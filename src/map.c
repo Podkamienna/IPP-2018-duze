@@ -11,7 +11,6 @@
 #include <stdbool.h>
 #include <stdlib.h>
 #include <string.h>
-#include <math.h>
 
 /**
  * Struktura przechowująca mapę dróg krajowych.
@@ -41,10 +40,8 @@ void deleteMap(Map *map) {
         return;
     }
 
-    if (map->routes != NULL) {
-        for (int i = 0; i < 1000; i++) {
-            deleteRoute(map->routes[i], true);
-        }
+    for (int i = 0; i < 1000; i++) {
+        deleteRoute(map->routes[i], true);
     }
 
     deleteDictionary(map->cities, (void (*)(void *)) deleteCity);
@@ -325,7 +322,7 @@ char const *getRouteDescription(Map *map, unsigned routeId) {
     char *length = NULL, *year = NULL;
 
     ListNode *position = map->routes[routeId]->path->beginning;
-    PathNode *pathNode = position->data;
+    PathNode *pathNode = NULL;
     char *routeIdString = unsignedToString(routeId);
 
     FAIL_IF(!concatenateString(string, routeIdString));
@@ -345,7 +342,7 @@ char const *getRouteDescription(Map *map, unsigned routeId) {
             year = intToString(pathNode->road->year);
             FAIL_IF(year == NULL);
 
-            length = intToString(pathNode->road->length);
+            length = unsignedToString(pathNode->road->length);
             FAIL_IF(length == NULL);
 
             FAIL_IF(!concatenateString(string, length));

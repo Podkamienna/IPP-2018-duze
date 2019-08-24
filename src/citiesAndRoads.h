@@ -76,7 +76,7 @@ City *getNeighbour(Road *road, City *city);
  * @return Wskaźnik na nową drogę, jeżeli wszystko się uda.
  * Null jeżeli nie udało się zaalokować pamięci.
  */
-Road *getNewRoad(int year, int length, City *city1, City *city2);
+Road *getNewRoad(int year, unsigned length, City *city1, City *city2);
 
 /**
  * @brief Usuwa zadaną drogę

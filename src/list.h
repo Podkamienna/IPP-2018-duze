@@ -112,14 +112,6 @@ bool insertAtTheEndList(List *list, List *toInsert, void (*deleteValue)(void *))
 bool insertToList(List *list, List *toInsert, void deleteValue(void *), bool areEqual (void *, void *));
 
 /**
- * @brief Zwraca element wstawiany jako ostatni do listy.
- * @param list — lista z której element jest zwracany
- * @return Element wstawiony jako ostatni do listy lub wartość @p NULL, gdy
- * lista nie zawiera elementów.
- */
-void *getLastFromList(List *list);
-
-/**
  * @brief Alokuje pamięć na i zwraca nowy iteratory do zadanej listy.
  * @param list — lista do której iterator będzie tworzony
  * @return Wskaźnika na utworzoną strukturę, jeżeli lista była NULLem

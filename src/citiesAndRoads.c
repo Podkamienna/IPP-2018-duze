@@ -126,7 +126,7 @@ City *getNeighbour(Road *road, City *city) {
     return NULL;
 }
 
-Road *getNewRoad(int year, int length, City *city1, City *city2) {
+Road *getNewRoad(int year, unsigned length, City *city1, City *city2) {
     Road *newRoad = malloc(sizeof(Road));
 
     if (newRoad == NULL) {
