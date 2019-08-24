@@ -27,15 +27,15 @@ void deletePathNode(PathNode *pathNode) {
     free(pathNode);
 }
 
-int comparePathNodes(PathNode *a, PathNode *b) {
+bool areEqualPathNodes(PathNode *a, PathNode *b) {
     if (a->road == NULL || b->road == NULL) {
         return areEqualCities(a->city, b->city);
     }
 
-    return compareRoads(a->road, b->road);
+    return areEqualRoads(a->road, b->road);
 }
 
-int comparePathNodes2(PathNode *a, PathNode *b) {
+bool areEqualPathNodesByCities(PathNode *a, PathNode *b) {
     return areEqualCities(a->city, b->city);
 }
 

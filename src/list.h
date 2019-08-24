@@ -29,8 +29,6 @@ struct ListIterator {
 /**
  * @brief Alokuje pamięc pod i zwraca wskaźnik na
  * nową listę.
- * @param compare — funkcja pozwalająca na porównywanie
- * elementów zawartych w liście
  * @return Wskaźnik na zaalokowaną strukturę, lub NULL,
  * jeżeli nie udało się zaalokować pamięci lub parametr ma
  * wartość NULL.
@@ -67,7 +65,7 @@ bool addToList(List *list, void *value);
  * Wartość @p false, jeżeli któryś z elementów wejściowych
  * ma wartość NULL lub wyszukiwany element nie istnieje.
  */
-void *searchList(List *list, void *value, int compare (void *, void *));
+void *searchList(List *list, void *value, bool areEqual (void *, void *));
 
 /**
  * @brief Funkcja łącząca listę do wstawienia z zadaną listą tak, że
@@ -77,12 +75,11 @@ void *searchList(List *list, void *value, int compare (void *, void *));
  * @param list — lista do której będzie dołączane
  * @param toInsert — lista, która będzie dołączana
  * @param deleteValue — funkcja usuwająca ostatni element listy do wstawienia
- * @param compare — funkcja porównująca zawartości listy
  * @return Wartość @p true, jeżeli udało się połączyć listy.
  * Wartość @p false, jeżeli zawartości końca drugiej listu i początku pierszej
  * nie są równe lub któraś z list ma wartość NULL.
  */
-bool insertAtTheBeginningList(List *list, List *toInsert, void deleteValue(void *), int compare (void *, void *));
+bool insertAtTheBeginningList(List *list, List *toInsert, void (*deleteValue)(void *));
 
 /**
  * @brief Funkcja łącząca listę do wstawienia z zadaną listą tak, że
@@ -92,12 +89,11 @@ bool insertAtTheBeginningList(List *list, List *toInsert, void deleteValue(void 
  * @param list — lista do której będzie dołączane
  * @param toInsert — lista, która będzie dołączana
  * @param deleteValue — funkcja usuwająca ostatni element listy
- * @param compare — funkcja porównująca zawartości listy
  * @return Wartość @p true, jeżeli udało się połączyć listy.
  * Wartość @p false, jeżeli zawartości początku drugiej listu i końca pierszej
  * nie są równe lub któraś z list ma wartość NULL.
  */
-bool insertAtTheEndList(List *list, List *toInsert, void deleteValue(void *), int compare (void *, void *));
+bool insertAtTheEndList(List *list, List *toInsert, void (*deleteValue)(void *));
 
 /**
  * @brief Mając dane dwie listy o długości conajmniej 2, sprawdza koniec i początek tej do wstawienia,
@@ -108,12 +104,12 @@ bool insertAtTheEndList(List *list, List *toInsert, void deleteValue(void *), in
  * @param list — lista do której ma być wstawiane
  * @param toInsert — lista, która ma być wstawiana
  * @param deleteValue — funkcja usuwająca zawartość z list
- * @param compare — funckja porównująca zawartości list
+ * @param areEqual — funckja porównująca zawartości list
  * @return Wartość @p true, jeżeli wstawianie się powiodło, wartość @p false, jeżeli parametry miały
  * nieodpowiednią wartość lub nie udało się znaleźć szukanej pary w liście do której wykonywana była
  * próba wstawienia.
  */
-bool insertToList(List *list, List *toInsert, void deleteValue(void *), int compare (void *, void *));
+bool insertToList(List *list, List *toInsert, void deleteValue(void *), bool areEqual (void *, void *));
 
 /**
  * @brief Zwraca element wstawiany jako ostatni do listy.

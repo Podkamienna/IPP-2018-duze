@@ -9,14 +9,14 @@
 
 struct Set {
     Vector *vector;
-    bool (*equals)(void *, void *);
+    bool (*areEqual)(void *, void *);
 };
 
 struct SetIterator {
     VectorIterator *vectorIterator;
 };
 
-Set *initializeSet(bool equals(void *, void *)) {
+Set *initializeSet(bool areEqual(void *, void *)) {
     Set *newSet = malloc(sizeof(Set));
 
     if (newSet == NULL) {
@@ -24,7 +24,7 @@ Set *initializeSet(bool equals(void *, void *)) {
     }
 
     newSet->vector = initializeVector();
-    newSet->equals = equals;
+    newSet->areEqual = areEqual;
 
     return newSet;
 }
@@ -43,7 +43,7 @@ void *searchSet(Set *set, void *value) {
         return NULL;
     }
 
-    return searchVector(set->vector, set->equals, value);
+    return searchVector(set->vector, set->areEqual, value);
 }
 
 bool insertSet(Set *set, void *value) {
@@ -59,7 +59,7 @@ bool deleteFromSet(Set *set, void deleteValue(void *), void *value) {
         return false;
     }
 
-    return deleteFromVector(set->vector, deleteValue, set->equals, value);
+    return deleteFromVector(set->vector, deleteValue, set->areEqual, value);
 }
 
 SetIterator *getNewSetIterator(Set *set) {

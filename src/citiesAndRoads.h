@@ -94,7 +94,7 @@ void deleteRoad(Road *road);
  * @return Wartość @p 0 jeżeli drogi są równe,
  * wartość @p 1, jeżeli nie są równe.
  */
-int compareRoads(Road *road1, Road *road2);
+bool areEqualRoads(Road *road1, Road *road2);
 
 /**
  * @brief Ustawia drogę na niemożliwą do przejścia

@@ -257,7 +257,7 @@ static Distance *calculateDistances(Map *map, City *source, City *destination, b
         isVisited[heapEntry->city->id] = true;
         distances[heapEntry->city->id] = heapEntry->distance;
 
-        if (areEqualCities(heapEntry->city, destination) == 0) {
+        if (areEqualCities(heapEntry->city, destination)) {
             deleteHeapEntry(heapEntry);
 
             break;
@@ -312,7 +312,7 @@ static FindPathResult *reconstructPath(City *source, City *destination, Distance
     Distance potentialNewDistance = WORST_DISTANCE;
     Distance currentDistance = BASE_DISTANCE;
 
-    while (areEqualCities(position, source) != 0) {
+    while (!areEqualCities(position, source)) {
         potentialNextPosition = NULL;
 
         SetIterator *setIterator = getNewSetIterator(position->roads);

@@ -164,7 +164,7 @@ bool extendRoute(Map *map, unsigned routeId, const char *cityName) {
     path = getNewPathNode(city, NULL);
     FAIL_IF(path == NULL);
 
-    FAIL_IF(searchList(map->routes[routeId]->path, path, (int (*)(void *, void *)) comparePathNodes));
+    FAIL_IF(searchList(map->routes[routeId]->path, path, (bool (*)(void *, void *)) areEqualPathNodes));
 
     deletePathNode(path);
     path = NULL;
@@ -185,8 +185,7 @@ bool extendRoute(Map *map, unsigned routeId, const char *cityName) {
 
         FAIL_IF(!isCorrectPathResult(findPathResult1));
 
-        insertAtTheBeginningList(map->routes[routeId]->path, findPathResult1->path, (void (*)(void *)) deletePathNode,
-                                 (int (*)(void *, void *)) comparePathNodes);
+        insertAtTheBeginningList(map->routes[routeId]->path, findPathResult1->path, (void (*)(void *)) deletePathNode);
         findPathResult1->path = NULL;
         map->routes[routeId]->source = findPathResult1->source;
 
@@ -199,8 +198,7 @@ bool extendRoute(Map *map, unsigned routeId, const char *cityName) {
 
         FAIL_IF(!isCorrectPathResult(findPathResult2));
 
-        insertAtTheEndList(map->routes[routeId]->path, findPathResult2->path, (void (*)(void *)) deletePathNode,
-                           (int (*)(void *, void *)) comparePathNodes);
+        insertAtTheEndList(map->routes[routeId]->path, findPathResult2->path, (void (*)(void *)) deletePathNode);
         findPathResult2->path = NULL;
         map->routes[routeId]->destination = findPathResult2->destination;
 
@@ -258,11 +256,11 @@ bool removeRoad(Map *map, const char *city1, const char *city2) {
         }
 
         List *restrictedPath = map->routes[i]->path;
-        PathNode *searchResult = searchList(restrictedPath, pathNode, (int (*)(void *, void *)) comparePathNodes);
+        PathNode *searchResult = searchList(restrictedPath, pathNode, (bool (*)(void *, void *)) areEqualPathNodes);
         FindPathResult *findPathResult;
 
         if (searchResult != NULL) {
-            if (areEqualCities(tmpCity1, searchResult->city) == 0) {
+            if (areEqualCities(tmpCity1, searchResult->city)) {
                 findPathResult = findPath(map, tmpCity1, tmpCity2, restrictedPath);
             } else {
                 findPathResult = findPath(map, tmpCity2, tmpCity1, restrictedPath);
@@ -285,7 +283,7 @@ bool removeRoad(Map *map, const char *city1, const char *city2) {
     for (unsigned i = MINIMAL_ROUTE_ID; i <= MAXIMAL_ROUTE_ID; i++) {
         if (map->routes[i] != NULL) {
             insertToList(map->routes[i]->path, routesToInsert[i], (void (*)(void *)) deletePathNode,
-                         (int (*)(void *, void *)) comparePathNodes2);
+                         (bool (*)(void *, void *)) areEqualPathNodesByCities);
         }
     }
 

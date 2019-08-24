@@ -41,7 +41,7 @@ void deletePathNode(PathNode *pathNode);
  * wartość @p 0, gdy argumenty są równe,
  * wartość @p -1 gdy drugi argument jest większy
  */
-int comparePathNodes(PathNode *a, PathNode *b);
+bool areEqualPathNodes(PathNode *a, PathNode *b);
 
 /**
  * @brief Druga z funkcji do porównywania elementów typu
@@ -52,7 +52,7 @@ int comparePathNodes(PathNode *a, PathNode *b);
  * wartość @p 0, gdy argumenty są równe,
  * wartość @p -1 gdy drugi argument jest większy
  */
-int comparePathNodes2(PathNode *a, PathNode *b);
+bool areEqualPathNodesByCities(PathNode *a, PathNode *b);
 
 /**
  * @brief Alokuje pamięć pod i zwraca nową drogę
