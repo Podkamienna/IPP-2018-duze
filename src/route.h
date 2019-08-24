@@ -10,8 +10,8 @@
 #include <stdbool.h>
 
 /** Stałe z minimalnym i maksymalnym numerem drogi krajowej */
-static const unsigned MINIMAL_ROUTE_ID = 1;
-static const unsigned MAXIMAL_ROUTE_ID = 999;
+extern const unsigned MINIMAL_ROUTE_ID;
+extern const unsigned MAXIMAL_ROUTE_ID;
 
 /** Struktura przechowująca jedno pole z listy będącej ścieżką drogi krajowej*/
 typedef struct PathNode PathNode;
@@ -60,7 +60,7 @@ bool areEqualPathNodesByCities(PathNode *a, PathNode *b);
  * @return Wskaźnik na nową strukturę lub wartość @p NULL,
  * jeżeli nie udało się zaalokować pamięci
  */
-Route *getNewRoute();
+Route *getNewRoute(List *path, City *source, City *destination);
 
 /**
  * @brief Usuwa drogę krajową.

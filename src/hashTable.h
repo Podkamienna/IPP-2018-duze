@@ -33,7 +33,7 @@ void *searchHashTable(HashTable *hashTable, const char *name);
 /**
  * @brief Dodaje element do hash tablicy, jeżeli go nie ma w tej tablicy
  * @param hashTable — hash tablica do której element jest dodawany
- * @param name — nazwa przyporządkowana do wartości, którama być dodana
+ * @param name — nazwa przyporządkowana do wartości, która ma być dodana
  * @param value — wartość która ma być dodana to hash tablicy
  * @return Wartość @p true jeżeli udało się dodać element.
  * Wartość @p false, jeżeli coś się nie powiodło: nie udało się zaalokować

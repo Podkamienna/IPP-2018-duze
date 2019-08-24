@@ -5,13 +5,12 @@
 
 
 #include "vector.h"
-#include "definitions.h"
 
 #include <stdlib.h>
 #include <stdbool.h>
 
 /**
- * @brief Funckja zwiększająca zadany wektor.
+ * @brief Funkcja zwiększająca zadany wektor.
  * @param vector — wektor do zwiększenia
  * @return Wartość @p true jeżeli wszystko się powiodło.
  * Wartość @p false jeżeli nie udało się zaalokować pamięci,
@@ -20,7 +19,7 @@
 static bool resizeVector(Vector *vector);
 
 /**
- * @brief Funckcja zamieniająca 2 miejsca w tablicy,
+ * @brief Funkcja zamieniająca 2 miejsca w tablicy,
  * używana na tablicy będącej przechowywaną przez wektor.
  * @param arr — tablica w której elementy będą zamieniane
  * @param i — pozycja pierwszego elementu do zamienienia
@@ -100,19 +99,23 @@ void *searchVector(Vector *vector, bool areEqual(void *, void *), void *value) {
 }
 
 bool pushToVector(Vector *vector, void *value) {
-    FAIL_IF(vector == NULL);
-    FAIL_IF(value == NULL);
+    if (vector == NULL) {
+        return false;
+    }
+
+    if (value == NULL) {
+        return false;
+    }
 
     if (vector->size + 1 > vector->maxSize) {
-        FAIL_IF(!resizeVector(vector));
+        if (!resizeVector(vector)) {
+            return false;
+        }
     }
 
     vector->data[vector->size++] = value;
 
     return true;
-
-    failure:;
-    return false;
 }
 
 void popFromVector(Vector *vector, void deleteValue(void *)) {
@@ -142,7 +145,7 @@ bool deleteFromVector(Vector *vector, void deleteValue(void *), bool areEqual(vo
 
     size_t size = vector->size;
 
-    for(size_t position = 1; position <= size; position++) {
+    for (size_t position = 1; position <= size; position++) {
         if (areEqual(vector->data[size - position], value)) {
             swap(vector->data, size - position, vector->size - 1);
             popFromVector(vector, deleteValue);

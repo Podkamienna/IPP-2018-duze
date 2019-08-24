@@ -2,16 +2,30 @@
 // Created by alicja on 13.07.19.
 //
 #include "findPath.h"
-#include "heap.h"
 #include "citiesAndRoads.h"
+#include "definitions.h"
+#include "heap.h"
 #include "list.h"
 #include "set.h"
 #include "route.h"
 #include "dictionary.h"
 
+#include <stdbool.h>
 #include <stdlib.h>
 #include <inttypes.h>
 #include <limits.h>
+
+struct Distance {
+    uint64_t length;
+    int minYear;
+};
+
+struct FindPathResult {
+    List *path;
+    City *source, *destination;
+    Distance distance;
+    bool isUnique;
+};
 
 struct HeapEntry {
     City *city;
@@ -31,7 +45,7 @@ const Distance WORST_DISTANCE = (Distance) {UINT64_MAX, INT_MIN};
 static Distance getDistance(uint64_t length, int minYear);
 
 /**
- * @brief Porównuje dystanse (po wspołrzędnych).
+ * @brief Porównuje dystanse (po współrzędnych).
  * @param distance1 — pierwszy dystans do porównania
  * @param distance2 — drugi dystans do porównania
  * @return Wartość @p 1, jeżeli pierwszy dystans jest większy.
@@ -86,14 +100,14 @@ static int compareHeapEntries(HeapEntry *heapEntry1, HeapEntry *heapEntry2);
 /**
  * @brief Wkłada odwiedzalnych (nieodwiedzonych i takich do których wejście nie jest zabronione)
  * sąsiadów zadanego przez pole wkładane na kopiec miasta na zadany kopiec.
- * @param entry — pole zadające miasto
+ * @param heapEntry — pole zadające miasto
  * @param heap — kopiec na który będą wkładani sąsiedzi
  * @param isVisited — tablica pozwalająca na sprawdzenie, czy miasto było odwiedzone
  * @param isRestricted — tablica pozwalająca na sprawdzanie, czy można wejść do danego miasta
  * @return Wartość @p false, jeżeli nie udało się zaalokować pamięci, wartość @p true, jeżeli wszystko
  * się powiodło.
  */
-static bool pushNeighbours(HeapEntry *entry, Heap *heap, const bool *isVisited, const bool *isRestricted);
+static bool pushNeighbours(HeapEntry *heapEntry, Heap *heap, const bool *isVisited, const bool *isRestricted);
 
 /**
  * @brief Przy użyciu algorytmu Dijkstry oblicza odległość od źródła do celu, zapisuje uzyskane
@@ -114,7 +128,7 @@ static Distance *calculateDistances(Map *map, City *source, City *destination, b
  * @param source — miasto z którego szukana jest ścieżka
  * @param destination — miasto do którego szukana jest ścieżka
  * @param distances — obliczona tablica dystansów
- * @return Wartość @p NULL, jeżeli nie udało się zaalokować pamięci, obliczoną ścieżkę w innnym razie.
+ * @return Wartość @p NULL, jeżeli nie udało się zaalokować pamięci, obliczoną ścieżkę w innym razie.
  * Jeżeli ścieżka nie jest wyznaczona jednoznacznie, zwraca sufiks ścieżki, który jest wyznaczony jednoznacznie.
  */
 static FindPathResult *reconstructPath(City *source, City *destination, Distance *distances);
@@ -185,14 +199,14 @@ static int compareHeapEntries(HeapEntry *heapEntry1, HeapEntry *heapEntry2) {
     return compareDistances(heapEntry1->distance, heapEntry2->distance);
 }
 
-static bool pushNeighbours(HeapEntry *entry, Heap *heap, const bool *isVisited, const bool *isRestricted) {
+static bool pushNeighbours(HeapEntry *heapEntry, Heap *heap, const bool *isVisited, const bool *isRestricted) {
     HeapEntry *newEntry = NULL;
-    SetIterator *setIterator = getNewSetIterator(entry->city->roads);
+    SetIterator *setIterator = getNewSetIterator(heapEntry->city->roads);
 
     FAIL_IF(setIterator == NULL);
 
     for (Road *road = getNextSetIterator(setIterator); road != NULL; road = getNextSetIterator(setIterator)) {
-        City *neighbour = getNeighbour(road, entry->city);
+        City *neighbour = getNeighbour(road, heapEntry->city);
 
         if (neighbour == NULL) {
             continue;
@@ -202,8 +216,7 @@ static bool pushNeighbours(HeapEntry *entry, Heap *heap, const bool *isVisited, 
             continue;
         }
 
-        newEntry = getNewHeapEntry(neighbour, addRoadToDistance(entry->distance, road));
-
+        newEntry = getNewHeapEntry(neighbour, addRoadToDistance(heapEntry->distance, road));
         FAIL_IF(newEntry == NULL);
 
         FAIL_IF(!pushHeap(heap, newEntry));
@@ -404,17 +417,29 @@ Route *findPathResultToRoute(FindPathResult *findPathResult) {
         return NULL;
     }
 
-    Route *newRoute = getNewRoute();
+    Route *newRoute = getNewRoute(findPathResult->path, findPathResult->source, findPathResult->destination);
 
     if (newRoute == NULL) {
         return NULL;
     }
 
-    newRoute->path = findPathResult->path;
-    newRoute->destination = findPathResult->destination;
-    newRoute->source = findPathResult->source;
-
+    findPathResult->path = NULL;
+    deleteFindPathResult(findPathResult);
     return newRoute;
+}
+
+
+List *findPathResultToPath(FindPathResult *findPathResult) {
+    if (findPathResult == NULL) {
+        return NULL;
+    }
+
+    List *path = findPathResult->path;
+
+    findPathResult->path = NULL;
+    deleteFindPathResult(findPathResult);
+
+    return path;
 }
 
 int compareFindPathResults(FindPathResult *findPathResult1, FindPathResult *findPathResult2) {

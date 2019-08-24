@@ -28,7 +28,7 @@ typedef struct Vector Vector;
 
 /**
  * Jeżeli warunek jest spełniony, kończy wykonywanie funkcji,
- * wykonyjąc wcześniej polecenia pod etykietą failure.
+ * wykonując wcześniej polecenia pod etykietą failure.
  */
 #define FAIL_IF(condition)              \
     do {                                \
@@ -37,7 +37,7 @@ typedef struct Vector Vector;
 
 /**
 * Jeżeli warunek jest spełniony, kończy wykonywanie funkcji,
-* wykonyjąc wcześniej polecenia pod etykietą failure##label.
+* wykonując wcześniej polecenia pod etykietą failure##label.
 */
 #define FAIL_IF_LABELED(condition, label)    \
     do {                                     \

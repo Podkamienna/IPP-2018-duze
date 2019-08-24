@@ -14,7 +14,7 @@ typedef struct String String;
 
 /**
  * @brief Tworzy nową strukturę przechowującą napis.
- * @return Wskaźnikna nową strukturę lub NULL, gdy nie udało
+ * @return Wskaźnik na nową strukturę lub NULL, gdy nie udało
  * się zaalokować pamięci.
  */
 String *initializeString();
@@ -30,7 +30,7 @@ void deleteString(String *string, bool deleteData);
 /**
  * @brief Zwraca napis trzymany przez
  * zadaną strukturę.
- * @param string — struktura trzumająca napis
+ * @param string — struktura trzymająca napis
  * @return Napis trzymany przez strukturę.
  */
 char *getData(String *string);
@@ -41,7 +41,7 @@ char *getData(String *string);
  * na tak uzyskaną strukturę.
  * @param number — liczba do zamienienia
  * @return wartość @p NULL jeżeli nie udało się zaalokować pamięci.
- * Utworzony napis, jeżeli wszystko poszłó dobrze.
+ * Utworzony napis, jeżeli wszystko poszło dobrze.
  */
 char *intToString(int number);
 
@@ -51,7 +51,7 @@ char *intToString(int number);
  * na tak uzyskaną strukturę.
  * @param number — liczba do zamienienia
  * @return wartość @p NULL jeżeli nie udało się zaalokować pamięci.
- * Utworzony napis, jeżeli wszystko poszłó dobrze.
+ * Utworzony napis, jeżeli wszystko poszło dobrze.
  */
 char *unsignedToString(unsigned number);
 

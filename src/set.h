@@ -6,7 +6,6 @@
 #define DROGI_SET_H
 
 #include <stdbool.h>
-#include "vector.h"
 
 /**Struktura przechowująca zbiór*/
 typedef struct Set Set;
@@ -28,7 +27,7 @@ void deleteSet(Set *set, void deleteValue(void *));
 
 /**
  * @brief Funkcja wyszukująca w Set zadanej wartości.
- * @param set — zbiór w ktorym będzie szukane
+ * @param set — zbiór w którym będzie szukane
  * @param cmp — funkcja do porównywanie wartości
  * @param value — szukana wartość
  * @return Zwraca znalezioną wartość lub NULL, gdy się nie udało jej znaleźć,
@@ -37,11 +36,11 @@ void deleteSet(Set *set, void deleteValue(void *));
 void *searchSet(Set *set, void *value);
 
 /**
- * @brief Dodaje zadaną wartość do setu.
+ * @brief Dodaje zadaną wartość do zbioru.
  * @param set — zbiór do którego będzie dodawane
  * @param value — wartość do dodania
  * @return Wartość @p true jeżeli dodawanie się powiodło, false,
- * jeżeli coś poszło źle: zadany zbiór lub wartość były NULLami,
+ * jeżeli coś poszło źle: zadany zbiór lub wartość były NULL,
  * albo nie udało się zaalokować pamięci
  */
 bool insertSet(Set *set, void *value);

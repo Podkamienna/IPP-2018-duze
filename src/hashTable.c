@@ -3,7 +3,6 @@
  */
 
 #include "hashTable.h"
-#include "definitions.h"
 
 #include <stdbool.h>
 #include <stdlib.h>
@@ -11,7 +10,7 @@
 #include <string.h>
 
 static const uint64_t PRIME = 179425373; //duża liczba pierwsza
-static const uint64_t GENERATOR = 259; //generator grupy multyplikatywnej Z_{PRIME}
+static const uint64_t GENERATOR = 259; //generator grupy multiplikatywnej Z_{PRIME}
 
 typedef struct HashTable HashTable;
 typedef struct Entry Entry;
@@ -60,8 +59,11 @@ static Entry *getNewEntry(const char *name, void *value);
  * Wartość @p false, jeżeli nie zachodzi.
  */
 static bool isEqual(uint64_t hash, const char *name, Entry *entry);
+
 static size_t getPosition(HashTable *hashTable, size_t hash);
+
 static bool insertEntry(HashTable *hashTable, Entry *entry);
+
 static void deleteEntry(Entry *entry, void deleteValue(void *));
 
 static uint64_t getHash(const char *text) {
@@ -140,25 +142,26 @@ static void deleteEntry(Entry *entry, void deleteValue(void *)) {
 }
 
 HashTable *initializeHashTable(size_t initialSize) {
-    HashTable *newHashTable = NULL;
+    if (initialSize <= 0) {
+        return NULL;
+    }
 
-    FAIL_IF(initialSize <= 0);
+    HashTable *newHashTable = malloc(sizeof(HashTable));
 
-    newHashTable = malloc(sizeof(HashTable));
-
-    FAIL_IF(newHashTable == NULL);
+    if (newHashTable == NULL) {
+        return NULL;
+    }
 
     newHashTable->size = initialSize;
     newHashTable->table = calloc(newHashTable->size, sizeof(Entry));
 
-    FAIL_IF(newHashTable->table == NULL);
+    if (newHashTable->table == NULL) {
+        free(newHashTable);
+
+        return NULL;
+    }
 
     return newHashTable;
-
-    failure:;
-    free(newHashTable);
-
-    return NULL;
 }
 
 

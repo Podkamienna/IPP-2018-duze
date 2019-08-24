@@ -5,30 +5,34 @@
 #include "heap.h"
 #include "vector.h"
 
+#include <stdbool.h>
+#include <stdlib.h>
+
 typedef struct Heap Heap;
 
 struct Heap {
     Vector *vector;
+
     int (*compare)(void *, void *);
 };
 
 /**
  * @brief Zwraca indeks rodzica elementu kopca z zadanym indeksem.
- * @param i — ineks, którego rodzic jest poszukiwany
+ * @param i — indeks, którego rodzic jest poszukiwany
  * @return Znaleziony indeks.
  */
 static size_t getParent(size_t i);
 
 /**
  * @brief Zwraca indeks lewego syna elementu kopca z zadanym indeksem.
- * @param i — ineks, którego lewy syn jest poszukiwany
+ * @param i — indeks, którego lewy syn jest poszukiwany
  * @return Znaleziony indeks.
  */
 static size_t getLeftChild(size_t i);
 
 /**
  * @brief Zwraca indeks prawego syna elementu kopca z zadanym indeksem.
- * @param i — ineks, którego prawy syn jest poszukiwany
+ * @param i — indeks, którego prawy syn jest poszukiwany
  * @return Znaleziony indeks.
  */
 static size_t getRightChild(size_t i);
@@ -125,9 +129,7 @@ bool pushHeap(Heap *heap, void *value) {
         if (position != 0 && heap->compare(data[parent], data[position]) > 0) {
             swap(data, position, parent);
             position = parent;
-        }
-
-        else {
+        } else {
             break;
         }
     }

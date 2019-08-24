@@ -5,8 +5,8 @@
 #define _GNU_SOURCE
 
 #include "string.h"
-#include "definitions.h"
 
+#include <stdbool.h>
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
@@ -22,7 +22,7 @@ struct String {
 };
 
 /**
- * @brief Funckja zwiększająca zadany napis.
+ * @brief Funkcja zwiększająca zadany napis.
  * @param string — wektor do zwiększenia
  * @return Wartość @p true jeżeli wszystko się powiodło.
  * Wartość @p false jeżeli nie udało się zaalokować pamięci,
@@ -71,9 +71,7 @@ void deleteString(String *string, bool deleteData) {
     if (deleteData) {
         free(string->data);
         free(string);
-    }
-
-    else {
+    } else {
         free(string);
     }
 }
@@ -83,47 +81,35 @@ char *getData(String *string) {
 }
 
 char *intToString(int number) {
-    char *tmpText = calloc(MAX_NUMBER_LENGTH, sizeof(char));
+    char *text = calloc(MAX_NUMBER_LENGTH, sizeof(char));
 
-    if (tmpText == NULL) {
+    if (text == NULL) {
         return NULL;
     }
 
-    if (snprintf(tmpText, MAX_NUMBER_LENGTH, "%d", number) == -1)  {
-        free (tmpText);
+    if (snprintf(text, MAX_NUMBER_LENGTH, "%d", number) < 0) {
+        free(text);
 
         return NULL;
     }
 
-    //zamiana napisu na taki, który nie ma z tyłu za wiele zaalokowanej pamięci
-    //by uniknąć błędów pamięci przy konkatynacji
-    char *finalText = strdup(tmpText);
-
-    free(tmpText);
-
-    return finalText;
+    return text;
 }
 
 char *unsignedToString(unsigned number) {
-    char *tmpText = calloc(MAX_NUMBER_LENGTH, sizeof(char));
+    char *text = calloc(MAX_NUMBER_LENGTH, sizeof(char));
 
-    if (tmpText == NULL) {
+    if (text == NULL) {
         return NULL;
     }
 
-    if (snprintf(tmpText, MAX_NUMBER_LENGTH, "%u", number) == -1)  {
-        free (tmpText);
+    if (snprintf(text, MAX_NUMBER_LENGTH, "%u", number) < 0) {
+        free(text);
 
         return NULL;
     }
 
-    //zamiana napisu na taki, który nie ma z tyłu za wiele zaalokowanej pamięci
-    //by uniknąć błędów pamięci przy konkatynacji
-    char *finalText = strdup(tmpText);
-
-    free(tmpText);
-
-    return finalText;
+    return text;
 }
 
 

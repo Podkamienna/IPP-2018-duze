@@ -5,9 +5,9 @@
 #include "dictionary.h"
 #include "hashTable.h"
 #include "definitions.h"
+// TODO usunąć tego include i fail_ify
 
 #include <stdbool.h>
-#include <string.h>
 #include <stdlib.h>
 
 /*Stała oznaczająca początkowy rozmiar hash tablicy*/
@@ -86,7 +86,7 @@ bool insertDictionary(Dictionary *dictionary, const char *name, void *value) {
         HashTable *newHashTable = resizeHashTable(dictionary->hashTable, 2 * dictionary->size);
         FAIL_IF(newHashTable == NULL);
 
-        dictionary->size = 2*dictionary->size;
+        dictionary->size = 2 * dictionary->size;
 
         dictionary->hashTable = newHashTable;
     }

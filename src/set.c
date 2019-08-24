@@ -5,10 +5,12 @@
 #include "set.h"
 #include "vector.h"
 
+#include <stdbool.h>
 #include <stdlib.h>
 
 struct Set {
     Vector *vector;
+
     bool (*areEqual)(void *, void *);
 };
 

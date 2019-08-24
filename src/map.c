@@ -130,11 +130,9 @@ bool newRoute(Map *map, unsigned routeId,
 
     Route *newRoute = findPathResultToRoute(findPathResult);
     FAIL_IF(newRoute == NULL);
-    findPathResult->path = NULL;
+    findPathResult = NULL;
 
     map->routes[routeId] = newRoute;
-
-    deleteFindPathResult(findPathResult);
 
     return true;
 
@@ -182,11 +180,10 @@ bool extendRoute(Map *map, unsigned routeId, const char *cityName) {
 
         FAIL_IF(!isCorrectPathResult(findPathResult1));
 
-        insertAtTheBeginningList(map->routes[routeId]->path, findPathResult1->path, (void (*)(void *)) deletePathNode);
-        findPathResult1->path = NULL;
-        map->routes[routeId]->source = findPathResult1->source;
+        insertAtTheBeginningList(map->routes[routeId]->path, findPathResultToPath(findPathResult1),
+                                 (void (*)(void *)) deletePathNode);
 
-        deleteFindPathResult(findPathResult1);
+        map->routes[routeId]->source = city;
     }
 
     if (compareResult < 0) {
@@ -195,11 +192,10 @@ bool extendRoute(Map *map, unsigned routeId, const char *cityName) {
 
         FAIL_IF(!isCorrectPathResult(findPathResult2));
 
-        insertAtTheEndList(map->routes[routeId]->path, findPathResult2->path, (void (*)(void *)) deletePathNode);
-        findPathResult2->path = NULL;
-        map->routes[routeId]->destination = findPathResult2->destination;
+        insertAtTheEndList(map->routes[routeId]->path, findPathResultToPath(findPathResult2),
+                           (void (*)(void *)) deletePathNode);
 
-        deleteFindPathResult(findPathResult2);
+        map->routes[routeId]->destination = city;
     }
 
     return true;
@@ -271,9 +267,7 @@ bool removeRoad(Map *map, const char *city1, const char *city2) {
                 FAIL;
             }
 
-            routesToInsert[i] = findPathResult->path;
-            findPathResult->path = NULL;
-            deleteFindPathResult(findPathResult);
+            routesToInsert[i] = findPathResultToPath(findPathResult);
         }
     }
 

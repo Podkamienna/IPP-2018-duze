@@ -10,7 +10,7 @@
 #include <stdbool.h>
 
 /**
- * @brief Alokuje pamięc pod i zwraca wskaźnik na
+ * @brief Alokuje pamięć pod i zwraca wskaźnik na
  * nowe miasto.
  * @param name — nazwa nowego miasta
  * @return Wartość @p true jeżeli udało się dodać miasto.
@@ -30,7 +30,7 @@ void deleteCity(City *city);
  * @param city — wskaźnik na napis do sprawdzenia
  * @return Wartość @p true jeżeli napis jest poprawną nazwą miasta.
  * Wartość @p false jeżeli city ma wartość NULL lub nie jest
- * poprawną nazwą miastą.
+ * poprawną nazwą miasta.
  */
 bool isCityName(const char *city);
 
@@ -38,7 +38,7 @@ bool isCityName(const char *city);
  * @brief Porównuje miasta, sortując je po momencie
  * dodania ich do mapy.
  * @param city1 — pierwsze z miast do porównania
- * @param city2 — drugie z miast do porówania
+ * @param city2 — drugie z miast do porównania
  * @return Wartość @p 1 jeżeli pierwsze miasto jest
  * większe, wartość @p 0 jeżeli miasta są równe,
  * wartość @p -1 jeżeli drugie miasto jest większe.
@@ -68,7 +68,7 @@ City *searchCity(Map *map, const char *city);
 City *getNeighbour(Road *road, City *city);
 
 /**
- * @brief Alokuje pamieć pod i zwraca wskaźnik na nową drogę.
+ * @brief Alokuje pamięć pod i zwraca wskaźnik na nową drogę.
  * @param year — rok budowy nowej drogi
  * @param length — długość nowej drogi
  * @param city1 — jeden koniec nowej drogi

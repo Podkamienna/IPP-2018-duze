@@ -2,34 +2,19 @@
 // Created by alicja on 29.03.19.
 //
 
-#ifndef DROGI_FINDPATH_H
-#define DROGI_FINDPATH_H
+#ifndef DROGI_FIND_PATH_H
+#define DROGI_FIND_PATH_H
 
-#include "map.h"
 #include "definitions.h"
 #include "list.h"
 
-// TODO przeniesc do findPath,c
+#include <stdbool.h>
+
 typedef struct Distance Distance;
 typedef struct HeapEntry HeapEntry;
 
-const Distance BASE_DISTANCE;
-const Distance WORST_DISTANCE;
-
-struct Distance {
-    uint64_t length;
-    int minYear;
-};
-
-struct FindPathResult {
-    List *path;
-    City *source, *destination;
-    Distance distance;
-    bool isUnique;
-};
-
-// TODO przeniesc do findPath,c kinec
-
+extern const Distance BASE_DISTANCE;
+extern const Distance WORST_DISTANCE;
 
 typedef struct FindPathResult FindPathResult;
 
@@ -40,6 +25,8 @@ void deleteFindPathResult(FindPathResult *findPathResult);
 bool isCorrectPathResult(FindPathResult *findPathResult);
 
 Route *findPathResultToRoute(FindPathResult *findPathResult);
+
+List *findPathResultToPath(FindPathResult *findPathResult);
 
 /**
  * Nie umie NULLi!!!!
@@ -62,4 +49,4 @@ int compareFindPathResults(FindPathResult *findPathResult1, FindPathResult *find
  */
 FindPathResult *findPath(Map *map, City *source, City *destination, List *restrictedPath);
 
-#endif //DROGI_FINDPATH_H
+#endif //DROGI_FIND_PATH_H

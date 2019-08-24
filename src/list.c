@@ -10,6 +10,25 @@
 typedef struct ListNode ListNode;
 typedef struct List List;
 
+static ListNode *getNewListNode(ListNode *next, void *value) {
+    ListNode *newListNode = malloc(sizeof(ListNode));
+
+    if (newListNode == NULL) {
+        return NULL;
+    }
+
+    newListNode->next = next;
+
+    if (next != NULL) {
+        next->prev = newListNode;
+    }
+
+    newListNode->prev = NULL;
+    newListNode->data = value;
+
+    return newListNode;
+}
+
 static void deleteListNode(ListNode *listNode, void deleteValue(void *)) {
     if (listNode == NULL) {
         return;
@@ -66,20 +85,11 @@ bool addToList(List *list, void *value) {
         return false;
     }
 
-    ListNode *newListNode = malloc(sizeof(ListNode));
+    ListNode *newListNode = getNewListNode(list->beginning, value);
 
     if (newListNode == NULL) {
         return false;
     }
-
-    newListNode->next = list->beginning;
-
-    if (list->beginning != NULL) {
-        list->beginning->prev = newListNode;
-    }
-
-    newListNode->prev = NULL;
-    newListNode->data = value;
 
     list->beginning = newListNode;
 
@@ -157,28 +167,18 @@ bool insertToList(List *list, List *toInsert, void deleteValue(void *), bool are
     while (position->next != NULL) {
         if (areEqual(position->data, toInsert->beginning->data)) {
             if (areEqual(position->next->data, toInsert->end->data)) {
-                if (position->prev == NULL) {
-                    ListNode *toDelete1 = toInsert->end;
-                    ListNode *toDelete2 = list->beginning;
-
-                    toInsert->end->prev->next = list->beginning->next;
-                    list->beginning->next->prev = toInsert->end->prev;
-                    list->beginning = toInsert->beginning;
-
-                    deleteListNode(toDelete1, deleteValue);
-                    deleteListNode(toDelete2, deleteValue);
-
-                    free(toInsert);
-                    return true;
-                }
-
                 ListNode *toDelete1 = toInsert->end;
                 ListNode *toDelete2 = position;
 
-                position->prev->next = toInsert->beginning;
+                toInsert->end->prev->next = position->next;
                 toInsert->beginning->prev = position->prev;
                 position->next->prev = toInsert->end->prev;
-                toInsert->end->prev->next = position->next;
+
+                if (position->prev == NULL) {
+                    list->beginning = toInsert->beginning;
+                } else {
+                    position->prev->next = toInsert->beginning;
+                }
 
                 deleteListNode(toDelete1, deleteValue);
                 deleteListNode(toDelete2, deleteValue);

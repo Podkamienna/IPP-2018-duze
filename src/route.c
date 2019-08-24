@@ -5,10 +5,14 @@
 #include "route.h"
 #include "definitions.h"
 #include "citiesAndRoads.h"
-#include "dictionary.h"
 #include "list.h"
 
+#include <stdbool.h>
 #include <stdlib.h>
+
+/** Stałe z minimalnym i maksymalnym numerem drogi krajowej */
+const unsigned MINIMAL_ROUTE_ID = 1;
+const unsigned MAXIMAL_ROUTE_ID = 999;
 
 PathNode *getNewPathNode(City *city, Road *road) {
     PathNode *pathNode = malloc(sizeof(PathNode));
@@ -39,14 +43,16 @@ bool areEqualPathNodesByCities(PathNode *a, PathNode *b) {
     return areEqualCities(a->city, b->city);
 }
 
-Route *getNewRoute() {
+Route *getNewRoute(List *path, City *source, City *destination) {
     Route *newRoute = malloc(sizeof(Route));
 
     if (newRoute == NULL) {
         return NULL;
     }
 
-    newRoute->path = NULL;
+    newRoute->path = path;
+    newRoute->destination = destination;
+    newRoute->source = source;
 
     return newRoute;
 }
@@ -57,7 +63,7 @@ void deleteRoute(Route *route, bool deletePath) {
     }
 
     if (deletePath) {
-        deleteList(route->path, (void (*)(void *))deletePathNode);
+        deleteList(route->path, (void (*)(void *)) deletePathNode);
     }
 
     free(route);
