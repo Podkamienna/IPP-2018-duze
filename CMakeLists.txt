@@ -23,7 +23,6 @@ set(CMAKE_C_FLAGS "-std=c11 -g -Wall -Wextra")
 set(SOURCE_FILES
         src/map.c
         src/map.h
-        src/maintest.c
         src/dictionary.c
         src/dictionary.h
         src/definitions.c
@@ -46,6 +45,7 @@ set(SOURCE_FILES
         src/list.h
         src/string.c
         src/string.h
+        src/map_main.c
         )
 
 # Wskazujemy plik wykonywalny.

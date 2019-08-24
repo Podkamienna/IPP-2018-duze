@@ -1,3 +1,4 @@
+#include "map.h"
 #include "definitions.h"
 #include "dictionary.h"
 #include "route.h"
@@ -126,7 +127,7 @@ bool newRoute(Map *map, unsigned routeId,
 
     findPathResult = findPath(map, searchDictionary(map->cities, city1), searchDictionary(map->cities, city2), NULL);
 
-    FAIL_IF(!isCorrectPathResult(findPathResult)); //sprawdzam, czy udalo sie wyznaczyc droge i czy jednznacznie
+    FAIL_IF(!isCorrectPathResult(findPathResult)); //sprawdzam, czy udało sie wyznaczyc droge i czy jednznacznie
 
     Route *newRoute = findPathResultToRoute(findPathResult);
     FAIL_IF(newRoute == NULL);
@@ -174,7 +175,7 @@ bool extendRoute(Map *map, unsigned routeId, const char *cityName) {
 
     FAIL_IF(compareResult == 0);
 
-    if (compareResult > 0) {
+    if (compareResult < 0) {
         deleteFindPathResult(findPathResult2);
         findPathResult2 = NULL;
 
@@ -186,7 +187,7 @@ bool extendRoute(Map *map, unsigned routeId, const char *cityName) {
         map->routes[routeId]->source = city;
     }
 
-    if (compareResult < 0) {
+    if (compareResult > 0) {
         deleteFindPathResult(findPathResult1);
         findPathResult1 = NULL;
 
@@ -229,10 +230,11 @@ bool removeRoad(Map *map, const char *city1, const char *city2) {
     City *tmpCity2 = searchCity(map, city2);
     List **routesToInsert = NULL;
     PathNode *pathNode = NULL;
+    Road *toRemove = NULL;
 
     FAIL_IF(tmpCity1 == NULL || tmpCity2 == NULL);
 
-    Road *toRemove = searchRoad(map, tmpCity1, tmpCity2);
+    toRemove = searchRoad(map, tmpCity1, tmpCity2);
     FAIL_IF(toRemove == NULL);
 
     blockRoad(toRemove);
@@ -305,7 +307,7 @@ char const *getRouteDescription(Map *map, unsigned routeId) {
     }
 
     if (routeId < MINIMAL_ROUTE_ID || routeId > MAXIMAL_ROUTE_ID) {
-        return NULL;
+        return calloc(1, sizeof(char));
     }
 
     if (map->routes[routeId] == NULL) {

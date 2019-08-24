@@ -114,13 +114,13 @@ static bool insertEntry(HashTable *hashTable, Entry *entry) {
     size_t position = getPosition(hashTable, entry->hash);
 
     for (size_t i = 0; i < hashTable->size; i++, position = (position + 1) % hashTable->size) {
-        if (hashTable->table[i] == NULL) {
-            hashTable->table[i] = entry;
+        if (hashTable->table[position] == NULL) {
+            hashTable->table[position] = entry;
 
             return true;
         }
 
-        if (isEqual(entry->hash, entry->name, hashTable->table[i])) {
+        if (isEqual(entry->hash, entry->name, hashTable->table[position])) {
             return false;
         }
     }
@@ -178,12 +178,12 @@ void *searchHashTable(HashTable *hashTable, const char *name) {
     size_t position = hash % hashTable->size;
 
     for (size_t i = 0; i < hashTable->size; i++, position = (position + 1) % hashTable->size) {
-        if (hashTable->table[i] == NULL) {
+        if (hashTable->table[position] == NULL) {
             return NULL;
         }
 
-        if (isEqual(hash, name, hashTable->table[i])) {
-            return hashTable->table[i]->value;
+        if (isEqual(hash, name, hashTable->table[position])) {
+            return hashTable->table[position]->value;
         }
     }
 

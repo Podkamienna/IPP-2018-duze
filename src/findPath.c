@@ -448,19 +448,19 @@ int compareFindPathResults(FindPathResult *findPathResult1, FindPathResult *find
     }
 
     if (!isCorrectPathResult(findPathResult1)) {
-        if (compareDistances(findPathResult1->distance, findPathResult2->distance) > 0) {
-            return 0;
-        }
-
-        return -1;
-    }
-
-    if (!isCorrectPathResult(findPathResult2)) {
-        if (compareDistances(findPathResult1->distance, findPathResult2->distance) < 0) {
+        if (compareDistances(findPathResult1->distance, findPathResult2->distance) <= 0) {
             return 0;
         }
 
         return 1;
+    }
+
+    if (!isCorrectPathResult(findPathResult2)) {
+        if (compareDistances(findPathResult1->distance, findPathResult2->distance) >= 0) {
+            return 0;
+        }
+
+        return -1;
     }
 
     return compareDistances(findPathResult1->distance, findPathResult2->distance);
@@ -470,6 +470,8 @@ FindPathResult *findPath(Map *map, City *source, City *destination, List *restri
     ListIterator *listIterator = NULL;
     Distance *distances = NULL;
     bool *isRestricted = NULL;
+
+    FAIL_IF(source == NULL || destination == NULL);
 
     listIterator = getNewListIterator(restrictedPath);
     FAIL_IF(listIterator == NULL && restrictedPath != NULL);
