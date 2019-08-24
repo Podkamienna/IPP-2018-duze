@@ -40,7 +40,7 @@ City *getNewCity(Map *map, const char *name) {
     newCity = malloc(sizeof(City));
     FAIL_IF(newCity == NULL);
 
-    newCity->roads = initializeSet((int(*)(void *, void *))compareRoads);
+    newCity->roads = initializeSet((bool (*)(void *, void *)) areEqualRoads);
     FAIL_IF(newCity->roads == NULL);
 
     newCity->name = strdup(name);
@@ -86,28 +86,16 @@ bool isCityName(const char *city) {
     return true;
 }
 
-int compareCities(City *a, City *city2) {
-    if (a == NULL && city2 == NULL) {
-        return 0;
+bool areEqualCities(City *city1, City *city2) {
+    if (city1 == NULL && city2 == NULL) {
+        return true;
     }
 
-    if (a == NULL) {
-        return 1;
+    if (city1 == NULL || city2 == NULL) {
+        return false;
     }
 
-    if (city2 == NULL) {
-        return -1;
-    }
-
-    if (a->id > city2->id) {
-        return 1;
-    }
-
-    if (a->id < city2->id) {
-        return -1;
-    }
-
-    return 0;
+    return city1->id == city2->id;
 }
 
 City *searchCity(Map *map, const char *city) {
@@ -125,14 +113,13 @@ City *searchCity(Map *map, const char *city) {
 City *getNeighbour(Road *road, City *city) {
     FAIL_IF(road == NULL || city == NULL);
     FAIL_IF(road->isBlocked);
-    FAIL_IF(compareCities(road->city1, city) != 0  && compareCities(road->city2, city) != 0);
 
-    if (compareCities(road->city1, city) != 0) {
-        return road->city1;
+    if (areEqualCities(road->city1, city)) {
+        return road->city2;
     }
 
-    if (compareCities(road->city2, city) != 0) {
-        return road->city2;
+    if (areEqualCities(road->city2, city)) {
+        return road->city1;
     }
 
     failure:;
@@ -156,31 +143,27 @@ Road *getNewRoad(int year, int length, City *city1, City *city2) {
 }
 
 void deleteRoad(Road *road) {
-    if (road == NULL) {
-        return;
-    }
-
     free(road);
 }
 
-int compareRoads(Road *road1, Road *road2) {
+bool areEqualRoads(Road *road1, Road *road2) {
     if (road1 == NULL && road2 == NULL) {
-        return 0;
+        return true;
     }
 
     if (road1 == NULL || road2 == NULL) {
-        return 1;
+        return false;
     }
 
-    if (road1->city1 == road2->city1 && road1->city2 == road2->city2) {
-        return 0;
+    if (areEqualCities(road1->city1, road2->city1) && areEqualCities(road1->city2, road2->city2)) {
+        return true;
     }
 
-    if (road1->city1 == road2->city2 && road1->city2 == road2->city1) {
-        return 0;
+    if (areEqualCities(road1->city1, road2->city2) && areEqualCities(road1->city2, road2->city1)) {
+        return true;
     }
 
-    return 1;
+    return false;
 }
 
 void blockRoad(Road *road) {

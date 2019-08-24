@@ -17,7 +17,7 @@ typedef struct SetIterator SetIterator;
  * @brief Funkcja alokująca pamięć pod i zwracająca nowy Set.
  * @return Nowy Set lub NULL, gdy nie udało się zaalokować pamięci.
  */
-Set *initializeSet(int compare(void *, void *));
+Set *initializeSet(bool areEqual(void *, void *));
 
 /**
  * @brief Usuwa zbiór.

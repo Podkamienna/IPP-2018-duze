@@ -43,7 +43,7 @@ bool isCityName(const char *city);
  * większe, wartość @p 0 jeżeli miasta są równe,
  * wartość @p -1 jeżeli drugie miasto jest większe.
  */
-int compareCities(City *city1, City *city2);
+bool areEqualCities(City *city1, City *city2);
 
 /**
  * @brief Wyszukuje w zadanej mapie miasta powiązanego z
@@ -94,7 +94,7 @@ void deleteRoad(Road *road);
  * @return Wartość @p 0 jeżeli drogi są równe,
  * wartość @p 1, jeżeli nie są równe.
  */
-int compareRoads(Road *road1, Road *road2);
+bool areEqualRoads(Road *road1, Road *road2);
 
 /**
  * @brief Ustawia drogę na niemożliwą do przejścia

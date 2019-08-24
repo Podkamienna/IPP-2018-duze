@@ -90,7 +90,7 @@ bool addToList(List *list, void *value) {
     return true;
 }
 
-void *searchList(List *list, void *value, int compare(void *, void *)) {
+void *searchList(List *list, void *value, bool areEqual(void *, void *)) {
     if (list == NULL) {
         return NULL;
     }
@@ -102,7 +102,7 @@ void *searchList(List *list, void *value, int compare(void *, void *)) {
     ListNode *position = list->beginning;
 
     while (position != NULL) {
-        if (compare(value, position->data) == 0) {
+        if (areEqual(value, position->data)) {
             return position->data;
         }
         position = position->next;
@@ -111,12 +111,8 @@ void *searchList(List *list, void *value, int compare(void *, void *)) {
     return NULL;
 }
 
-bool insertAtTheBeginningList(List *list, List *toInsert, void deleteValue(void *), int compare(void *, void *)) {
+bool insertAtTheBeginningList(List *list, List *toInsert, void (*deleteValue)(void *)) {
     if (list == NULL || toInsert == NULL) {
-        return false;
-    }
-
-    if (compare(toInsert->end->data, list->beginning->data) != 0) {
         return false;
     }
 
@@ -131,12 +127,8 @@ bool insertAtTheBeginningList(List *list, List *toInsert, void deleteValue(void 
     return true;
 }
 
-bool insertAtTheEndList(List *list, List *toInsert, void deleteValue(void *), int compare(void *, void *)) {
+bool insertAtTheEndList(List *list, List *toInsert, void (*deleteValue)(void *)) {
     if (list == NULL || toInsert == NULL) {
-        return false;
-    }
-
-    if (compare(toInsert->beginning->data, list->end->data) != 0) {
         return false;
     }
 
@@ -151,7 +143,7 @@ bool insertAtTheEndList(List *list, List *toInsert, void deleteValue(void *), in
     return true;
 }
 
-bool insertToList(List *list, List *toInsert, void deleteValue(void *), int compare(void *, void *)) {
+bool insertToList(List *list, List *toInsert, void deleteValue(void *), bool areEqual(void *, void *)) {
     if (list == NULL || toInsert == NULL) {
         return false;
     }
@@ -163,8 +155,8 @@ bool insertToList(List *list, List *toInsert, void deleteValue(void *), int comp
     }
 
     while (position->next != NULL) {
-        if (compare(position->data, toInsert->beginning->data) == 0) {
-            if (compare(position->next->data, toInsert->end->data) == 0) {
+        if (areEqual(position->data, toInsert->beginning->data)) {
+            if (areEqual(position->next->data, toInsert->end->data)) {
                 if (position->prev == NULL) {
                     ListNode *toDelete1 = toInsert->end;
                     ListNode *toDelete2 = list->beginning;
