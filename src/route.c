@@ -29,14 +29,14 @@ void deletePathNode(PathNode *pathNode) {
 
 int comparePathNodes(PathNode *a, PathNode *b) {
     if (a->road == NULL || b->road == NULL) {
-        return compareCities(a->city, b->city);
+        return areEqualCities(a->city, b->city);
     }
 
     return compareRoads(a->road, b->road);
 }
 
 int comparePathNodes2(PathNode *a, PathNode *b) {
-    return compareCities(a->city, b->city);
+    return areEqualCities(a->city, b->city);
 }
 
 Route *getNewRoute() {

@@ -23,6 +23,18 @@
  */
 static bool addCityToMap(Map *map, City *city);
 
+static int sign(int number) {
+    if (number > 0) {
+        return 1;
+    }
+
+    if (number < 0) {
+        return -1;
+    }
+
+    return 0;
+}
+
 static bool addCityToMap(Map *map, City *city) {
     if (city == NULL || map == NULL) {
         return false;
@@ -86,28 +98,16 @@ bool isCityName(const char *city) {
     return true;
 }
 
-int compareCities(City *a, City *city2) {
-    if (a == NULL && city2 == NULL) {
-        return 0;
+bool areEqualCities(City *city1, City *city2) {
+    if (city1 == NULL && city2 == NULL) {
+        return true;
     }
 
-    if (a == NULL) {
-        return 1;
+    if (city1 == NULL || city2 == NULL) {
+        return false;
     }
 
-    if (city2 == NULL) {
-        return -1;
-    }
-
-    if (a->id > city2->id) {
-        return 1;
-    }
-
-    if (a->id < city2->id) {
-        return -1;
-    }
-
-    return 0;
+    return city1->id == city2->id;
 }
 
 City *searchCity(Map *map, const char *city) {
@@ -125,14 +125,13 @@ City *searchCity(Map *map, const char *city) {
 City *getNeighbour(Road *road, City *city) {
     FAIL_IF(road == NULL || city == NULL);
     FAIL_IF(road->isBlocked);
-    FAIL_IF(compareCities(road->city1, city) != 0  && compareCities(road->city2, city) != 0);
 
-    if (compareCities(road->city1, city) != 0) {
-        return road->city1;
+    if (areEqualCities(road->city1, city) == 0) {
+        return road->city2;
     }
 
-    if (compareCities(road->city2, city) != 0) {
-        return road->city2;
+    if (areEqualCities(road->city2, city) == 0) {
+        return road->city1;
     }
 
     failure:;
@@ -146,6 +145,12 @@ Road *getNewRoad(int year, int length, City *city1, City *city2) {
         return NULL;
     }
 
+    if (areEqualCities(city1, city2) > 0) {
+        City *tmp = city1;
+        city1 = city2;
+        city2 = tmp;
+    }
+
     newRoad->isBlocked = false;
     newRoad->length = length;
     newRoad->year = year;
@@ -156,10 +161,6 @@ Road *getNewRoad(int year, int length, City *city1, City *city2) {
 }
 
 void deleteRoad(Road *road) {
-    if (road == NULL) {
-        return;
-    }
-
     free(road);
 }
 
@@ -168,19 +169,15 @@ int compareRoads(Road *road1, Road *road2) {
         return 0;
     }
 
-    if (road1 == NULL || road2 == NULL) {
+    if (road1 == NULL) {
         return 1;
     }
 
-    if (road1->city1 == road2->city1 && road1->city2 == road2->city2) {
-        return 0;
+    if (road2 == NULL) {
+        return -1;
     }
 
-    if (road1->city1 == road2->city2 && road1->city2 == road2->city1) {
-        return 0;
-    }
-
-    return 1;
+    return sign(areEqualCities(road1->city1, road2->city1)) * 2 + sign(areEqualCities(road1->city2, road2->city2));
 }
 
 void blockRoad(Road *road) {

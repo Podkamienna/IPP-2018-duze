@@ -85,13 +85,13 @@ void deleteVector(Vector *vector, void deleteValue(void *)) {
     free(vector);
 }
 
-void *searchVector(Vector *vector, int cmp(void *, void *), void *value) {
+void *searchVector(Vector *vector, bool equals(void *, void *), void *value) {
     if (vector == NULL) {
         return NULL;
     }
 
     for (size_t i = 0; i < vector->size; i++) {
-        if (cmp(vector->data[i], value) == 0) {
+        if (equals(vector->data[i], value)) {
             return vector->data[i];
         }
     }
@@ -131,7 +131,7 @@ void popFromVector(Vector *vector, void deleteValue(void *)) {
     }
 }
 
-bool deleteFromVector(Vector *vector, void deleteValue(void *), int compare(void *, void *), void *value) {
+bool deleteFromVector(Vector *vector, void deleteValue(void *), bool equals(void *, void *), void *value) {
     if (vector == NULL) {
         return false;
     }
@@ -143,7 +143,7 @@ bool deleteFromVector(Vector *vector, void deleteValue(void *), int compare(void
     size_t size = vector->size;
 
     for(size_t position = 1; position <= size; position++) {
-        if (compare(vector->data[size - position], value) == 0) {
+        if (equals(vector->data[size - position], value)) {
             swap(vector->data, size - position, vector->size - 1);
             popFromVector(vector, deleteValue);
 

@@ -179,7 +179,7 @@ bool extendRoute(Map *map, unsigned routeId, const char *cityName) {
 
     FAIL_IF(compareResult == 0);
 
-    if (compareResult == 1) {
+    if (compareResult > 0) {
         deleteFindPathResult(findPathResult2);
         findPathResult2 = NULL;
 
@@ -193,7 +193,7 @@ bool extendRoute(Map *map, unsigned routeId, const char *cityName) {
         deleteFindPathResult(findPathResult1);
     }
 
-    if (compareResult == -1) {
+    if (compareResult < 0) {
         deleteFindPathResult(findPathResult1);
         findPathResult1 = NULL;
 
@@ -262,7 +262,7 @@ bool removeRoad(Map *map, const char *city1, const char *city2) {
         FindPathResult *findPathResult;
 
         if (searchResult != NULL) {
-            if (compareCities(tmpCity1, searchResult->city) == 0) {
+            if (areEqualCities(tmpCity1, searchResult->city) == 0) {
                 findPathResult = findPath(map, tmpCity1, tmpCity2, restrictedPath);
             } else {
                 findPathResult = findPath(map, tmpCity2, tmpCity1, restrictedPath);
@@ -331,7 +331,7 @@ char const *getRouteDescription(Map *map, unsigned routeId) {
     char *routeIdString = unsignedToString(routeId);
 
     FAIL_IF(!concatenateString(string, routeIdString));
-    FAIL_IF(!concatenateString(string, SEMICOLON));
+    FAIL_IF(!concatenateString(string, DELIMITER));
 
     while (position != NULL) {
         year = NULL;
@@ -342,7 +342,7 @@ char const *getRouteDescription(Map *map, unsigned routeId) {
         FAIL_IF(!concatenateString(string, pathNode->city->name));
 
         if (pathNode->road != NULL) {
-            FAIL_IF(!concatenateString(string, SEMICOLON));
+            FAIL_IF(!concatenateString(string, DELIMITER));
 
             year = intToString(pathNode->road->year);
             FAIL_IF(year == NULL);
@@ -351,9 +351,9 @@ char const *getRouteDescription(Map *map, unsigned routeId) {
             FAIL_IF(length == NULL);
 
             FAIL_IF(!concatenateString(string, length));
-            FAIL_IF(!concatenateString(string, SEMICOLON));
+            FAIL_IF(!concatenateString(string, DELIMITER));
             FAIL_IF(!concatenateString(string, year));
-            FAIL_IF(!concatenateString(string, SEMICOLON));
+            FAIL_IF(!concatenateString(string, DELIMITER));
 
             free(length);
             free(year);

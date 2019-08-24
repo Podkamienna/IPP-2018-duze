@@ -18,6 +18,9 @@ typedef struct Dictionary Dictionary;
 typedef struct Set Set;
 typedef struct Vector Vector;
 
+/**
+ * Kończy wykonywanie funkcji, wykonując wcześniej polecenia pod etykietą failure.
+ */
 #define FAIL           \
     do {               \
         goto failure;  \
@@ -44,7 +47,7 @@ typedef struct Vector Vector;
 /** Liczba dróg krajowych */
 #define ROUTE_COUNT 1000
 
-extern const char *SEMICOLON;
+extern const char *DELIMITER;
 
 struct Map {
     Route *routes[ROUTE_COUNT];

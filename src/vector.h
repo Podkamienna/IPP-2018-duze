@@ -44,13 +44,13 @@ void deleteVector(Vector *vector, void deleteValue(void *));
  * @brief Wyszukuje i zwraca pole w wektorze związane z
  * z zadaną wartością.
  * @param vector — wektor w którym jest szukane
- * @param cmp — funkcja zadająca porządek na elementach wektora
+ * @param equals — funkcja zadająca porządek na elementach wektora
  * @param value — wartość która jest wyszukiwana
  * @return Zwraca znalezioną wartość lub @p NULL, gdy nie jest ona
  * obecna w wektorze, lub któryś z parametrów
  * ma niepoprawną wartość
  */
-void *searchVector(Vector *vector, int cmp(void *, void *), void *value);
+void *searchVector(Vector *vector, bool equals(void *, void *), void *value);
 
 /**
  * @brief Dodaje zadaną wartość na koniec wektora.
@@ -79,7 +79,7 @@ void popFromVector(Vector *vector, void deleteValue(void *));
  * Wartość @p false, jeżeli element do usunięcia nie jest zawarty
  * w wektorze lub któryś z parametrów jest niepoprawny.
  */
-bool deleteFromVector(Vector *vector, void deleteValue(void *), int compare(void *, void *), void *value);
+bool deleteFromVector(Vector *vector, void deleteValue(void *), bool equals(void *, void *), void *value);
 
 /**
  * @brief Funkcja sprawdzająca, czy wektor jest pusty.

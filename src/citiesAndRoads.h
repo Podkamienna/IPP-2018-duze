@@ -43,7 +43,7 @@ bool isCityName(const char *city);
  * większe, wartość @p 0 jeżeli miasta są równe,
  * wartość @p -1 jeżeli drugie miasto jest większe.
  */
-int compareCities(City *city1, City *city2);
+bool areEqualCities(City *city1, City *city2);
 
 /**
  * @brief Wyszukuje w zadanej mapie miasta powiązanego z
