@@ -16,7 +16,7 @@ typedef struct HeapEntry HeapEntry;
 const Distance BASE_DISTANCE;
 const Distance WORST_DISTANCE;
 
-struct Distance { // TODO udostępnić
+struct Distance {
     uint64_t length;
     int minYear;
 };
@@ -41,6 +41,12 @@ bool isCorrectPathResult(FindPathResult *findPathResult);
 
 Route *findPathResultToRoute(FindPathResult *findPathResult);
 
+/**
+ * Nie umie NULLi!!!!
+ * @param findPathResult1
+ * @param findPathResult2
+ * @return
+ */
 int compareFindPathResults(FindPathResult *findPathResult1, FindPathResult *findPathResult2);
 
 /**

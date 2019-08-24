@@ -27,7 +27,43 @@ struct Entry {
     void *value;
 };
 
-//funkcja licząca hash danego napisu
+/**
+ * @brief Oblicza i zwraca hash zadanego tekstu.
+ * @param text — tekst którego hash ma być obliczony.
+ * @return Obliczony hash.
+ */
+static uint64_t getHash(const char *text);
+
+/**
+ * @brief Usuwa hash tablicę, bez usuwania zawartości
+ * @param hashTable — hash tablica do usunięcia
+ */
+static void deleteHashTableLeaveEntries(HashTable *hashTable);
+
+/**
+ * @brief Alokuje pamięć pod i zwraca wskaźnik na nowy
+ * element hash tablicy.
+ * @param name — nazwa do której ma być przypisana wartość w hash tablicy
+ * @param value — wartość do wstawienia do hash tablicy
+ * @return Wskaźnik na nową tablicę, lub NULL, gdy któryś z parametrów miał
+ * złą wartość lub nie udało się zaalokować pamięci.
+ */
+static Entry *getNewEntry(const char *name, void *value);
+
+/**
+ * @brief Sprawdza, czy element hash tablicy jest przypisany danemu
+ * napisowi
+ * @param hash — hash napisu, który będzie sprawdzany
+ * @param name  — napis, który będzie sprawdzany
+ * @param entry  — element hash tablicy do sprawdzenia
+ * @return Wartość @p true, jeżeli równość zachodzi.
+ * Wartość @p false, jeżeli nie zachodzi.
+ */
+static bool isEqual(uint64_t hash, const char *name, Entry *entry);
+static size_t getPosition(HashTable *hashTable, size_t hash);
+static bool insertEntry(HashTable *hashTable, Entry *entry);
+static void deleteEntry(Entry *entry, void deleteValue(void *));
+
 static uint64_t getHash(const char *text) {
     uint64_t coefficient = 1, tmpHash = 0;
 
@@ -41,7 +77,6 @@ static uint64_t getHash(const char *text) {
     return tmpHash;
 }
 
-//usuwa hash tablicę, niezwalniając pamięci zaalokowanej na jej elementy
 static void deleteHashTableLeaveEntries(HashTable *hashTable) {
     if (hashTable == NULL) {
         return;
@@ -51,8 +86,7 @@ static void deleteHashTableLeaveEntries(HashTable *hashTable) {
     free(hashTable);
 }
 
-//zwraca nowe entry, lub NULL, gdy się nie udało zaalokować pamięci
-static Entry *initializeEntry(const char *name, void *value) {
+static Entry *getNewEntry(const char *name, void *value) {
     Entry *newEntry = malloc(sizeof(Entry));
 
     if (newEntry == NULL) {
@@ -66,22 +100,15 @@ static Entry *initializeEntry(const char *name, void *value) {
     return newEntry;
 }
 
-//jeżeli dane wejście jest wyznaczone przez zadany napisa i hash
-//zwraca true, wpp zwraca false
 static bool isEqual(uint64_t hash, const char *name, Entry *entry) {
     return entry->hash == hash && strcmp(entry->name, name) == 0;
 }
 
-//zwraca pozycje elementu w danej hash tablicy
 static size_t getPosition(HashTable *hashTable, size_t hash) {
     return hash % hashTable->size;
 }
 
-//wstawia wejście na pierwsze po wyliczonej pozycji
-//puste miejsce w hash tablicy
-//jeżeli to wejście jest już obecne lub nie ma wolnych pól w tablicy
-//zwraca false, inaczej zwraca true
-static bool insertEntryHashTable(HashTable *hashTable, Entry *entry) {
+static bool insertEntry(HashTable *hashTable, Entry *entry) {
     size_t position = getPosition(hashTable, entry->hash);
 
     for (size_t i = 0; i < hashTable->size; i++, position = (position + 1) % hashTable->size) {
@@ -167,13 +194,13 @@ bool insertHashTable(HashTable *hashTable, const char *name, void *value) {
         return false;
     }
 
-    newEntry = initializeEntry(name, value);
+    newEntry = getNewEntry(name, value);
 
     if (newEntry == NULL) {
         return false;
     }
 
-    if (!insertEntryHashTable(hashTable, newEntry)) {
+    if (!insertEntry(hashTable, newEntry)) {
         deleteEntry(newEntry, NULL);
         return false;
     }
@@ -194,7 +221,7 @@ HashTable *resizeHashTable(HashTable *hashTable, size_t newSize) {
 
     for (size_t i = 0; i < hashTable->size; i++) {
         if (hashTable->table[i] != NULL) {
-            if (!insertEntryHashTable(newHashTable, hashTable->table[i])) {
+            if (!insertEntry(newHashTable, hashTable->table[i])) {
                 deleteHashTableLeaveEntries(newHashTable);
 
                 return NULL;

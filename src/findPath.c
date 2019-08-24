@@ -93,7 +93,7 @@ static int compareHeapEntries(HeapEntry *heapEntry1, HeapEntry *heapEntry2);
  * @return Wartość @p false, jeżeli nie udało się zaalokować pamięci, wartość @p true, jeżeli wszystko
  * się powiodło.
  */
-static bool pushNeighbours(HeapEntry *entry, Heap *heap, bool *isVisited, bool *isRestricted);
+static bool pushNeighbours(HeapEntry *entry, Heap *heap, const bool *isVisited, const bool *isRestricted);
 
 /**
  * @brief Przy użyciu algorytmu Dijkstry oblicza odległość od źródła do celu, zapisuje uzyskane
@@ -117,7 +117,7 @@ static Distance *calculateDistances(Map *map, City *source, City *destination, b
  * @return Wartość @p NULL, jeżeli nie udało się zaalokować pamięci, obliczoną ścieżkę w innnym razie.
  * Jeżeli ścieżka nie jest wyznaczona jednoznacznie, zwraca sufiks ścieżki, który jest wyznaczony jednoznacznie.
  */
-static List *reconstructPath(City *source, City *destination, Distance *distances);
+static FindPathResult *reconstructPath(City *source, City *destination, Distance *distances);
 
 static Distance getDistance(uint64_t length, int minYear) {
     return (Distance) {length, minYear};
@@ -147,6 +147,11 @@ static Distance addDistances(Distance distance1, Distance distance2) {
     Distance result = distance1;
 
     result.length += distance2.length;
+
+    // Jeżeli suma byłaby większa niż maksymalna wartość przechowywana przez typ, to zwraca możliwie najbliższy jej dystans.
+    if (result.length < distance1.length || result.length < distance2.length) {
+        return WORST_DISTANCE;
+    }
 
     if (result.minYear > distance2.minYear) {
         result.minYear = distance2.minYear;
@@ -180,7 +185,7 @@ static int compareHeapEntries(HeapEntry *heapEntry1, HeapEntry *heapEntry2) {
     return compareDistances(heapEntry1->distance, heapEntry2->distance);
 }
 
-static bool pushNeighbours(HeapEntry *entry, Heap *heap, bool *isVisited, bool *isRestricted) {
+static bool pushNeighbours(HeapEntry *entry, Heap *heap, const bool *isVisited, const bool *isRestricted) {
     HeapEntry *newEntry = NULL;
     SetIterator *setIterator = getNewSetIterator(entry->city->roads);
 
@@ -252,7 +257,7 @@ static Distance *calculateDistances(Map *map, City *source, City *destination, b
         isVisited[heapEntry->city->id] = true;
         distances[heapEntry->city->id] = heapEntry->distance;
 
-        if (compareCities(heapEntry->city, destination) == 0) {
+        if (areEqualCities(heapEntry->city, destination) == 0) {
             deleteHeapEntry(heapEntry);
 
             break;
@@ -278,18 +283,36 @@ static Distance *calculateDistances(Map *map, City *source, City *destination, b
 
 }
 
-static List *reconstructPath(City *source, City *destination, Distance *distances) {
-    List *path = initializeList();
+static FindPathResult *reconstructPath(City *source, City *destination, Distance *distances) {
+    FindPathResult *result = getNewFindPathResult();
+    List *path = NULL;
+    PathNode *pathNode = NULL;
+
+    FAIL_IF(result == NULL);
+
+    result->source = source;
+    result->destination = destination;
+    result->distance = distances[destination->id];
+    if (compareDistances(result->distance, WORST_DISTANCE) == 0) {
+        return result;
+    }
+
+    path = initializeList();
     FAIL_IF(path == NULL);
+
+    // Wrzucanie celu na ścieżkę.
+    pathNode = getNewPathNode(destination, NULL);
+    FAIL_IF(pathNode == NULL);
+
+    FAIL_IF(!addToList(path, pathNode));
+    pathNode = NULL;
 
     City *position = destination;
     City *potentialNextPosition;
-    Distance potentialNewDistance;
+    Distance potentialNewDistance = WORST_DISTANCE;
     Distance currentDistance = BASE_DISTANCE;
 
-    addToList(path, getNewPathNode(position, NULL));
-
-    while (compareCities(position, source) != 0) {
+    while (areEqualCities(position, source) != 0) {
         potentialNextPosition = NULL;
 
         SetIterator *setIterator = getNewSetIterator(position->roads);
@@ -308,8 +331,10 @@ static List *reconstructPath(City *source, City *destination, Distance *distance
             if (compareDistances(distances[destination->id], distanceThroughNeighbour) == 0) {
                 if (potentialNextPosition != NULL) {
                     deleteSetIterator(setIterator);
+                    deleteList(path, (void (*)(void *)) deletePathNode);
 
-                    return path;
+                    result->isUnique = false;
+                    return result;
                 }
 
                 potentialNextPosition = neighbour;
@@ -326,9 +351,14 @@ static List *reconstructPath(City *source, City *destination, Distance *distance
         deleteSetIterator(setIterator);
     }
 
-    return path;
+
+    result->path = path;
+
+    return result;
 
     failure:;
+    deletePathNode(pathNode);
+    deleteFindPathResult(result);
     deleteList(path, (void (*)(void *)) deletePathNode);
 
     return NULL;
@@ -370,9 +400,13 @@ bool isCorrectPathResult(FindPathResult *findPathResult) {
 }
 
 Route *findPathResultToRoute(FindPathResult *findPathResult) {
+    if (findPathResult == NULL) {
+        return NULL;
+    }
+
     Route *newRoute = getNewRoute();
 
-    if (newRoute == NULL || findPathResult == NULL) {
+    if (newRoute == NULL) {
         return NULL;
     }
 
@@ -387,12 +421,20 @@ int compareFindPathResults(FindPathResult *findPathResult1, FindPathResult *find
     if (!isCorrectPathResult(findPathResult1) && !isCorrectPathResult(findPathResult2)) {
         return 0;
     }
-    // TODO poprawić warunki przy niejezdnozanczym resulcie
+
     if (!isCorrectPathResult(findPathResult1)) {
+        if (compareDistances(findPathResult1->distance, findPathResult2->distance) > 0) {
+            return 0;
+        }
+
         return -1;
     }
 
     if (!isCorrectPathResult(findPathResult2)) {
+        if (compareDistances(findPathResult1->distance, findPathResult2->distance) < 0) {
+            return 0;
+        }
+
         return 1;
     }
 
@@ -400,77 +442,41 @@ int compareFindPathResults(FindPathResult *findPathResult1, FindPathResult *find
 }
 
 FindPathResult *findPath(Map *map, City *source, City *destination, List *restrictedPath) {
-    ListIterator *listIterator = getNewListIterator(restrictedPath);
+    ListIterator *listIterator = NULL;
+    Distance *distances = NULL;
+    bool *isRestricted = NULL;
 
-    if (listIterator == NULL && restrictedPath != NULL) {
-        return NULL;
-    }
+    listIterator = getNewListIterator(restrictedPath);
+    FAIL_IF(listIterator == NULL && restrictedPath != NULL);
 
     size_t cityCount = getId(map->cities);
 
-    bool *isRestricted = calloc(cityCount, sizeof(bool));
-    if (isRestricted == NULL) {
-        deleteListIterator(listIterator);
-
-        return NULL;
-    }
+    isRestricted = calloc(cityCount, sizeof(bool));
+    FAIL_IF(isRestricted == NULL);
 
     for (PathNode *path = getNextListIterator(listIterator); path != NULL; path = getNextListIterator(listIterator)) {
-        PathNode *path = getNextListIterator(listIterator);
-
-        if (path == NULL) {
-            break;
-        }
-
         isRestricted[path->city->id] = true;
     }
 
     isRestricted[source->id] = false;
     isRestricted[destination->id] = false;
 
-    Distance *distances = calculateDistances(map, source, destination, isRestricted);
+    distances = calculateDistances(map, source, destination, isRestricted);
+    FAIL_IF(distances == NULL);
 
-    FindPathResult *result = getNewFindPathResult();
-    if (result == NULL) {
-        free(distances);
-        free(isRestricted);
-        deleteListIterator(listIterator);
-
-        return NULL;
-    }
-
-    if (compareDistances(distances[destination->id], WORST_DISTANCE) == 0) { //Jeżeli nie ma ścieżki
-        free(distances); // TODO przerzucić to reconstructPath
-        free(isRestricted);
-        deleteListIterator(listIterator);
-
-        result->path = NULL;
-
-        return result;
-    }
-
-    List *reconstructedPath = reconstructPath(source, destination, distances);
-    PathNode *endOfReconstructedPath = getLastFromList(reconstructedPath);
-
-    result->source = source;
-    result->destination = destination;
-    result->distance = distances[destination->id];
-
-    if (compareCities(endOfReconstructedPath->city, source) != 0) {  //Sprawdzenie czy ścieżka jest jednoznaczna
-        free(distances);
-        free(isRestricted);
-        deleteListIterator(listIterator);
-
-        result->path = NULL;
-
-        return result;
-    }
+    FindPathResult *result = reconstructPath(source, destination, distances);
+    FAIL_IF(result == NULL);
 
     free(distances);
     free(isRestricted);
     deleteListIterator(listIterator);
 
-    result->path = reconstructedPath;
-
     return result;
+
+    failure:;
+    free(distances);
+    free(isRestricted);
+    deleteListIterator(listIterator);
+
+    return NULL;
 }
