@@ -384,6 +384,8 @@ bool newRouteSpecified(Map *map, size_t routeId, char **cityNames, unsigned *len
     size_t cityCount = roadCount + 1;
 
     cities = calloc(cityCount, sizeof(City *));
+    FAIL_IF(cities == NULL);
+
     for (size_t i = 0; i < cityCount; i++) {
         cities[i] = searchCity(map, cityNames[i]);
 

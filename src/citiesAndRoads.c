@@ -37,7 +37,7 @@ City *getNewCity(Map *map, const char *name) {
     FAIL_IF(name == NULL);
     FAIL_IF(!isCityName(name));
 
-    newCity = malloc(sizeof(City));
+    newCity = calloc(1, sizeof(City));
     FAIL_IF(newCity == NULL);
 
     newCity->roads = initializeSet((bool (*)(void *, void *)) areEqualRoads);

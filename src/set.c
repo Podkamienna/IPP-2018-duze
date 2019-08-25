@@ -26,6 +26,13 @@ Set *initializeSet(bool areEqual(void *, void *)) {
     }
 
     newSet->vector = initializeVector();
+
+    if (newSet->vector == NULL) {
+        deleteSet(newSet, NULL);
+
+        return NULL;
+    }
+
     newSet->areEqual = areEqual;
 
     return newSet;
@@ -96,6 +103,10 @@ void *getNextSetIterator(SetIterator *setIterator) {
 }
 
 void deleteSetIterator(SetIterator *setIterator) {
+    if (setIterator == NULL) {
+        return;
+    }
+
     deleteVectorIterator(setIterator->vectorIterator);
 
     free(setIterator);

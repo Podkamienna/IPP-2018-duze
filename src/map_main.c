@@ -14,6 +14,7 @@ static void printErrorMessage(size_t lineNumber) {
 int main() {
     Vector *splittedInput = NULL;
     Map *map = NULL;
+    char *buffer = NULL;
 
     map = newMap();
     FAIL_IF(map == NULL);
@@ -21,7 +22,7 @@ int main() {
     splittedInput = initializeVector();
     FAIL_IF(splittedInput == NULL);
 
-    char *buffer = NULL;
+    buffer = NULL;
     size_t bufferSize = 0;
 
     __ssize_t readLength = getline(&buffer, &bufferSize, stdin);

@@ -353,7 +353,14 @@ static FindPathResult *reconstructPath(City *source, City *destination, Distance
                 potentialNextPosition = neighbour;
                 potentialNewDistance = addRoadToDistance(currentDistance, road);
 
-                addToList(path, getNewPathNode(neighbour, road));
+                pathNode = getNewPathNode(neighbour, road);
+
+                if(!addToList(path, pathNode)) {
+                    deleteSetIterator(setIterator);
+
+                    FAIL;
+                }
+                pathNode = NULL;
             }
 
         }
