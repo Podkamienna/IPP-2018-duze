@@ -53,7 +53,7 @@ void deleteMap(Map *map) {
 
 bool addRoad(Map *map, const char *city1, const char *city2,
              unsigned length, int builtYear) {
-    FAIL_IF_LABELED(map == NULL, 4);
+    FAIL_IF_LABELED(map == NULL, 4); // TODO zoptymalizwoac lebaled
     FAIL_IF_LABELED(!isCityName(city1) || !isCityName(city2) || strcmp(city1, city2) == 0, 4);
     FAIL_IF_LABELED(length == 0 || builtYear == 0, 4);
 
@@ -406,6 +406,7 @@ bool newRouteSpecified(Map *map, size_t routeId, char **cityNames, unsigned *len
     FAIL_IF(roads == NULL);
 
     for (size_t i = 0; i < roadCount; i++) {
+        FAIL_IF(lengths[i] == 0 || years[i] == 0);
         roads[i] = searchRoad(map, cities[i], cities[i + 1]);
 
         if (roads[i] == NULL) {
