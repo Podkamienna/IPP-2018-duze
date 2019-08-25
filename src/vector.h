@@ -40,6 +40,8 @@ Vector *initializeVector();
  */
 void deleteVector(Vector *vector, void deleteValue(void *));
 
+void resetVector(Vector *vector);
+
 /**
  * @brief Wyszukuje i zwraca pole w wektorze związane z
  * z zadaną wartością.

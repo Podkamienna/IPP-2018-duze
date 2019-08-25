@@ -57,14 +57,12 @@ Route *getNewRoute(List *path, City *source, City *destination) {
     return newRoute;
 }
 
-void deleteRoute(Route *route, bool deletePath) {
+void deleteRoute(Route *route) {
     if (route == NULL) {
         return;
     }
 
-    if (deletePath) {
-        deleteList(route->path, (void (*)(void *)) deletePathNode);
-    }
+    deleteList(route->path, (void (*)(void *)) deletePathNode);
 
     free(route);
 }

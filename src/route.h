@@ -65,10 +65,9 @@ Route *getNewRoute(List *path, City *source, City *destination);
 /**
  * @brief Usuwa drogę krajową.
  * @param route — droga krajowa do usunięcia
- * @param deletePath — wartość mówiąca o tym, czy usuwać
  * ścieżkę z drogi krajowej.
  */
-void deleteRoute(Route *route, bool deletePath);
+void deleteRoute(Route *route);
 
 
 #endif //DROGI_ROUTE_H

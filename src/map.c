@@ -42,7 +42,7 @@ void deleteMap(Map *map) {
     }
 
     for (int i = 0; i < 1000; i++) {
-        deleteRoute(map->routes[i], true);
+        deleteRoute(map->routes[i]);
     }
 
     deleteDictionary(map->cities, (void (*)(void *)) deleteCity);
@@ -225,7 +225,7 @@ bool extendRoute(Map *map, unsigned routeId, const char *cityName) {
  * uzupełnić przerwanego ciągu drogi krajowej lub nie udało się zaalokować
  * pamięci.
  */
-bool removeRoad(Map *map, const char *city1, const char *city2) {
+bool removeRoad(Map *map, const char *city1, const char *city2) { //TODO cityName
     City *tmpCity1 = searchCity(map, city1);
     City *tmpCity2 = searchCity(map, city2);
     List **routesToInsert = NULL;
@@ -302,9 +302,10 @@ bool removeRoad(Map *map, const char *city1, const char *city2) {
 }
 
 char const *getRouteDescription(Map *map, unsigned routeId) {
-    if (map == NULL) {
-        return NULL;
-    }
+    char *length = NULL, *year = NULL, *routeIdString = NULL;
+    String *string = NULL;
+
+    FAIL_IF(map == NULL);
 
     if (routeId < MINIMAL_ROUTE_ID || routeId > MAXIMAL_ROUTE_ID) {
         return calloc(1, sizeof(char));
@@ -314,12 +315,10 @@ char const *getRouteDescription(Map *map, unsigned routeId) {
         return calloc(1, sizeof(char));
     }
 
-    String *string = initializeString();
-    char *length = NULL, *year = NULL;
-
+    string = initializeString();
     ListNode *position = map->routes[routeId]->path->beginning;
     PathNode *pathNode = NULL;
-    char *routeIdString = unsignedToString(routeId);
+    routeIdString = unsignedToString(routeId);
 
     FAIL_IF(!concatenateString(string, routeIdString));
     FAIL_IF(!concatenateString(string, DELIMITER));
@@ -367,6 +366,120 @@ char const *getRouteDescription(Map *map, unsigned routeId) {
     free(routeIdString);
 
     return NULL;
+}
+
+bool newRouteSpecified(Map *map, size_t routeId, char **cityNames, unsigned *lengths, int *years, size_t roadCount) {
+    Road **roads = NULL;
+    City **cities = NULL;
+    bool *exists = NULL;
+    List *path = NULL;
+    PathNode *pathNode = NULL;
+
+    FAIL_IF(map == NULL);
+    FAIL_IF(cityNames == NULL || lengths == NULL || years == NULL);
+
+    FAIL_IF(routeId < MINIMAL_ROUTE_ID || routeId > MAXIMAL_ROUTE_ID);
+    FAIL_IF(map->routes[routeId] != NULL);
+
+    size_t cityCount = roadCount + 1;
+
+    cities = calloc(cityCount, sizeof(City *));
+    for (size_t i = 0; i < cityCount; i++) {
+        cities[i] = searchCity(map, cityNames[i]);
+
+        if (cities[i] == NULL) {
+            cities[i] = getNewCity(map, cityNames[i]);
+            FAIL_IF(cities[i] == NULL);
+        }
+    }
+
+    exists = calloc(getId(map->cities), sizeof(bool));
+    FAIL_IF(exists == NULL);
+
+    for (size_t i = 0; i < cityCount; i++) {
+        FAIL_IF(exists[cities[i]->id]);
+
+        exists[cities[i]->id] = true;
+    }
+
+    roads = malloc(roadCount * sizeof(Road *));
+    FAIL_IF(roads == NULL);
+
+    for (size_t i = 0; i < roadCount; i++) {
+        roads[i] = searchRoad(map, cities[i], cities[i + 1]);
+
+        if (roads[i] == NULL) {
+            continue;
+        }
+
+        FAIL_IF(roads[i]->length != lengths[i]);
+        FAIL_IF(roads[i]->year > years[i]);
+    }
+
+    for (size_t i = 0; i < roadCount; i++) {
+        if (roads[i] == NULL) {
+            FAIL_IF(!addRoad(map, cityNames[i], cityNames[i + 1], lengths[i], years[i]));
+
+            roads[i] = searchRoad(map, cities[i], cities[i + 1]);
+
+            continue;
+        }
+
+        FAIL_IF(!repairRoad(map, cityNames[i], cityNames[i + 1], years[i]));
+    }
+
+    path = initializeList();
+    FAIL_IF(path == NULL);
+
+    pathNode = getNewPathNode(cities[cityCount-1], NULL);
+    FAIL_IF(pathNode == NULL);
+    FAIL_IF(!addToList(path, pathNode));
+    pathNode = NULL;
+
+    for (size_t i = 1; i <= roadCount; i++) {
+        pathNode = getNewPathNode(cities[roadCount - i], roads[roadCount - i]);
+        FAIL_IF(pathNode == NULL);
+        FAIL_IF(!addToList(path, pathNode));
+        pathNode = NULL;
+    }
+
+    Route *route = malloc(sizeof(Route));
+    FAIL_IF(route == NULL);
+
+    route->path = path;
+    route->source = cities[0];
+    route->destination = cities[cityCount - 1];
+
+    map->routes[routeId] = route;
+
+    free(roads);
+    free(cities);
+    free(exists);
+
+    return true;
+
+    failure:;
+    free(roads);
+    free(cities);
+    free(exists);
+    deleteList(path, (void (*)(void *)) deletePathNode);
+    deletePathNode(pathNode);
+
+    return false;
+}
+
+bool removeRoute(Map *map, unsigned routeId) {
+    FAIL_IF(map == NULL);
+    FAIL_IF(routeId < MINIMAL_ROUTE_ID || routeId > MAXIMAL_ROUTE_ID);
+    FAIL_IF(map->routes[routeId] == NULL);
+
+    deleteRoute(map->routes[routeId]);
+    map->routes[routeId] = NULL;
+
+    return true;
+
+    failure:;
+    return false;
 }
 
 

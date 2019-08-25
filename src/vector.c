@@ -84,6 +84,14 @@ void deleteVector(Vector *vector, void deleteValue(void *)) {
     free(vector);
 }
 
+void resetVector(Vector *vector) {
+    if (vector == NULL) {
+        return;
+    }
+
+    vector->size = 0;
+}
+
 void *searchVector(Vector *vector, bool areEqual(void *, void *), void *value) {
     if (vector == NULL) {
         return NULL;

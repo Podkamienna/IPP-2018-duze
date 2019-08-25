@@ -9,6 +9,7 @@
 #ifndef DROGI_MAP_H
 #define DROGI_MAP_H
 
+#include <stddef.h>
 #include <stdbool.h>
 
 /**
@@ -136,5 +137,9 @@ bool removeRoad(Map *map, const char *city1, const char *city2);
  * @return Wskaźnik na napis lub NULL, gdy nie udało się zaalokować pamięci.
  */
 char const *getRouteDescription(Map *map, unsigned routeId);
+
+bool newRouteSpecified(Map *map, size_t routeId, char **cityNames, unsigned *lengths, int *years, size_t roadCount);
+
+bool removeRoute(Map *map, unsigned routeId);
 
 #endif /* DROGI_MAP_H */
