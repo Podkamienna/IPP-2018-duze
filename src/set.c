@@ -8,12 +8,17 @@
 #include <stdbool.h>
 #include <stdlib.h>
 
+/**
+ * Struktura przechowująca zbiór.
+ */
 struct Set {
     Vector *vector;
-
     bool (*areEqual)(void *, void *);
 };
 
+/**
+ * Struktura przechowująca iterator na zbiór.
+ */
 struct SetIterator {
     VectorIterator *vectorIterator;
 };

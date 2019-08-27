@@ -15,10 +15,13 @@
 //w systemie dziesiętnym do zamiany na napis
 const size_t MAX_NUMBER_LENGTH = 100;
 
+/**
+ * Struktura przechowująca napis.
+ */
 struct String {
-    size_t size;
-    size_t maxSize;
-    char *data;
+    size_t size; // rozmiar napisu
+    size_t maxSize; // rozmiar maksymalnego napisu
+    char *data; // napis
 };
 
 /**

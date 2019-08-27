@@ -1,6 +1,6 @@
-//
-// Created by alicja on 10.07.19.
-//
+/**
+ * @file Interfejs struktury będącej kopcem,
+ */
 
 #include "heap.h"
 #include "vector.h"

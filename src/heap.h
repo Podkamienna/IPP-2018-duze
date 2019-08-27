@@ -1,6 +1,6 @@
-//
-// Created by alicja on 10.07.19.
-//
+/**
+ * @file Interfejs struktury będącej kopcem, zaimplementowanym w wersji tablicowej.
+ */
 
 #ifndef DROGI_HEAP_H
 #define DROGI_HEAP_H

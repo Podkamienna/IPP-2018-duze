@@ -9,7 +9,7 @@
 
 /**Struktura przechowująca zbiór*/
 typedef struct Set Set;
-/**Struktura przechowująca iterator po zbiorze*/
+/**Struktura przechowująca iterator na zbiór*/
 typedef struct SetIterator SetIterator;
 
 /**

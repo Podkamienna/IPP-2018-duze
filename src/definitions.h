@@ -47,27 +47,40 @@ typedef struct Vector Vector;
 /** Liczba dróg krajowych */
 #define ROUTE_COUNT 1000
 
+/** Znak oddzielający kolejne wyrazy w wejściu*/
 extern const char *DELIMITER;
 
+/**
+ * Struktura przechowująca mapę dróg krajowych.
+ */
 struct Map {
-    Route *routes[ROUTE_COUNT];
-    Dictionary *cities;
-    Vector *roads;
+    Route *routes[ROUTE_COUNT]; // Tablica dróg krajowych.
+    Dictionary *cities; // Słownik zawierający miasta dodane do mapy.
+    Vector *roads; // Vector dróg dodanych do mapy.
 };
 
+/**
+ * Struktura przechowująca miasto.
+ */
 struct City {
-    size_t id;
-    char *name;
-    Set *roads;
+    size_t id; // id miasta
+    char *name; // nazwa miasta
+    Set *roads; // Zbiór dróg wychodzących z miasta.
 };
 
+/**
+ * Struktura przechowująca drogę.
+ */
 struct Road {
-    bool isBlocked;
-    unsigned length;
-    int year;
-    City *city1, *city2;
+    bool isBlocked; // Parametr pozwalający stwierdzić, czy wolno przejechać daną drogą.
+    unsigned length; // długość drogi
+    int year; // Rok budowy/ostatniego remontu drogi.
+    City *city1, *city2; // końce drogi
 };
 
+/**
+ * Struktura przechowująca drogę krajową.
+ */
 struct Route {
     List *path;
     City *source, *destination;

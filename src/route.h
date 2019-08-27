@@ -1,6 +1,6 @@
-//
-// Created by alicja on 19.07.19.
-//
+/**
+ * @file Interfejs 
+ */
 
 #ifndef DROGI_ROUTE_H
 #define DROGI_ROUTE_H

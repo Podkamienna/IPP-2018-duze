@@ -40,6 +40,10 @@ Vector *initializeVector();
  */
 void deleteVector(Vector *vector, void deleteValue(void *));
 
+/**
+ * @brief Ustawia ilość zajętych pól w wektorze na 0.
+ * @param vector — wektor który będzie edytowany
+ */
 void resetVector(Vector *vector);
 
 /**
