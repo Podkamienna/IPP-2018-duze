@@ -52,6 +52,14 @@ void deleteSet(Set *set, void deleteValue(void *)) {
     free(set);
 }
 
+size_t getSetSize(Set *set) {
+    if (set == NULL) {
+        return 0;
+    }
+
+    return set->vector->size;
+}
+
 void *searchSet(Set *set, void *value) {
     if (set == NULL) {
         return NULL;

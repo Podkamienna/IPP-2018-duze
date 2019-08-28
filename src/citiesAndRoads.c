@@ -198,7 +198,11 @@ Road *searchRoad(Map *map, City *city1, City *city2) {
     tmpRoad.city1 = city1;
     tmpRoad.city2 = city2;
 
-    return searchSet(city1->roads, &tmpRoad);
+    if (getSetSize(city1->roads) < getSetSize(city2->roads)) {
+        return searchSet(city1->roads, &tmpRoad);
+    }
+
+    return searchSet(city2->roads, &tmpRoad);
 }
 
 bool deleteRoadFromMap(Map *map, City *city1, City *city2) {

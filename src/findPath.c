@@ -355,7 +355,7 @@ static FindPathResult *reconstructPath(City *source, City *destination, Distance
 
                 pathNode = getNewPathNode(neighbour, road);
 
-                if(!addToList(path, pathNode)) {
+                if (!addToList(path, pathNode)) {
                     deleteSetIterator(setIterator);
 
                     FAIL;

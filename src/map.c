@@ -434,7 +434,7 @@ bool newRouteSpecified(Map *map, size_t routeId, char **cityNames, unsigned *len
     path = initializeList();
     FAIL_IF(path == NULL);
 
-    pathNode = getNewPathNode(cities[cityCount-1], NULL);
+    pathNode = getNewPathNode(cities[cityCount - 1], NULL);
     FAIL_IF(pathNode == NULL);
     FAIL_IF(!addToList(path, pathNode));
     pathNode = NULL;

@@ -6,6 +6,7 @@
 #define DROGI_SET_H
 
 #include <stdbool.h>
+#include <stdlib.h>
 
 /**Struktura przechowująca zbiór*/
 typedef struct Set Set;
@@ -24,6 +25,8 @@ Set *initializeSet(bool areEqual(void *, void *));
  * @param deleteValue — funkcja usuwająca elementy zbioru
  */
 void deleteSet(Set *set, void deleteValue(void *));
+
+size_t getSetSize(Set *set);
 
 /**
  * @brief Funkcja wyszukująca w Set zadanej wartości.
