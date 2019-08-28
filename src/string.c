@@ -19,9 +19,9 @@ const size_t MAX_NUMBER_LENGTH = 100;
  * Struktura przechowująca napis.
  */
 struct String {
-    size_t size; // rozmiar napisu
-    size_t maxSize; // rozmiar maksymalnego napisu
-    char *data; // napis
+    size_t size; ///< rozmiar napisu
+    size_t maxSize; ///< rozmiar maksymalnego napisu
+    char *data; ///< napis
 };
 
 /**
