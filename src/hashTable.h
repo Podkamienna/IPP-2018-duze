@@ -1,5 +1,5 @@
 /**
- *  @file Interfejs tablicy hashującej.
+ * @file Interfejs tablicy hashującej.
  */
 
 #ifndef DROGI_HASH_TABLE_H

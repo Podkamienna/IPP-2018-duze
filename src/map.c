@@ -1,3 +1,7 @@
+/**
+ * @file Implementacja klasy przechowującej mapę dróg krajowych
+ */
+
 #include "map.h"
 #include "definitions.h"
 #include "dictionary.h"

@@ -1,5 +1,5 @@
 /**
- *  @file Implementacja tablicy hashującej.
+ * @file Implementacja tablicy hashującej.
  */
 
 #include "hashTable.h"

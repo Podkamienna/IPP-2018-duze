@@ -1,5 +1,5 @@
-/** @file
- * Interfejs struktury zbiór.
+/**
+ * @file Interfejs struktury zbiór.
  */
 
 #ifndef DROGI_SET_H

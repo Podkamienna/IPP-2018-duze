@@ -1,5 +1,5 @@
 /**
- * Moduł zawierający definicje używane w projekcie.
+ * @file Moduł zawierający definicje używane w projekcie.
  */
 
 #ifndef DROGI_DEFINITIONS_H

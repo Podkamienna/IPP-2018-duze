@@ -1,5 +1,5 @@
-/** @file
- * Interfejs struktury wektor, reprezentującej dynamicznie alokowane tablice
+/**
+ * @file Interfejs struktury wektor, reprezentującej dynamicznie alokowane tablice
  * o zmiennym rozmiarze.
  */
 

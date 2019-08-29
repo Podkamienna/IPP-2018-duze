@@ -1,5 +1,5 @@
-/** @file
- * Implementacja struktury zbiór.
+/**
+ * @file Implementacja struktury zbiór.
  */
 
 #include "set.h"

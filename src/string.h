@@ -1,5 +1,5 @@
-/** @file
- * Interfejs struktury string, reprezentującej napis o zmiennej długości.
+/**
+ * @file Interfejs struktury string, reprezentującej napis o zmiennej długości.
  */
 
 #ifndef DROGI_STRING_H

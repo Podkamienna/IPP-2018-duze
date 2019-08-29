@@ -1,5 +1,5 @@
-/** @file
- * Implementacja struktury string, reprezentującej napis o zmiennej długości.
+/**
+ * @file Implementacja struktury string, reprezentującej napis o zmiennej długości.
  */
 
 #define _GNU_SOURCE

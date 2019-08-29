@@ -1,5 +1,5 @@
 /**
- * Moduł zawierający definicje używane w projekcie.
+ * @file Moduł zawierający definicje używane w projekcie.
  */
 
 const char *DELIMITER = ";";
