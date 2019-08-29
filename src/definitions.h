@@ -1,6 +1,6 @@
-//
-// Created by alicja on 04.07.19.
-//
+/**
+ * Moduł zawierający definicje używane w projekcie.
+ */
 
 #ifndef DROGI_DEFINITIONS_H
 #define DROGI_DEFINITIONS_H
@@ -9,14 +9,28 @@
 #include <stdint.h>
 #include <stdbool.h>
 
+/**
+ * Struktura przechowująca miasto.
+ */
 typedef struct City City;
+
+/**
+ * Struktura przechowująca drogę.
+ */
 typedef struct Road Road;
+
+/**
+ * Struktura przechowując drogę krajową.
+ */
 typedef struct Route Route;
+
+/// @cond ALREADY_DOCUMENTED
 typedef struct List List;
 typedef struct Map Map;
 typedef struct Dictionary Dictionary;
 typedef struct Set Set;
 typedef struct Vector Vector;
+/// @endcond
 
 /**
  * Kończy wykonywanie funkcji, wykonując wcześniej polecenia pod etykietą failure.
@@ -44,33 +58,28 @@ typedef struct Vector Vector;
         if (condition) goto failure##label;  \
     } while(0)                               \
 
-/** Liczba dróg krajowych */
+/**
+ * Liczba dróg krajowych
+ */
 #define ROUTE_COUNT 1000
 
-/** Znak oddzielający kolejne wyrazy w wejściu*/
+/**
+ * Znak oddzielający kolejne wyrazy w wejściu
+ */
 extern const char *DELIMITER;
 
-/**
- * Struktura przechowująca mapę dróg krajowych.
- */
 struct Map {
-    Route *routes[ROUTE_COUNT]; ///< Tablica dróg krajowych.
-    Dictionary *cities; ///< Słownik zawierający miasta dodane do mapy.
-    Vector *roads; ///< Vector dróg dodanych do mapy.
+    Route *routes[ROUTE_COUNT]; ///< tablica dróg krajowych
+    Dictionary *cities; ///< słownik zawierający miasta dodane do mapy
+    Vector *roads; ///< vector dróg dodanych do mapy
 };
 
-/**
- * Struktura przechowująca miasto.
- */
 struct City {
     size_t id; ///< id miasta
     char *name; ///< nazwa miasta
-    Set *roads; ///< Zbiór dróg wychodzących z miasta.
+    Set *roads; ///< zbiór dróg wychodzących z miasta
 };
 
-/**
- * Struktura przechowująca drogę.
- */
 struct Road {
     bool isBlocked; ///< Parametr pozwalający stwierdzić, czy wolno przejechać daną drogą.
     unsigned length; ///< długość drogi
@@ -78,17 +87,14 @@ struct Road {
     City *city1, *city2; ///< końce drogi
 };
 
-/**
- * Struktura przechowująca drogę krajową.
- */
 struct Route {
-    List *path;
-    City *source, *destination;
+    List *path; ///< najkrótsza ścieżka między source a destination
+    City *source, *destination; ///< miasto początkowe i końcowe ścieżki
 };
 
 struct PathNode {
-    City *city;
-    Road *road;
+    City *city; ///< miasto
+    Road *road; ///< droga wychodząca z city
 };
 
 #endif //DROGI_DEFINITIONS_H

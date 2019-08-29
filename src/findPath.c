@@ -1,6 +1,7 @@
-//
-// Created by alicja on 13.07.19.
-//
+/**
+ * @file Implementacja modułu do znajdowania najkrótszej ścieżki.
+ */
+
 #include "findPath.h"
 #include "citiesAndRoads.h"
 #include "definitions.h"
@@ -15,25 +16,38 @@
 #include <inttypes.h>
 #include <limits.h>
 
+/**
+ * Struktura, która będzie wkładana na kopiec
+ * w celu znalezienia najkrótszej ścieżki.
+ */
+typedef struct HeapEntry HeapEntry;
+
 struct Distance {
-    uint64_t length;
-    int minYear;
+    uint64_t length; ///< długość drogi
+    int minYear; ///< minimalny rok na drodze
 };
 
 struct FindPathResult {
-    List *path;
-    City *source, *destination;
-    Distance distance;
-    bool isUnique;
+    List *path; ///< znaleziona najkrótsza ścieżka między source i destination
+    City *source, *destination; ///< miasta początkowe i końcowe wyszukiwanej ścieżki
+    Distance distance; ///< dystans między source i destination
+    bool isUnique; ///< parametr oznaczający, czy znaleziona ścieżka jest jednoznaczna
 };
 
 struct HeapEntry {
-    City *city;
-    Distance distance;
+    City *city; ///< miasto
+    Distance distance; ///< dystans od początkowego miasta
 };
 
-const Distance BASE_DISTANCE = (Distance) {0, INT_MAX};
-const Distance WORST_DISTANCE = (Distance) {UINT64_MAX, INT_MIN};
+/**
+ * Neutralny dystans.
+ */
+static const Distance BASE_DISTANCE = (Distance) {0, INT_MAX};
+
+/**
+ * Największy możliwy dystans. Traktowany jako nieosiągalny.
+ */
+static const Distance WORST_DISTANCE = (Distance) {UINT64_MAX, INT_MIN};
 
 /**
  * @brief Zwraca zmienną typu dystans, zawierającą informacje

@@ -4,18 +4,20 @@
 
 #include "dictionary.h"
 #include "hashTable.h"
-#include "definitions.h"
-// TODO usunąć tego include i fail_ify
 
 #include <stdbool.h>
 #include <stdlib.h>
 
-/*Stała oznaczająca początkowy rozmiar hash tablicy*/
+/**
+ * Stała oznaczająca początkowy rozmiar hash tablicy
+ */
 static const size_t INITIAL_HASH_TABLE_SIZE = 128;
 
-/*Stałe oznaczające, że jeżeli liczba elementów w hash tablicy
+/*
+ * Stałe oznaczające, że jeżeli liczba elementów w hash tablicy
  * przekroczy LOAD_FACTOR_MULTIPLIER/LOAD_FACTOR_DIVIDER jej
- * rozmiaru, to należy ją zwiększyć (aby uniknąć zbyt częstych kolizji)*/
+ * rozmiaru, to należy ją zwiększyć (aby uniknąć zbyt częstych kolizji)
+ */
 static const size_t LOAD_FACTOR_MULTIPLIER = 3;
 static const size_t LOAD_FACTOR_DIVIDER = 4;
 
@@ -25,9 +27,9 @@ typedef struct HashTable HashTable;
 typedef struct Entry Entry;
 
 struct Dictionary {
-    size_t size;
-    size_t numberOfElements;
-    HashTable *hashTable;
+    size_t size; ///< ile elementów może być włożonych do słownika
+    size_t numberOfElements; ///< ile elementów jest włożonych do słownika
+    HashTable *hashTable; ///< hash tablica na której przechowywane są elementy
 };
 
 /**
@@ -78,27 +80,36 @@ size_t getId(Dictionary *dictionary) {
 }
 
 bool insertDictionary(Dictionary *dictionary, const char *name, void *value) {
-    FAIL_IF(dictionary == NULL);
-    FAIL_IF(name == NULL);
-    FAIL_IF(value == NULL);
+    if (dictionary == NULL) {
+        return false;
+    }
+
+    if (name == NULL) {
+        return false;
+    }
+
+    if (value == NULL) {
+        return false;
+    }
 
     if (isFull(dictionary)) {
         HashTable *newHashTable = resizeHashTable(dictionary->hashTable, 2 * dictionary->size);
-        FAIL_IF(newHashTable == NULL);
+        if (newHashTable == NULL) {
+            return false;
+        }
 
         dictionary->size = 2 * dictionary->size;
 
         dictionary->hashTable = newHashTable;
     }
 
-    FAIL_IF(!insertHashTable(dictionary->hashTable, name, value));
+    if (!insertHashTable(dictionary->hashTable, name, value)) {
+        return false;
+    }
 
     dictionary->numberOfElements++;
 
     return true;
-
-    failure:;
-    return false;
 }
 
 void deleteDictionary(Dictionary *dictionary, void deleteValue(void *)) {

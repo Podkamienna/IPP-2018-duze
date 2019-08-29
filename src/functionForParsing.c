@@ -1,6 +1,6 @@
-//
-// Created by alicja on 24.08.2019.
-//
+/**
+ * @file Implementacja modułu z funkcjami używanymi do parsowania wejścia.
+ */
 
 #include "functionForParsing.h"
 #include "definitions.h"
@@ -12,9 +12,8 @@
 #include <errno.h>
 #include <limits.h>
 
-//TODO tu skończyłam
 /**
- * @brief Funkcja konwertująca napis na liczbę.
+ * @brief Funkcja konwertująca napis na liczbę typu unsigned.
  * @param string — napis do przekonwertowania
  * @param numberPtr — wskaźnik na liczbę, jeżeli
  * wykonanie funkcji się powiedzie, to będzie zawierało
@@ -25,8 +24,28 @@
  */
 static bool stringToUnsigned(const char *string, unsigned *numberPtr);
 
+/**
+ * @brief Funkcja konwertująca napis na liczbę typu int.
+ * @param string — napis do przekonwertowania
+ * @param numberPtr — wskaźnik na liczbę, jeżeli
+ * wykonanie funkcji się powiedzie, to będzie zawierało
+ * przekonwertowany napis.
+ * @return Wartość @p true, jeżeli konwersja się powiodła.
+ * Wartość @p false, jeżeli zadany napis jest NULLem, pustym napisem,
+ * a także, gdy nie mieści się w typie unsigned.
+ */
 static bool stringToInt(const char *string, int *numberPtr);
 
+/**
+ * @brief Funkcja pomocnicza do wywoływania funkcji newRouteSpecified
+ * z modułu map.
+ * @param map — mapa na której ma być wykonana operacja
+ * @param splittedVector — wektor z krórego mają zostać odczytane argumenty
+ * dla funkcji newRouteSpecified
+ * @return Wartość @p true, jeżeli wszystko poszło dobrze.
+ * Wartość @p false, jeżeli któryś z argumentów ma niepoprawną wartość
+ * lub nie udało się zaalokować pamięci.
+ */
 static bool executeNewRouteSpecified(Map *map, Vector *splittedVector);
 
 static bool stringToUnsigned(const char *string, unsigned *numberPtr) {

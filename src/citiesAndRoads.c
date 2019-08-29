@@ -1,7 +1,9 @@
-/**
- * @file Implementacja klasy przechowującej miasta i drogi.
+/** @file
+ * Implementacja klasy przechowującej miasta i drogi.
+ *
+ * @author Alicja Ziarko <ala.ziarko@gmail.com>
+ * @date 05.07.2019
  */
-
 #define _GNU_SOURCE
 
 #include "citiesAndRoads.h"

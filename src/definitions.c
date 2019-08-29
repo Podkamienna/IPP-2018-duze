@@ -1,5 +1,5 @@
-//
-// Created by alicja on 12.08.2019.
-//
+/**
+ * Moduł zawierający definicje używane w projekcie.
+ */
 
 const char *DELIMITER = ";";

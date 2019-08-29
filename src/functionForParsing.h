@@ -1,6 +1,6 @@
-//
-// Created by alicja on 24.08.2019.
-//
+/**
+ * @file Interfejs modułu z funkcjami używanymi do parsowania wejścia.
+ */
 
 #ifndef DROGI_FUNCTION_FOR_PARSING_H
 #define DROGI_FUNCTION_FOR_PARSING_H
