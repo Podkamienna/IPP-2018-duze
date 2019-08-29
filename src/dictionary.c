@@ -16,19 +16,19 @@
  */
 static const size_t INITIAL_HASH_TABLE_SIZE = 128;
 
-/*
- * Stałe oznaczające, że jeżeli liczba elementów w hash tablicy
- * przekroczy LOAD_FACTOR_MULTIPLIER/LOAD_FACTOR_DIVIDER jej
- * rozmiaru, to należy ją zwiększyć (aby uniknąć zbyt częstych kolizji)
+/**
+ * Licznik ułamka, określającego, kiedy słownik jest pełny.
  */
 static const size_t LOAD_FACTOR_MULTIPLIER = 3;
+
+/**
+ * Mianowik ułamka, określającego, kiedy słownik jest pełny.
+ */
 static const size_t LOAD_FACTOR_DIVIDER = 4;
 
-
-typedef struct Dictionary Dictionary;
-typedef struct HashTable HashTable;
-typedef struct Entry Entry;
-
+/**
+ * Struktura będąca słownikiem, używająca tablicy hashująąej.
+ */
 struct Dictionary {
     size_t size; ///< ile elementów może być włożonych do słownika
     size_t numberOfElements; ///< ile elementów jest włożonych do słownika

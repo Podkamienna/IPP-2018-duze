@@ -12,7 +12,7 @@
 #include <stdlib.h>
 
 /**
- * Struktura przechowująca zbiór.
+ * Struktura przechowująca zbiór, zaimplementowany jako wektor.
  */
 struct Set {
     Vector *vector; ///< wektor na którym są przechowywane elementy zbioru

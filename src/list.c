@@ -10,8 +10,20 @@
 #include <stdlib.h>
 #include <stdbool.h>
 
-typedef struct ListNode ListNode;
-typedef struct List List;
+/**
+ * @brief Zwraca nowy element listy.
+ * @param next — element, który będzie następnym elementem w liśie po tym nowym
+ * @param value — wartość, która będzi w nowym elemencie listy
+ * @return Nowy element listy, lub wartość @p NULL nie udało się zaalokować pamięci
+ */
+static ListNode *getNewListNode(ListNode *next, void *value);
+
+/**
+ * @brief Usuwa element listy.
+ * @param listNode  — element listy do usunięcia
+ * @param deleteValue — funkcja usuwająca zawartość elementu listy
+ */
+static void deleteListNode(ListNode *listNode, void deleteValue(void *));
 
 static ListNode *getNewListNode(ListNode *next, void *value) {
     ListNode *newListNode = malloc(sizeof(ListNode));

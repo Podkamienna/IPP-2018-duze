@@ -20,23 +20,33 @@
 #include <limits.h>
 
 /**
- * Struktura, która będzie wkładana na kopiec
- * w celu znalezienia najkrótszej ścieżki.
+ * Struktura, która będzie wkładana na kopiec.
  */
 typedef struct HeapEntry HeapEntry;
 
+/**
+ * Struktura będąca dystansem miedzy dwoma miastami, używana przy
+ * wyszukiwaniu najkrótszej ścieżki.
+ */
 struct Distance {
     uint64_t length; ///< długość drogi
     int minYear; ///< minimalny rok na drodze
 };
 
+/**
+ * Struktura będąca wynikiem wyszukiwania najkrótszej ścieżki.
+ */
 struct FindPathResult {
     List *path; ///< znaleziona najkrótsza ścieżka między source i destination
-    City *source, *destination; ///< miasta początkowe i końcowe wyszukiwanej ścieżki
+    City *source; ///< miasto początkowe wyszukiwanej ścieżki
+    City *destination; ///< miasto końcowe wyszukiwanej ścieżki
     Distance distance; ///< dystans między source i destination
     bool isUnique; ///< parametr oznaczający, czy znaleziona ścieżka jest jednoznaczna
 };
 
+/**
+ * Struktura wkładana na kopiec, przy znajdowaniu najkrótszej ścieżki.
+ */
 struct HeapEntry {
     City *city; ///< miasto
     Distance distance; ///< dystans od początkowego miasta

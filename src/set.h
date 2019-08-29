@@ -23,6 +23,7 @@ typedef struct SetIterator SetIterator;
 
 /**
  * @brief Funkcja alokująca pamięć pod i zwracająca nowy Set.
+ * @param areEqual — funkcja sprawdzająca czy 2 elementy są równe.
  * @return Nowy Set lub NULL, gdy nie udało się zaalokować pamięci.
  */
 Set *initializeSet(bool areEqual(void *, void *));
@@ -45,7 +46,6 @@ size_t getSetSize(Set *set);
 /**
  * @brief Funkcja wyszukująca w Set zadanej wartości.
  * @param set — zbiór w którym będzie szukane
- * @param cmp — funkcja do porównywanie wartości
  * @param value — szukana wartość
  * @return Zwraca znalezioną wartość lub NULL, gdy się nie udało jej znaleźć,
  * lub set jest NULLem
@@ -75,27 +75,27 @@ bool deleteFromSet(Set *set, void deleteValue(void *), void *value);
 
 /**
  * @brief Alokuje pamięć pod i zwraca wskaźnik na
- * nowy iterator na zadanym wektorze.
- * @param vector — wektor dla którego tworzony będzie
+ * nowy iterator na zadanym zbiorze.
+ * @param set — zbiór dla którego tworzony będzie
  * iterator
  * @return Wskaźnik na zaalokowaną strukturę, jeżeli wszystko się udało,
- * @p NULL, jeżeli nie udało się zaalokować pamięci, lub zadany wektor jest
+ * @p NULL, jeżeli nie udało się zaalokować pamięci, lub zadany zbiór jest
  * NULLem.
  */
 SetIterator *getNewSetIterator(Set *set);
 
 /**
- * @brief Funkcja usuwająca zadany iterator wektora.
- * @param vectorIterator — iterator do usunięcia.
+ * @brief Funkcja usuwająca zadany iterator zbioru.
+ * @param setIterator — iterator do usunięcia.
  */
 void deleteSetIterator(SetIterator *setIterator);
 
 /**
- * @brief Zwraca kolejny element wektora.
- * @param vectorIterator — iterator, który
+ * @brief Zwraca kolejny element zbioru.
+ * @param setIterator — iterator, który
  * wie, jaki element zwrócić
- * @return Kolejny element wektora, lub wartość
- * @p NULL, jeżeli koniec wektora został osiągnięty
+ * @return Kolejny element zbioru, lub wartość
+ * @p NULL, jeżeli zbiór został przejrzany.
  */
 void *getNextSetIterator(SetIterator *setIterator);
 

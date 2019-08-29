@@ -22,12 +22,18 @@ typedef struct Vector Vector;
  */
 typedef struct VectorIterator VectorIterator;
 
+/**
+ * Struktura będąca tablicą o zmiennej wielkości, zawierającą swoją wielkość.
+ */
 struct Vector {
     size_t size; ///< ilość elementów w wektorze
     size_t maxSize; ///< obecna maksymalna ilość elementów w wektorze
     void **data; ///< tablica przechowująca dane z wektora
 };
 
+/**
+ * Struktura do iterowania się po wektorze, po pozycji.
+ */
 struct VectorIterator {
     size_t position; ///< pozycja w tablicy na której akurat jest iterator
     Vector *vector; ///< wektor po którym następuje iteracja
@@ -58,8 +64,8 @@ void resetVector(Vector *vector);
  * @brief Wyszukuje i zwraca pole w wektorze związane z
  * z zadaną wartością.
  * @param vector — wektor w którym jest szukane
- * @param areEqual — funkcja zadająca porządek na elementach wektora
- * @param value — wartość która jest wyszukiwana
+ * @param areEqual — funkcja sprawdzająca czy 2 elementy są równe
+ * @param value — wyszukiwana wartość
  * @return Zwraca znalezioną wartość lub @p NULL, gdy nie jest ona
  * obecna w wektorze, lub któryś z parametrów
  * ma niepoprawną wartość
@@ -88,6 +94,7 @@ void popFromVector(Vector *vector, void deleteValue(void *));
  * @brief Usuwa zadany element z wektora.
  * @param vector — wektor z którego będzie usuwane
  * @param deleteValue — funkcja usuwająca element wektora
+ * @param areEqual — funkcja sprawdzająca czy 2 elementy są równe
  * @param value — element do usunięcia
  * @return Wartość @p true jeżeli udało się usunąć.
  * Wartość @p false, jeżeli element do usunięcia nie jest zawarty

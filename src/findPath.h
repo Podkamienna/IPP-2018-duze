@@ -73,7 +73,7 @@ int compareFindPathResults(FindPathResult *findPathResult1, FindPathResult *find
 
 /**
  * @brief Znajduje najkrótszą ścieżkę pomiędzy zadanymi miastami, nie przechodzącą
- * przez rzeczy z zadanej listy.
+ * przez rzeczy z zadanej listy, używając wariantu algorytmu Dijkstry.
  * @param map — mapa w której ścieżka jest wyszukiwana
  * @param source — miasto początkowe
  * @param destination — miasto końcowe

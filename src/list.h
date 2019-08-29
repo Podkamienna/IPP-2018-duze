@@ -11,7 +11,7 @@
 #include <stdbool.h>
 
 /**
- * Struktura będąca jednym elementem listy.
+ * Elementem listy.
  */
 typedef struct ListNode ListNode;
 
@@ -25,17 +25,26 @@ typedef struct List List;
  */
 typedef struct ListIterator ListIterator;
 
+/**
+ * Struktura do przechowywania elementów listy.
+ */
 struct ListNode {
     void *data; ///< dane przechowywane w wierzchołku listy
-    ListNode *next; ///< następnu element listy
+    ListNode *next; ///< następny element listy
     ListNode *prev; ///< poprzedni element listy
 };
 
+/**
+ * Struktura będąca listą dwukierunkową, zawirającą jej początek i koniec.
+ */
 struct List {
     ListNode *beginning; ///< wskaźnik na początek listy
     ListNode *end; ///< wskaźnik na koniec listy
 };
 
+/**
+ * Struktura do iterowania się po liście, zawiera obecną pozycję.
+ */
 struct ListIterator {
     ListNode *listNode; ///< wskaźnik na element listy, na którym obecnie jest iterator
 };
@@ -75,6 +84,7 @@ bool addToList(List *list, void *value);
  * @param list — lista, w której wartość
  * będzie szukana
  * @param value — wartość, która będzie szukana
+ * @param areEqual — funkcja sprawdzająca czy 2 elementy są równe
  * @return Wartość @p true, jeżeli element został znaleziony.
  * Wartość @p false, jeżeli któryś z elementów wejściowych
  * ma wartość NULL lub wyszukiwany element nie istnieje.

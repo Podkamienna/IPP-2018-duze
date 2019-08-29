@@ -12,9 +12,6 @@
 #include <stdint.h>
 #include <string.h>
 
-//TODO komentarze przy typedefach czy przy strukturach????
-//TODO pozmieniać wszystkie krótkie komentarze na małe litery bez kropek, a duże na wielkie i kropki.
-
 /**
  * Duża liczba pierwsza.
  */
@@ -35,11 +32,17 @@ typedef struct HashTable HashTable;
  */
 typedef struct Entry Entry;
 
+/**
+ * Struktura będą tablicą hashującą.
+ */
 struct HashTable {
     Entry **table; ///< tablica na której jest tablica hashująca
     size_t size; ///< rozmiar tablicy hashującej
 };
 
+/**
+ * Struktura będąca wejściem tablicy hashującej.
+ */
 struct Entry {
     uint64_t hash; ///< hash nazwy z danego wejścia hash tablicy
     const char *name; ///< nazwa danego wejścia hash tablicy
@@ -80,10 +83,31 @@ static Entry *getNewEntry(const char *name, void *value);
  */
 static bool isEqual(uint64_t hash, const char *name, Entry *entry);
 
+/**
+ * @brief Zwraca pozycję elementu o danym hashu w danej
+ * tablicy hashującej
+ * @param hashTable — tablica hashująca w której pozycji szukamy
+ * @param hash – hash elementu, którego pozycja jest szuakna
+ * @return Pozycja elementu.
+ */
 static size_t getPosition(HashTable *hashTable, size_t hash);
 
+/**
+ * @brief Funkcja wkładająca nowy element tablicy hashującej
+ * do tej tablicy.
+ * @param hashTable — tablica, do której element ma być włożony
+ * @param entry — element do włożenia
+ * @return Wartość @p true jeżeli się udałó, wartość @p false,
+ * jeżeli element do włożenia juz jest w tablicy hashującej lub
+ * nie udało się zaalokować pamięci.
+ */
 static bool insertEntry(HashTable *hashTable, Entry *entry);
 
+/**
+ * @brief Usuwa wejście tablicy hashującej.
+ * @param entry — wejście do usunięcia
+ * @param deleteValue — funkcja usuwająca zawartość wejścia
+ */
 static void deleteEntry(Entry *entry, void deleteValue(void *));
 
 static uint64_t getHash(const char *text) {

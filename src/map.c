@@ -60,44 +60,49 @@ void deleteMap(Map *map) {
 
 bool addRoad(Map *map, const char *city1, const char *city2,
              unsigned length, int builtYear) {
-    FAIL_IF_LABELED(map == NULL, 4); // TODO zoptymalizwoac lebaled
-    FAIL_IF_LABELED(!isCityName(city1) || !isCityName(city2) || strcmp(city1, city2) == 0, 4);
-    FAIL_IF_LABELED(length == 0 || builtYear == 0, 4);
+    Road *newRoad = NULL;
+
+    FAIL_IF(map == NULL);
+    FAIL_IF(!isCityName(city1) || !isCityName(city2) || strcmp(city1, city2) == 0);
+    FAIL_IF(length == 0 || builtYear == 0);
 
     City *newCity1 = searchCity(map, city1);
     City *newCity2 = searchCity(map, city2);
 
     if (newCity1 == NULL) {
         newCity1 = getNewCity(map, city1);
-        FAIL_IF_LABELED(newCity1 == NULL, 4);
+        FAIL_IF(newCity1 == NULL);
     }
 
     if (newCity2 == NULL) {
         newCity2 = getNewCity(map, city2);
-        FAIL_IF_LABELED(newCity2 == NULL, 4);
+        FAIL_IF(newCity2 == NULL);
     }
 
-    FAIL_IF_LABELED(searchRoad(map, newCity1, newCity2), 4);
+    FAIL_IF(searchRoad(map, newCity1, newCity2));
 
-    Road *newRoad = getNewRoad(builtYear, length, newCity1, newCity2);
-    FAIL_IF_LABELED(newRoad == NULL, 4);
+    newRoad = getNewRoad(builtYear, length, newCity1, newCity2);
+    FAIL_IF(newRoad == NULL);
 
-    FAIL_IF_LABELED(!pushToVector(map->roads, newRoad), 3);
-    FAIL_IF_LABELED(!insertSet(newCity2->roads, newRoad), 2);
-    FAIL_IF_LABELED(!insertSet(newCity1->roads, newRoad), 1);
+    FAIL_IF(!pushToVector(map->roads, newRoad));
+
+    if (!insertSet(newCity2->roads, newRoad)) {
+        popFromVector(map->roads, NULL);
+
+        FAIL;
+    }
+
+    if (!insertSet(newCity1->roads, newRoad)) {
+        deleteFromSet(newCity2->roads, NULL, newRoad);
+        popFromVector(map->roads, NULL);
+
+        FAIL;
+    }
 
     return true;
 
-    failure1:;
-    deleteFromSet(newCity2->roads, NULL, newRoad);
-
-    failure2:;
-    popFromVector(map->roads, NULL);
-
-    failure3:;
+    failure:;
     deleteRoad(newRoad);
-
-    failure4:;
     return false;
 }
 
@@ -134,7 +139,7 @@ bool newRoute(Map *map, unsigned routeId,
 
     findPathResult = findPath(map, searchDictionary(map->cities, city1), searchDictionary(map->cities, city2), NULL);
 
-    FAIL_IF(!isCorrectPathResult(findPathResult)); //sprawdzam, czy udało sie wyznaczyc droge i czy jednznacznie
+    FAIL_IF(!isCorrectPathResult(findPathResult)); //sprawdzam, czy udało sie wyznaczyć drogę i czy jednoznacznie
 
     Route *newRoute = findPathResultToRoute(findPathResult);
     FAIL_IF(newRoute == NULL);

@@ -16,6 +16,9 @@
  */
 typedef struct Heap Heap;
 
+/**
+ * Struktura będąca kopcem, zaimplementowanym jako tablica, umiejącym porównywać swoje elementy.
+ */
 struct Heap {
     Vector *vector; ///< wektor, na którym jest zaimplementowany kopiec
     int (*compare)(void *, void *); ///< funkcja do porównywania elementów kopca

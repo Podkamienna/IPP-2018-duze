@@ -14,12 +14,15 @@
 #include <string.h>
 #include <stdio.h>
 
-//stała reprezentująca maksymalną długość liczby
-//w systemie dziesiętnym do zamiany na napis
-const size_t MAX_NUMBER_LENGTH = 100;
+/**
+ * stała reprezentująca maksymalną długość liczby
+ * w systemie dziesiętnym do zamiany na napis
+ */
+
+static const size_t MAX_NUMBER_LENGTH = 100;
 
 /**
- * Struktura przechowująca napis.
+ * Struktura przechowująca napis o zmiennym rozmiarze.
  */
 struct String {
     size_t size; ///< rozmiar napisu

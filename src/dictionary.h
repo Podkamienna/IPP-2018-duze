@@ -11,6 +11,9 @@
 #include <stdbool.h>
 #include <stdlib.h>
 
+/**
+ * Słownik.
+ */
 typedef struct Dictionary Dictionary;
 
 /**

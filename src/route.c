@@ -16,9 +16,13 @@
 #include <stdlib.h>
 
 /**
- * Stałe z minimalnym i maksymalnym numerem drogi krajowej
+ * Minimalne id drogi krajowej.
  */
 const unsigned MINIMAL_ROUTE_ID = 1;
+
+/**
+ * Maksymalne id drogi krajowej.
+ */
 const unsigned MAXIMAL_ROUTE_ID = 999;
 
 PathNode *getNewPathNode(City *city, Road *road) {

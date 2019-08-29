@@ -15,6 +15,7 @@
 /**
  * @brief Alokuje pamięć pod i zwraca wskaźnik na
  * nowe miasto.
+ * @param map — mapa w której będzie to nowe miasto
  * @param name — nazwa nowego miasta
  * @return Wartość @p true jeżeli udało się dodać miasto.
  * Wartość @p false jeżeli nie udało się zaalokować pamięci,
@@ -122,14 +123,14 @@ void unblockRoad(Road *road);
 Road *searchRoad(Map *map, City *city1, City *city2);
 
 /**
- * @brief Wyszukuje miasta zadanego danym napisem w danej mapie.
- * @param map — mapa w której ma być wyszukiwane
- * @param city — napis zadający miasto, które ma być wyszukane
- * @return Wyszukiwane miasto jeżeli wszystko się powiodło,
- * NULL, jeżeli coś się nie powiodło - miasto nie istnieje
- * w mapie lub parametry wejściowe są nieprawidłowe.
+ * @brief Usuwa drogę między dwoma zadanymi miastami w zadanej mapie.
+ * @param map — mapa w której jest szukane
+ * @param city1 — jeden z końców drogi
+ * @param city2 — drugi z końców drogi
+ * @return Wartość @p true jeżeli udało się usunąć drogę,
+ * wartość @p false, jeżeli któryś ze wskaźników był NULLem,
+ * lub droga pomiędzy zadanymi miastami nie istnieje.
  */
-
 bool deleteRoadFromMap(Map *map, City *city1, City *city2);
 
 #endif //DROGI_CITIES_AND_ROADS_H

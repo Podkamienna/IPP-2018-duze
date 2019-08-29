@@ -52,14 +52,6 @@ typedef struct Vector Vector;
         if (condition) goto failure;    \
     } while(0)                          \
 
-/**
-* Jeżeli warunek jest spełniony, kończy wykonywanie funkcji,
-* wykonując wcześniej polecenia pod etykietą failure##label.
-*/
-#define FAIL_IF_LABELED(condition, label)    \
-    do {                                     \
-        if (condition) goto failure##label;  \
-    } while(0)                               \
 
 /**
  * Liczba dróg krajowych
@@ -71,30 +63,47 @@ typedef struct Vector Vector;
  */
 extern const char *DELIMITER;
 
+/**
+ * Struktura będąca mapą.
+ */
 struct Map {
     Route *routes[ROUTE_COUNT]; ///< tablica dróg krajowych
     Dictionary *cities; ///< słownik zawierający miasta dodane do mapy
     Vector *roads; ///< vector dróg dodanych do mapy
 };
 
+/**
+ * Struktura będąca miastem.
+ */
 struct City {
     size_t id; ///< id miasta
     char *name; ///< nazwa miasta
     Set *roads; ///< zbiór dróg wychodzących z miasta
 };
 
+/**
+ * Struktura będąca drogą.
+ */
 struct Road {
     bool isBlocked; ///< Parametr pozwalający stwierdzić, czy wolno przejechać daną drogą.
     unsigned length; ///< długość drogi
     int year; ///< Rok budowy/ostatniego remontu drogi.
-    City *city1, *city2; ///< końce drogi
+    City *city1; ///< jeden koniec drogi
+    City *city2; ///< drugi koniec drogi
 };
 
+/**
+ * Struktura będąca drogą krajową.
+ */
 struct Route {
     List *path; ///< najkrótsza ścieżka między source a destination
-    City *source, *destination; ///< miasto początkowe i końcowe ścieżki
+    City *source; ///< miasto początkowe ścieżki
+    City *destination; ///< miasto końcowe ścieżki
 };
 
+/**
+ * Struktura będąca wierzchołkiem ścieżki trzymanej przez drogę krajową.
+ */
 struct PathNode {
     City *city; ///< miasto
     Road *road; ///< droga wychodząca z city

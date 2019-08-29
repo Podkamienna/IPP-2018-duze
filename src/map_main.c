@@ -15,10 +15,20 @@
 
 #include <stdio.h>
 
+/**
+ * @brief Wypisuje wiadomości o błędach.
+ * @param lineNumber — numer linii w której wystąpił błąd
+ */
+static void printErrorMessage(size_t lineNumber);
+
 static void printErrorMessage(size_t lineNumber) {
     fprintf(stderr, "ERROR %zu\n", lineNumber);
 }
 
+/**
+ * @brief Główna funkcja programu
+ * @return Kod wyjścia.
+ */
 int main() {
     Vector *splittedInput = NULL;
     Map *map = NULL;

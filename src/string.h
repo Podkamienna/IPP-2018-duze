@@ -28,7 +28,6 @@ String *initializeString();
  * @brief Usuwa strukturę przechowującą napis,
  * @param string — struktura z napisem do usunięcia
  * @param deleteData — parametr wskazujący na to, czy usunąć napis
- * @param deleteValue — funkcja, która usuwa zawartość pola w wektorze
  */
 void deleteString(String *string, bool deleteData);
 
@@ -62,8 +61,8 @@ char *unsignedToString(unsigned number);
 
 /**
  * @brief Dodaje zadaną wartość na koniec napisu.
- * @param string — struktura z napisem do którego coś ma być dodane
- * @param value — wartość do dodania
+ * @param string1 — struktura z napisem do którego coś ma być dodane
+ * @param string2 — wartość do dodania
  * @return Wartość @p true jeżeli uda się dodać wartość,
  * wartość @p false, gdy coś nie wyjdzie: któryś z parametrów
  * ma niepoprawną wartość lub nie udało się zaalokować pamięci

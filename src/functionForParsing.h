@@ -20,6 +20,9 @@ typedef enum InputType InputType;
  */
 typedef struct Map Map;
 
+/**
+ * Enumerator, pozwalający określić, co robić z zadanym wejściem.
+ */
 enum InputType {
     INVALID, ///< wejście w którym jest błąd
     IGNORE, ///< wejście, które ma być ignorowane
