@@ -1,5 +1,8 @@
-/**
- * @file Implementacja struktury zbiór.
+/** @file
+ * Implementacja struktury zbiór.
+ *
+ * @author Alicja Ziarko <ala.ziarko@gmail.com>
+ * @date 05.07.2019
  */
 
 #include "set.h"

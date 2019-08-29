@@ -1,5 +1,8 @@
-/**
- * @file Implementacja klasy przechowującej mapę dróg krajowych
+/** @file
+ * Implementacja klasy przechowującej mapę dróg krajowych
+ *
+ * @author Alicja Ziarko <ala.ziarko@gmail.com>
+ * @date 02.07.2019
  */
 
 #include "map.h"

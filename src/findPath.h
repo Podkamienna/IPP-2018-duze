@@ -1,5 +1,8 @@
-/**
- * @file Interfejs modułu do znajdowania najkrótszej ścieżki.
+/** @file
+ * Interfejs modułu do znajdowania najkrótszej ścieżki.
+ *
+ * @author Alicja Ziarko <ala.ziarko@gmail.com>
+ * @date 22.08.2019
  */
 
 #ifndef DROGI_FIND_PATH_H

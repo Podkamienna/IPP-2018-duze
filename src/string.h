@@ -1,5 +1,8 @@
-/**
- * @file Interfejs struktury string, reprezentującej napis o zmiennej długości.
+/** @file
+ * Interfejs struktury string, reprezentującej napis o zmiennej długości.
+ *
+ * @author Alicja Ziarko <ala.ziarko@gmail.com>
+ * @date 11.08.2019
  */
 
 #ifndef DROGI_STRING_H

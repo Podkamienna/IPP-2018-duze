@@ -1,5 +1,8 @@
-/**
- * @file Interfejs listy wskaźnikowej dwukierunkowej.
+/** @file
+ * Interfejs listy wskaźnikowej dwukierunkowej.
+ *
+ * @author Alicja Ziarko <ala.ziarko@gmail.com>
+ * @date 02.07.2019
  */
 
 #ifndef DROGI_LIST_H

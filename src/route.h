@@ -1,7 +1,10 @@
-/**
- * @file Interfejs modułu zawierającego operacje na drogach krajowych
+/** @file
+ * Interfejs modułu zawierającego operacje na drogach krajowych
  * i pojedyńczych elementach tworzących listy będące ścieżkami w tych
  * drogach krajowych.
+ *
+ * @author Alicja Ziarko <ala.ziarko@gmail.com>
+ * @date 20.07.2019
  */
 
 #ifndef DROGI_ROUTE_H

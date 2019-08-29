@@ -1,5 +1,8 @@
-/**
- * @file Implementacja klasy będącej słownikiem.
+/** @file
+ * Implementacja klasy będącej słownikiem.
+ *
+ * @author Alicja Ziarko <ala.ziarko@gmail.com>
+ * @date 05.07.2019
  */
 
 #include "dictionary.h"

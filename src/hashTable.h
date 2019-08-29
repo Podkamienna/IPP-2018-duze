@@ -1,5 +1,8 @@
-/**
- * @file Interfejs tablicy hashującej.
+/** @file
+ * Interfejs tablicy hashującej.
+ *
+ * @author Alicja Ziarko <ala.ziarko@gmail.com>
+ * @date 09.07.2019
  */
 
 #ifndef DROGI_HASH_TABLE_H

@@ -1,5 +1,8 @@
-/**
- * @file Implementacja struktury będącej kopcem, zaimplementowanym w wersji tablicowej.
+/** @file
+ * Implementacja struktury będącej kopcem, zaimplementowanym w wersji tablicowej.
+ *
+ * @author Alicja Ziarko <ala.ziarko@gmail.com>
+ * @date 12.07.2019
  */
 
 #include "heap.h"

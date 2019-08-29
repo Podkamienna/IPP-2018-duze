@@ -1,5 +1,8 @@
-/**
- * @file Implementacja modułu z funkcjami używanymi do parsowania wejścia.
+/** @file
+ * Implementacja modułu z funkcjami używanymi do parsowania wejścia.
+ *
+ * @author Alicja Ziarko <ala.ziarko@gmail.com>
+ * @date 25.08.2019
  */
 
 #include "functionForParsing.h"

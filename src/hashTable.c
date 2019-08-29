@@ -1,5 +1,8 @@
-/**
- * @file Implementacja tablicy hashującej.
+/** @file
+ * Implementacja tablicy hashującej.
+ *
+ * @author Alicja Ziarko <ala.ziarko@gmail.com>
+ * @date 09.07.2019
  */
 
 #include "hashTable.h"

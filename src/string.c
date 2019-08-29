@@ -1,5 +1,8 @@
-/**
- * @file Implementacja struktury string, reprezentującej napis o zmiennej długości.
+/** @file
+ * Implementacja struktury string, reprezentującej napis o zmiennej długości.
+ *
+ * @author Alicja Ziarko <ala.ziarko@gmail.com>
+ * @date 11.08.2019
  */
 
 #define _GNU_SOURCE

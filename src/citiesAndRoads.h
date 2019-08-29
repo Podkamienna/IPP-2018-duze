@@ -1,5 +1,8 @@
-/**
- * @file Interfejs klasy przechowującej miasta i drogi.
+/** @file
+ * Interfejs klasy przechowującej miasta i drogi.
+ *
+ * @author Alicja Ziarko <ala.ziarko@gmail.com>
+ * @date 05.07.2019
  */
 
 #ifndef DROGI_CITIES_AND_ROADS_H

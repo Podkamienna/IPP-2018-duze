@@ -1,5 +1,8 @@
-/**
- * @file Interfejs struktury będącej kopcem.
+/** @file
+ * Interfejs struktury będącej kopcem.
+ *
+ * @author Alicja Ziarko <ala.ziarko@gmail.com>
+ * @date 12.07.2019
  */
 
 #ifndef DROGI_HEAP_H

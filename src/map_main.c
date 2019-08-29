@@ -1,6 +1,9 @@
-/**
- * @file Program pozwalający na wykonywanie operacji na mapie i zawartych
+/** @file
+ * Program pozwalający na wykonywanie operacji na mapie i zawartych
  * w niej miastach, drogach i drogach krajowych.
+ *
+ * @author Alicja Ziarko <ala.ziarko@gmail.com>
+ * @date 24.03.2019
  */
 
 #define _GNU_SOURCE

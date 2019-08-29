@@ -1,5 +1,8 @@
-/**
- * @file Interfejs klasy będącej słownikiem.
+/** @file
+ * Interfejs klasy będącej słownikiem.
+ *
+ * @author Alicja Ziarko <ala.ziarko@gmail.com>
+ * @date 05.07.2019
  */
 
 #ifndef DROGI_DICTIONARY_H

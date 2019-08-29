@@ -1,5 +1,8 @@
-/**
- * @file Implementacja modułu do znajdowania najkrótszej ścieżki.
+/** @file
+ * Implementacja modułu do znajdowania najkrótszej ścieżki.
+ *
+ * @author Alicja Ziarko <ala.ziarko@gmail.com>
+ * @date 22.08.2019
  */
 
 #include "findPath.h"

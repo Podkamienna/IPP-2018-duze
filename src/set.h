@@ -1,5 +1,8 @@
-/**
- * @file Interfejs struktury zbiór.
+/** @file
+ * Interfejs struktury zbiór.
+ *
+ * @author Alicja Ziarko <ala.ziarko@gmail.com>
+ * @date 05.07.2019
  */
 
 #ifndef DROGI_SET_H

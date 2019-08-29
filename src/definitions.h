@@ -1,5 +1,8 @@
-/**
- * @file Moduł zawierający definicje używane w projekcie.
+/** @file
+ * Moduł zawierający definicje używane w projekcie.
+ *
+ * @author Alicja Ziarko <ala.ziarko@gmail.com>
+ * @date 05.07.2019
  */
 
 #ifndef DROGI_DEFINITIONS_H

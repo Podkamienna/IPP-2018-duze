@@ -1,5 +1,8 @@
-/**
- * @file Implementacja listy wskaźnikowej dwukierunkowej.
+/** @file
+ * Implementacja listy wskaźnikowej dwukierunkowej.
+ *
+ * @author Alicja Ziarko <ala.ziarko@gmail.com>
+ * @date 02.07.2019
  */
 
 #include "list.h"

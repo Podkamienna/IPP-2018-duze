@@ -1,6 +1,9 @@
-/**
- * @file Implementacja struktury wektor reprezentującej dynamicznie alokowane tablice
+/** @file
+ * Implementacja struktury wektor reprezentującej dynamicznie alokowane tablice
  * o zmiennym rozmiarze.
+ *
+ * @author Alicja Ziarko <ala.ziarko@gmail.com>
+ * @date 02.07.2019
  */
 
 
