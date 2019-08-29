@@ -1,3 +1,8 @@
+/**
+ * @file Program pozwalający na wykonywanie operacji na mapie i zawartych
+ * w niej miastach, drogach i drogach krajowych.
+ */
+
 #define _GNU_SOURCE
 
 #include "map.h"

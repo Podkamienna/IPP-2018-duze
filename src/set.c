@@ -12,15 +12,15 @@
  * Struktura przechowująca zbiór.
  */
 struct Set {
-    Vector *vector;
-    bool (*areEqual)(void *, void *);
+    Vector *vector; ///< wektor na którym są przechowywane elementy zbioru
+    bool (*areEqual)(void *, void *); ///< predykat pozwalający na sprawdzenie, czy 2 elementy zbioru są równe
 };
 
 /**
  * Struktura przechowująca iterator na zbiór.
  */
 struct SetIterator {
-    VectorIterator *vectorIterator;
+    VectorIterator *vectorIterator; ///< iterator na wektor, na którym są elementy zbioru
 };
 
 Set *initializeSet(bool areEqual(void *, void *)) {

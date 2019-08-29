@@ -1,5 +1,7 @@
 /**
- * @file Interfejs 
+ * @file Interfejs modułu zawierającego operacje na drogach krajowych
+ * i pojedyńczych elementach tworzących listy będące ścieżkami w tych
+ * drogach krajowych.
  */
 
 #ifndef DROGI_ROUTE_H

@@ -1,5 +1,5 @@
 /**
- * @file Interfejs struktury będącej kopcem, zaimplementowanym w wersji tablicowej.
+ * @file Interfejs struktury będącej kopcem.
  */
 
 #ifndef DROGI_HEAP_H
@@ -7,6 +7,9 @@
 
 #include <stdbool.h>
 
+/**
+ * Struktura będąca kopcem.
+ */
 typedef struct Heap Heap;
 
 /**

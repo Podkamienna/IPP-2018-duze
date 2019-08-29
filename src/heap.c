@@ -1,5 +1,5 @@
 /**
- * @file Interfejs struktury będącej kopcem,
+ * @file Implementacja struktury będącej kopcem, zaimplementowanym w wersji tablicowej.
  */
 
 #include "heap.h"
@@ -8,12 +8,14 @@
 #include <stdbool.h>
 #include <stdlib.h>
 
+/**
+ * Struktura będąca kopcem.
+ */
 typedef struct Heap Heap;
 
 struct Heap {
-    Vector *vector;
-
-    int (*compare)(void *, void *);
+    Vector *vector; ///< wektor, na którym jest zaimplementowany kopiec
+    int (*compare)(void *, void *); ///< funkcja do porównywania elementów kopca
 };
 
 /**

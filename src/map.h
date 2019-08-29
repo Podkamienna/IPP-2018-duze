@@ -119,6 +119,10 @@ bool extendRoute(Map *map, unsigned routeId, const char *city);
  * uzupełnić przerwanego ciągu drogi krajowej lub nie udało się zaalokować
  * pamięci.
  */
+
+//TODO gdzie nie może być NULLem
+//TODO include'y
+//TODO komentarze
 bool removeRoad(Map *map, const char *city1, const char *city2);
 
 /** @brief Udostępnia informacje o drodze krajowej.
@@ -138,8 +142,28 @@ bool removeRoad(Map *map, const char *city1, const char *city2);
  */
 char const *getRouteDescription(Map *map, unsigned routeId);
 
+/**
+ * @brief Funkcja tworząca drogę krajową o zadany id, w której występują miasta o nazwach zadanych w tablicy,
+ * pomiędzy którymi są drogi o zadanych długościach i latach budowy, przy czym tablice zawierające parametry tych
+ * dróg są posortowane od pierwszej drogi do ostatniej.
+ * @param map — wskaźnika na strukturę przechowującą mapę dróg
+ * @param routeId — numer drogi krajowej
+ * @param cityNames — tablica nazw miast
+ * @param lengths — tablica długości kolejnych dróŋ
+ * @param years — tablica lat budowy kolejnych dróg
+ * @param roadCount — liczba dróg
+ * @return Wartość @p false, jeżeli któryś z parametrów jest NULLem, jeżeli numer drogi krajowej ma złą wartość,
+ * któraś z długości lub lat ma wartość 0, lub nie udało się zaalokować pamięci. Wartość @p true w innym razie.
+ */
 bool newRouteSpecified(Map *map, size_t routeId, char **cityNames, unsigned *lengths, int *years, size_t roadCount);
 
+/**
+ * @brief Usuwa drogę krajową z mapy.
+ * @param map — wskaźnika na strukturę przechowującą mapę dróg
+ * @param routeId — numer drogi krajowej
+ * @return Wartość @p false, jeżeli mapa jest NULLem, numer drogi krajowej ma złą wartość,
+ * lub podana droga krajowa nie istnieje. Wartość @p true w innym razie.
+ */
 bool removeRoute(Map *map, unsigned routeId);
 
 #endif /* DROGI_MAP_H */

@@ -1,5 +1,5 @@
-/** @file
- *
+/**
+ *  @file Interfejs tablicy hashującej.
  */
 
 #ifndef DROGI_HASH_TABLE_H
@@ -8,6 +8,9 @@
 #include <stdbool.h>
 #include <stdlib.h>
 
+/**
+ * Struktura będąca tablicą hashującą.
+ */
 typedef struct HashTable HashTable;
 
 /**

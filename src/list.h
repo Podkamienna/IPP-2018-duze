@@ -1,29 +1,40 @@
-//
-// Created by alicja on 01.08.2019.
-//
+/**
+ * @file Interfejs listy wskaźnikowej dwukierunkowej.
+ */
 
 #ifndef DROGI_LIST_H
 #define DROGI_LIST_H
 
 #include <stdbool.h>
 
+/**
+ * Struktura będąca jednym elementem listy.
+ */
 typedef struct ListNode ListNode;
+
+/**
+ * Struktura będąca listą.
+ */
 typedef struct List List;
+
+/**
+ * Iterator na listę.
+ */
 typedef struct ListIterator ListIterator;
 
 struct ListNode {
-    void *data;
-    ListNode *next;
-    ListNode *prev;
+    void *data; ///< dane przechowywane w wierzchołku listy
+    ListNode *next; ///< następnu element listy
+    ListNode *prev; ///< poprzedni element listy
 };
 
 struct List {
-    ListNode *beginning; // wskaźnik na początek listy
-    ListNode *end; // wskaźnik na koniec listy
+    ListNode *beginning; ///< wskaźnik na początek listy
+    ListNode *end; ///< wskaźnik na koniec listy
 };
 
 struct ListIterator {
-    ListNode *listNode;
+    ListNode *listNode; ///< wskaźnik na element listy, na którym obecnie jest iterator
 };
 
 /**

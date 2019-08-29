@@ -8,9 +8,14 @@
 #include <stdbool.h>
 #include <stdlib.h>
 
-/**Struktura przechowująca zbiór*/
+/**
+ * Struktura przechowująca zbiór
+ */
 typedef struct Set Set;
-/**Struktura przechowująca iterator na zbiór*/
+
+/**
+ * Struktura przechowująca iterator na zbiór
+ */
 typedef struct SetIterator SetIterator;
 
 /**
@@ -26,6 +31,12 @@ Set *initializeSet(bool areEqual(void *, void *));
  */
 void deleteSet(Set *set, void deleteValue(void *));
 
+/**
+ * @brief Zwraca rozmiar zbioru.
+ * @param set — zbiór, którego rozmiar ma być zwrócony
+ * @return Wartość @p 0, gdy przekazany paramentr to NULL,
+ * ilość elementów w zbiorze w innym razie.
+ */
 size_t getSetSize(Set *set);
 
 /**
@@ -75,7 +86,6 @@ SetIterator *getNewSetIterator(Set *set);
  * @param vectorIterator — iterator do usunięcia.
  */
 void deleteSetIterator(SetIterator *setIterator);
-
 
 /**
  * @brief Zwraca kolejny element wektora.

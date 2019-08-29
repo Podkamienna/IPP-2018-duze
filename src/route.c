@@ -1,6 +1,8 @@
-//
-// Created by alicja on 19.07.19.
-//
+/**
+ * @file Implementacja modułu zawierającego operacje na drogach krajowych
+ * i pojedyńczych elementach tworzących listy będące ścieżkami w tych
+ * drogach krajowych.
+ */
 
 #include "route.h"
 #include "definitions.h"
@@ -10,7 +12,9 @@
 #include <stdbool.h>
 #include <stdlib.h>
 
-/** Stałe z minimalnym i maksymalnym numerem drogi krajowej */
+/**
+ * Stałe z minimalnym i maksymalnym numerem drogi krajowej
+ */
 const unsigned MINIMAL_ROUTE_ID = 1;
 const unsigned MAXIMAL_ROUTE_ID = 999;
 

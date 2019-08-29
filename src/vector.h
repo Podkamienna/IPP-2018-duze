@@ -9,20 +9,25 @@
 #include <stdlib.h>
 #include <stdbool.h>
 
-/** Struktura przechowująca wektor. */
+/**
+ * Struktura przechowująca wektor.
+ */
 typedef struct Vector Vector;
-/** Struktura przechowująca iterator po wektorze*/
+
+/**
+ * Struktura przechowująca iterator po wektorze
+ */
 typedef struct VectorIterator VectorIterator;
 
 struct Vector {
-    size_t size;
-    size_t maxSize;
-    void **data;
+    size_t size; ///< ilość elementów w wektorze
+    size_t maxSize; ///< obecna maksymalna ilość elementów w wektorze
+    void **data; ///< tablica przechowująca dane z wektora
 };
 
 struct VectorIterator {
-    size_t position;
-    Vector *vector;
+    size_t position; ///< pozycja w tablicy na której akurat jest iterator
+    Vector *vector; ///< wektor po którym następuje iteracja
 };
 
 /**

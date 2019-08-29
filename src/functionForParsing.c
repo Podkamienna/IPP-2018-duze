@@ -12,6 +12,17 @@
 #include <errno.h>
 #include <limits.h>
 
+//TODO tu skończyłam
+/**
+ * @brief Funkcja konwertująca napis na liczbę.
+ * @param string — napis do przekonwertowania
+ * @param numberPtr — wskaźnik na liczbę, jeżeli
+ * wykonanie funkcji się powiedzie, to będzie zawierało
+ * przekonwertowany napis.
+ * @return Wartość @p true, jeżeli konwersja się powiodła.
+ * Wartość @p false, jeżeli zadany napis jest NULLem, pustym napisem,
+ * zaczyna się od znaku '-', a także, gdy nie mieści się w typie unsigned.
+ */
 static bool stringToUnsigned(const char *string, unsigned *numberPtr);
 
 static bool stringToInt(const char *string, int *numberPtr);

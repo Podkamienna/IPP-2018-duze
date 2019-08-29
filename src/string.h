@@ -9,7 +9,9 @@
 #include <stdlib.h>
 #include <stdbool.h>
 
-/** Struktura przechowująca napis. */
+/**
+ * Struktura przechowująca napis.
+ */
 typedef struct String String;
 
 /**

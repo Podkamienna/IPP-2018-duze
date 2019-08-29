@@ -1,5 +1,5 @@
-/** @file
- *
+/**
+ *  @file Implementacja tablicy hashującej.
  */
 
 #include "hashTable.h"
@@ -9,21 +9,38 @@
 #include <stdint.h>
 #include <string.h>
 
-static const uint64_t PRIME = 179425373; //duża liczba pierwsza
-static const uint64_t GENERATOR = 259; //generator grupy multiplikatywnej Z_{PRIME}
+//TODO komentarze przy typedefach czy przy strukturach????
+//TODO pozmieniać wszystkie krótkie komentarze na małe litery bez kropek, a duże na wielkie i kropki.
 
+/**
+ * Duża liczba pierwsza.
+ */
+static const uint64_t PRIME = 179425373;
+
+/**
+ * Generator grupy multiplikatywnej Z_{PRIME}.
+ */
+static const uint64_t GENERATOR = 259;
+
+/**
+ * Struktura przechowująca tablicę hashującą.
+ */
 typedef struct HashTable HashTable;
+
+/**
+ * Struktura przechowująca jedno wejście tablicy hashującej,
+ */
 typedef struct Entry Entry;
 
 struct HashTable {
-    Entry **table;
-    size_t size;
+    Entry **table; ///< tablica na której jest tablica hashująca
+    size_t size; ///< rozmiar tablicy hashującej
 };
 
 struct Entry {
-    uint64_t hash;
-    const char *name;
-    void *value;
+    uint64_t hash; ///< hash nazwy z danego wejścia hash tablicy
+    const char *name; ///< nazwa danego wejścia hash tablicy
+    void *value; ///< wartość przypisana danemu napisowi w hash tablicy
 };
 
 /**
@@ -128,7 +145,6 @@ static bool insertEntry(HashTable *hashTable, Entry *entry) {
     return false;
 }
 
-//usuwa wejście hash tablicy
 static void deleteEntry(Entry *entry, void deleteValue(void *)) {
     if (entry == NULL) {
         return;

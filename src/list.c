@@ -1,6 +1,6 @@
-//
-// Created by alicja on 01.08.2019.
-//
+/**
+ * @file Implementacja listy wskaźnikowej dwukierunkowej.
+ */
 
 #include "list.h"
 
