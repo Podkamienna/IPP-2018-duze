@@ -33,11 +33,11 @@ static bool addCityToMap(Map *map, City *city) {
     return insertDictionary(map->cities, city->name, city);
 }
 
-City *getNewCity(Map *map, const char *name) {
+City *getNewCity(Map *map, const char *cityName) {
     City *newCity = NULL;
 
-    FAIL_IF(name == NULL);
-    FAIL_IF(!isCityName(name));
+    FAIL_IF(cityName == NULL);
+    FAIL_IF(!isCityName(cityName));
 
     newCity = calloc(1, sizeof(City));
     FAIL_IF(newCity == NULL);
@@ -45,7 +45,7 @@ City *getNewCity(Map *map, const char *name) {
     newCity->roads = initializeSet((bool (*)(void *, void *)) areEqualRoads);
     FAIL_IF(newCity->roads == NULL);
 
-    newCity->name = strdup(name);
+    newCity->name = strdup(cityName);
     FAIL_IF(newCity->name == NULL);
 
     newCity->id = getId(map->cities);
@@ -193,18 +193,18 @@ Road *searchRoad(Map *map, City *city1, City *city2) {
         return NULL;
     }
 
-    Road tmpRoad;
+    Road road;
 
-    tmpRoad.length = 0;
-    tmpRoad.year = 0;
-    tmpRoad.city1 = city1;
-    tmpRoad.city2 = city2;
+    road.length = 0;
+    road.year = 0;
+    road.city1 = city1;
+    road.city2 = city2;
 
     if (getSetSize(city1->roads) < getSetSize(city2->roads)) {
-        return searchSet(city1->roads, &tmpRoad);
+        return searchSet(city1->roads, &road);
     }
 
-    return searchSet(city2->roads, &tmpRoad);
+    return searchSet(city2->roads, &road);
 }
 
 bool deleteRoadFromMap(Map *map, City *city1, City *city2) {
@@ -212,14 +212,14 @@ bool deleteRoadFromMap(Map *map, City *city1, City *city2) {
         return false;
     }
 
-    Road *tmpRoad = searchRoad(map, city1, city2);
+    Road *road = searchRoad(map, city1, city2);
 
-    if (tmpRoad == NULL) {
+    if (road == NULL) {
         return false;
     }
 
-    deleteFromSet(city1->roads, NULL, tmpRoad);
-    deleteFromSet(city2->roads, NULL, tmpRoad);
+    deleteFromSet(city1->roads, NULL, road);
+    deleteFromSet(city2->roads, NULL, road);
 
     return true;
 }

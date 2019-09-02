@@ -5,4 +5,7 @@
  * @date 05.07.2019
  */
 
+/**
+ * Znak oddzielający kolejne wyrazy w wejściu
+ */
 const char *DELIMITER = ";";

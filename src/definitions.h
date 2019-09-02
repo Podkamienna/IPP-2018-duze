@@ -85,9 +85,9 @@ struct City {
  * Struktura będąca drogą.
  */
 struct Road {
-    bool isBlocked; ///< Parametr pozwalający stwierdzić, czy wolno przejechać daną drogą.
+    bool isBlocked; ///< parametr pozwalający stwierdzić, czy wolno przejechać daną drogą
     unsigned length; ///< długość drogi
-    int year; ///< Rok budowy/ostatniego remontu drogi.
+    int year; ///< rok budowy/ostatniego remontu drogi
     City *city1; ///< jeden koniec drogi
     City *city2; ///< drugi koniec drogi
 };

@@ -16,12 +16,12 @@
  * @brief Alokuje pamięć pod i zwraca wskaźnik na
  * nowe miasto.
  * @param map — mapa w której będzie to nowe miasto
- * @param name — nazwa nowego miasta
+ * @param cityName — nazwa nowego miasta
  * @return Wartość @p true jeżeli udało się dodać miasto.
  * Wartość @p false jeżeli nie udało się zaalokować pamięci,
  * lub jeżeli zadany napis nie jest poprawną nazwą miasta.
  */
-City *getNewCity(Map *map, const char *name);
+City *getNewCity(Map *map, const char *cityName);
 
 /**
  * @brief Usuwa zadane miasto.

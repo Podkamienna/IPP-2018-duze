@@ -106,20 +106,20 @@ bool addRoad(Map *map, const char *city1, const char *city2,
     return false;
 }
 
-bool repairRoad(Map *map, const char *city1, const char *city2, int repairYear) {
+bool repairRoad(Map *map, const char *cityName1, const char *cityName2, int repairYear) {
     FAIL_IF(map == NULL);
-    FAIL_IF(!isCityName(city1) || !isCityName(city2));
+    FAIL_IF(!isCityName(cityName1) || !isCityName(cityName2));
     FAIL_IF(repairYear == 0);
 
-    City *tmpCity1 = searchCity(map, city1), *tmpCity2 = searchCity(map, city2);
-    FAIL_IF(tmpCity1 == NULL || tmpCity2 == NULL);
+    City *city1 = searchCity(map, cityName1), *city2 = searchCity(map, cityName2);
+    FAIL_IF(city1 == NULL || city2 == NULL);
 
-    Road *tmpRoad = searchRoad(map, tmpCity1, tmpCity2);
-    FAIL_IF(tmpRoad == NULL);
+    Road *road = searchRoad(map, city1, city2);
+    FAIL_IF(road == NULL);
 
-    FAIL_IF(tmpRoad->year > repairYear);
+    FAIL_IF(road->year > repairYear);
 
-    tmpRoad->year = repairYear;
+    road->year = repairYear;
 
     return true;
 
@@ -139,7 +139,7 @@ bool newRoute(Map *map, unsigned routeId,
 
     findPathResult = findPath(map, searchDictionary(map->cities, city1), searchDictionary(map->cities, city2), NULL);
 
-    FAIL_IF(!isCorrectPathResult(findPathResult)); //sprawdzam, czy udało sie wyznaczyć drogę i czy jednoznacznie
+    FAIL_IF(!isCorrectPathResult(findPathResult)); // Sprawdzam, czy udało sie wyznaczyć drogę i czy jednoznacznie
 
     Route *newRoute = findPathResultToRoute(findPathResult);
     FAIL_IF(newRoute == NULL);
@@ -185,8 +185,10 @@ bool extendRoute(Map *map, unsigned routeId, const char *cityName) {
 
     int compareResult = compareFindPathResults(findPathResult1, findPathResult2);
 
+    // Jeżeli ścieżki są równie dobre, to ścieżka nie jest jednoznaczna.
     FAIL_IF(compareResult == 0);
 
+    // Wybieranie lepszej ścieżki
     if (compareResult < 0) {
         deleteFindPathResult(findPathResult2);
         findPathResult2 = NULL;
@@ -220,33 +222,16 @@ bool extendRoute(Map *map, unsigned routeId, const char *cityName) {
     return false;
 }
 
-/** @brief Usuwa odcinek drogi między dwoma różnymi miastami.
- * Usuwa odcinek drogi między dwoma miastami. Jeśli usunięcie tego odcinka drogi
- * powoduje przerwanie ciągu jakiejś drogi krajowej, to uzupełnia ją
- * istniejącymi odcinkami dróg w taki sposób, aby była najkrótsza. Jeśli jest
- * więcej niż jeden sposób takiego uzupełnienia, to dla każdego wariantu
- * wyznacza wśród dodawanych odcinków drogi ten, który był najdawniej wybudowany
- * lub remontowany i wybiera wariant z odcinkiem, który jest najmłodszy.
- * @param[in,out] map    – wskaźnik na strukturę przechowującą mapę dróg;
- * @param[in] city1      – wskaźnik na napis reprezentujący nazwę miasta;
- * @param[in] city2      – wskaźnik na napis reprezentujący nazwę miasta.
- * @return Wartość @p true, jeśli odcinek drogi został usunięty.
- * Wartość @p false, jeśli z powodu błędu nie można usunąć tego odcinka drogi:
- * któryś z parametrów ma niepoprawną wartość, nie ma któregoś z podanych miast,
- * nie istnieje droga między podanymi miastami, nie da się jednoznacznie
- * uzupełnić przerwanego ciągu drogi krajowej lub nie udało się zaalokować
- * pamięci.
- */
-bool removeRoad(Map *map, const char *city1, const char *city2) { //TODO cityName
-    City *tmpCity1 = searchCity(map, city1);
-    City *tmpCity2 = searchCity(map, city2);
+bool removeRoad(Map *map, const char *cityName1, const char *cityName2) {
+    City *city1 = searchCity(map, cityName1);
+    City *city2 = searchCity(map, cityName2);
     List **routesToInsert = NULL;
     PathNode *pathNode = NULL;
     Road *toRemove = NULL;
 
-    FAIL_IF(tmpCity1 == NULL || tmpCity2 == NULL);
+    FAIL_IF(city1 == NULL || city2 == NULL);
 
-    toRemove = searchRoad(map, tmpCity1, tmpCity2);
+    toRemove = searchRoad(map, city1, city2);
     FAIL_IF(toRemove == NULL);
 
     blockRoad(toRemove);
@@ -257,6 +242,9 @@ bool removeRoad(Map *map, const char *city1, const char *city2) { //TODO cityNam
     routesToInsert = calloc(ROUTE_COUNT, sizeof(List));
     FAIL_IF(routesToInsert == NULL);
 
+    // Dla każdego możliwego numeru drogi krajowej sprawdzam, czy droga do usunięcia jest w niej zawarta
+    // Jeżeli tak, to sprawdzam, czy da się da ją jednoznacznie zastąpić przez inną ścieżkę
+    // Jeżeli się nie da, to odblokowuję drogę do usunięcia. Jeżeli dla każdej się da, to usuwam drogę do usunięcia.
     for (unsigned i = MINIMAL_ROUTE_ID; i <= MAXIMAL_ROUTE_ID; i++) {
         if (map->routes[i] == NULL) {
             continue;
@@ -267,10 +255,10 @@ bool removeRoad(Map *map, const char *city1, const char *city2) { //TODO cityNam
         FindPathResult *findPathResult;
 
         if (searchResult != NULL) {
-            if (areEqualCities(tmpCity1, searchResult->city)) {
-                findPathResult = findPath(map, tmpCity1, tmpCity2, restrictedPath);
+            if (areEqualCities(city1, searchResult->city)) {
+                findPathResult = findPath(map, city1, city2, restrictedPath);
             } else {
-                findPathResult = findPath(map, tmpCity2, tmpCity1, restrictedPath);
+                findPathResult = findPath(map, city2, city1, restrictedPath);
             }
 
             if (!isCorrectPathResult(findPathResult)) {
@@ -292,7 +280,7 @@ bool removeRoad(Map *map, const char *city1, const char *city2) { //TODO cityNam
         }
     }
 
-    deleteRoadFromMap(map, tmpCity1, tmpCity2);
+    deleteRoadFromMap(map, city1, city2);
 
     deletePathNode(pathNode);
     free(routesToInsert);

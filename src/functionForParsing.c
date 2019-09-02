@@ -118,6 +118,7 @@ static bool executeNewRouteSpecified(Map *map, Vector *splittedVector) {
     years = malloc(roadCount * sizeof(int));
     FAIL_IF(years == NULL);
 
+    // Przepisanie argumentów na wektory odpowiadające konkretnemu typowi argumentu
     for (size_t i = 0; i < roadCount + 1; i++) {
         size_t position = 3 * i + 1;
 

@@ -233,6 +233,7 @@ static bool pushNeighbours(HeapEntry *heapEntry, Heap *heap, const bool *isVisit
     FAIL_IF(setIterator == NULL);
 
     for (Road *road = getNextSetIterator(setIterator); road != NULL; road = getNextSetIterator(setIterator)) {
+        // Jeżeli droga jest zablokowana to funkcja getNeighbour zwróci NULL
         City *neighbour = getNeighbour(road, heapEntry->city);
 
         if (neighbour == NULL) {
@@ -286,6 +287,7 @@ static Distance *calculateDistances(Map *map, City *source, City *destination, b
         distances[i] = WORST_DISTANCE;
     }
 
+    // Dijkstra z kolejką priorytetową (kopcem)
     while (!isEmptyHeap(heap)) {
         heapEntry = popHeap(heap);
 
@@ -333,6 +335,8 @@ static FindPathResult *reconstructPath(City *source, City *destination, Distance
     result->source = source;
     result->destination = destination;
     result->distance = distances[destination->id];
+
+    // Jeżeli ścieżka nie istnieje
     if (compareDistances(result->distance, WORST_DISTANCE) == 0) {
         return result;
     }
@@ -352,6 +356,7 @@ static FindPathResult *reconstructPath(City *source, City *destination, Distance
     Distance potentialNewDistance = WORST_DISTANCE;
     Distance currentDistance = BASE_DISTANCE;
 
+    // Idąc od końca, szukam miast, dystansy do których dodają się tak, że mogłyby być na najkrótszej ścieżce
     while (!areEqualCities(position, source)) {
         potentialNextPosition = NULL;
 
@@ -369,6 +374,8 @@ static FindPathResult *reconstructPath(City *source, City *destination, Distance
                                                              addRoadToDistance(distances[neighbour->id], road));
 
             if (compareDistances(distances[destination->id], distanceThroughNeighbour) == 0) {
+                // Jeżeli w pewnym momencie dystanse do dwóch miast są takie, że mogłyby wystąpić na najkrótszej
+                // ścieżce, to znaczy, że ścieżka nie jest jednoznaczna
                 if (potentialNextPosition != NULL) {
                     deleteSetIterator(setIterator);
                     deleteList(path, (void (*)(void *)) deletePathNode);
@@ -515,6 +522,7 @@ FindPathResult *findPath(Map *map, City *source, City *destination, List *restri
     isRestricted = calloc(cityCount, sizeof(bool));
     FAIL_IF(isRestricted == NULL);
 
+    //przepisanie listy niedostępnych miast na tablicę, z pominięciem początku i końca
     for (PathNode *path = getNextListIterator(listIterator); path != NULL; path = getNextListIterator(listIterator)) {
         isRestricted[path->city->id] = true;
     }
