@@ -46,7 +46,8 @@ set(SOURCE_FILES
         src/string.c
         src/string.h
         src/map_main.c
-        src/functionForParsing.c src/functionForParsing.h)
+        src/functionForParsing.c
+        src/functionForParsing.h)
 
 # Wskazujemy plik wykonywalny.
 add_executable(map ${SOURCE_FILES})
