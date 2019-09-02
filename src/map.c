@@ -403,7 +403,8 @@ bool newRouteSpecified(Map *map, size_t routeId, char **cityNames, unsigned *len
 
         exists[cities[i]->id] = true;
     }
-
+    // Jeżeli trzeba by zaalokować więcej, niż maksymalny rozmiar tablicy.
+    FAIL_IF(roadCount > SIZE_MAX / sizeof(Road *));
     roads = malloc(roadCount * sizeof(Road *));
     FAIL_IF(roads == NULL);
 
